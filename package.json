@@ -1,0 +1,24 @@
+{
+	"name": "chat-app",
+	"version": "1.0.0",
+	"description": "Secure programming exercise work",
+	"scripts": {
+		"install:all": "npm install && npm install --prefix frontend && npm install --prefix backend",
+		"start:frontend": "npm start --prefix frontend",
+		"start:backend": "npm start --prefix backend",
+		"start": "concurrently \"npm start --prefix frontend\" \"npm start --prefix backend\"",
+		"dev": "concurrently \"npm start --prefix frontend\" \"npm run dev --prefix backend\"",
+		"lint:frontend": "cd frontend && npm run lint",
+		"lint:backend": "cd backend && npm run lint",
+		"lint": "npm run lint -prefix frontend && npm run lint:backend",
+		"format": "prettier --write ."
+	},
+	"author": "",
+	"license": "ISC",
+	"devDependencies": {
+		"prettier": "^3.5.1"
+	},
+	"dependencies": {
+		"concurrently": "^9.1.2"
+	}
+}

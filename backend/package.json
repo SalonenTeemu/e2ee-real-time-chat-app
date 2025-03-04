@@ -1,0 +1,48 @@
+{
+	"name": "backend",
+	"version": "1.0.0",
+	"main": "index.js",
+	"scripts": {
+		"start": "tsx index.ts",
+		"dev": "nodemon --exec tsx index.ts",
+		"lint": "eslint . --fix"
+	},
+	"keywords": [],
+	"author": "",
+	"license": "ISC",
+	"description": "",
+	"dependencies": {
+		"bcrypt": "^5.1.1",
+		"cors": "^2.8.5",
+		"dotenv": "^16.4.7",
+		"express": "^4.21.2",
+		"jsonwebtoken": "^9.0.2",
+		"knex": "^3.1.0",
+		"pg": "^8.13.3",
+		"socket.io": "^4.8.1"
+	},
+	"devDependencies": {
+		"@eslint/js": "^9.20.0",
+		"@types/bcrypt": "^5.0.2",
+		"@types/cors": "^2.8.17",
+		"@types/express": "^5.0.0",
+		"@types/jsonwebtoken": "^9.0.9",
+		"eslint": "^8.57.1",
+		"globals": "^15.15.0",
+		"nodemon": "^3.1.9",
+		"tsx": "^4.19.2",
+		"typescript": "^5.7.3",
+		"typescript-eslint": "^8.24.1"
+	},
+	"nodemonConfig": {
+		"ext": "ts,json",
+		"ignore": [
+			".git",
+			"node_modules/*",
+			"test/*",
+			"views/*",
+			"docs/*"
+		],
+		"delay": 1000
+	}
+}
