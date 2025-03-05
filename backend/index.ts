@@ -1,45 +1,34 @@
 import express from 'express';
 import cors from 'cors';
 import http from 'http';
-import { Server } from 'socket.io';
+import cookieParser from 'cookie-parser';
 import { initializeDatabase } from './db/initDB';
 import authRoutes from './routes/authRoutes';
 import messageRoutes from './routes/messageRoutes';
+import { setupSocket } from './services/socket';
 
 const app = express();
-
 export const corsOptions = {
 	methods: ['GET', 'POST'],
 	allowedHeaders: ['Content-Type'],
-	origin: 'http://localhost:3000',
+	origin: process.env.FRONTEND_URL,
 	credentials: true,
 };
 
 // Middleware
 app.use(cors(corsOptions));
 app.use(express.json());
-
-const server = http.createServer(app);
-
-const io = new Server(server);
+app.use(cookieParser());
 
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/messages', messageRoutes);
 
-io.on('connection', (socket) => {
-	console.log('User connected:', socket.id);
-
-	socket.on('sendMessage', (data) => {
-		io.emit('receiveMessage', data);
-	});
-
-	socket.on('disconnect', () => {
-		console.log('User disconnected:', socket.id);
-	});
-});
+// Create HTTP server and pass it to WebSockets
+const server = http.createServer(app);
+setupSocket(server);
 
 server.listen(5000, () => {
 	initializeDatabase();
-	console.log('Server running on http://localhost:5000');
+	console.log(`Server running on ${process.env.BACKEND_URL}`);
 });
