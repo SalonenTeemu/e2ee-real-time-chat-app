@@ -1,11 +1,15 @@
 import { useState, useEffect } from 'react';
-import socket from '../services/socket';
+import socket from '../../services/socket';
+import { useAuth } from '../../context/AuthContext';
 
 const Chat = () => {
+	const { user } = useAuth();
 	const [message, setMessage] = useState('');
 	const [messages, setMessages] = useState<string[]>([]);
 
 	useEffect(() => {
+		if (!user) return;
+
 		socket.on('receiveMessage', (data) => {
 			setMessages((prev) => [...prev, data]);
 		});
@@ -13,7 +17,7 @@ const Chat = () => {
 		return () => {
 			socket.off('receiveMessage');
 		};
-	}, []);
+	}, [user]);
 
 	const sendMessage = () => {
 		if (message.trim() !== '') {
@@ -21,6 +25,10 @@ const Chat = () => {
 			setMessage('');
 		}
 	};
+
+	if (!user) {
+		return <p>You need to be logged in to view this page.</p>;
+	}
 
 	return (
 		<div>

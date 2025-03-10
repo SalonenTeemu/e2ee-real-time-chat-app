@@ -1,5 +1,8 @@
 import { io } from 'socket.io-client';
 
+/**
+ * Socket.io client instance
+ */
 const socket = io(import.meta.env.VITE_BACKEND_URL, {
 	transports: ['websocket'],
 	reconnection: true,

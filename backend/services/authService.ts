@@ -11,10 +11,10 @@ const refreshExpiration = env.REFRESH_TOKEN_EXPIRATION || '7d';
 
 export async function createTokens(user: User) {
 	try {
-		const accessToken = jwt.sign({ userId: user.id }, secret, {
+		const accessToken = jwt.sign({ userId: user.id, role: user.role }, secret, {
 			expiresIn: expiration,
 		});
-		const refreshToken = jwt.sign({ userId: user.id }, refreshSecret, {
+		const refreshToken = jwt.sign({ userId: user.id, role: user.role }, refreshSecret, {
 			expiresIn: refreshExpiration,
 		});
 		await addRefreshToken(user.id, refreshToken);

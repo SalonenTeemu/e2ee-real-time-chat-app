@@ -1,5 +1,5 @@
 {
-	"name": "chat-app",
+	"name": "e2e-encrypted-real-time-chat-app",
 	"version": "1.0.0",
 	"description": "Secure programming exercise work",
 	"scripts": {
@@ -16,7 +16,8 @@
 	"author": "",
 	"license": "ISC",
 	"devDependencies": {
-		"prettier": "^3.5.1"
+		"prettier": "^3.5.1",
+		"prettier-plugin-tailwindcss": "^0.6.11"
 	},
 	"dependencies": {
 		"concurrently": "^9.1.2"

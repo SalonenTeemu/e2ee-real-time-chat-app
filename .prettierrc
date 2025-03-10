@@ -6,5 +6,6 @@
 	"trailingComma": "es5",
 	"bracketSpacing": true,
 	"printWidth": 150,
-	"endOfLine": "auto"
+	"endOfLine": "auto",
+	"plugins": ["prettier-plugin-tailwindcss"]
 }
