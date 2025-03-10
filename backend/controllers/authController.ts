@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import bcrypt from 'bcrypt';
 import { validateRegisterAndLogin } from '../utils/validate';
 import { createUser, getUserByUsername } from '../db/queries/user';
-import { createTokens } from '../services/authService';
+import { createTokens, revokeARefreshToken } from '../services/authService';
 
 const isProduction = process.env.NODE_ENV === 'production';
 
@@ -67,5 +67,28 @@ export const login = async (req: Request, res: Response) => {
 	} catch (error) {
 		console.error('Error logging in:', error);
 		res.status(500).json({ message: 'Error logging in' });
+	}
+};
+
+/**
+ * Responds to a POST request to log out a user.
+ *
+ * @param req The request object
+ * @param res The response object
+ * @returns The response
+ */
+export const logout = async (req: Request, res: Response) => {
+	try {
+		const cookies = req.cookies;
+		const refreshToken = cookies.refresh_token;
+		if (refreshToken) {
+			await revokeARefreshToken(refreshToken);
+		}
+		res.clearCookie('access_token', { httpOnly: true, sameSite: 'strict', secure: isProduction, maxAge: 0 });
+		res.clearCookie('refresh_token', { httpOnly: true, sameSite: 'strict', secure: isProduction, maxAge: 0 });
+		res.status(200).json({ message: 'Logout successful' });
+	} catch (error) {
+		console.error('Error logging out:', error);
+		res.status(500).json({ message: 'Error logging out' });
 	}
 };

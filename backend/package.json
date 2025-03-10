@@ -5,7 +5,8 @@
 	"scripts": {
 		"start": "tsx index.ts",
 		"dev": "nodemon --exec tsx index.ts",
-		"lint": "eslint . --fix"
+		"lint": "eslint . --fix",
+		"format": "prettier --write ."
 	},
 	"keywords": [],
 	"author": "",

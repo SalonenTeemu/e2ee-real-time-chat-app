@@ -6,6 +6,9 @@ dotenv.config();
 
 const env = process.env;
 
+/**
+ * The database connection.
+ */
 const db: Knex = knex({
 	client: 'pg',
 	connection: {

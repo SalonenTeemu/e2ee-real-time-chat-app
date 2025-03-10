@@ -6,9 +6,15 @@ import { userTableName } from '../initDB';
  *
  * @param id The user ID
  * @returns The user with the given ID
+ * @throws Error if there is an issue retrieving the user
  */
 export const getUserById = async (id: string) => {
-	return db(userTableName).where({ id }).first();
+	try {
+		return db(userTableName).where({ id }).first();
+	} catch (error) {
+		console.error('Error getting user by ID:', error);
+		throw new Error('Error getting user by ID');
+	}
 };
 
 /**
@@ -16,9 +22,15 @@ export const getUserById = async (id: string) => {
  *
  * @param username The username of the user
  * @returns The user with the given username
+ * @throws Error if there is an issue retrieving the user
  */
 export const getUserByUsername = async (username: string) => {
-	return db(userTableName).where({ username }).first();
+	try {
+		return db(userTableName).where({ username }).first();
+	} catch (error) {
+		console.error('Error getting user by username:', error);
+		throw new Error('Error getting user by username');
+	}
 };
 
 /**
@@ -28,5 +40,10 @@ export const getUserByUsername = async (username: string) => {
  * @param hashedPassword The hashed password of the user
  */
 export const createUser = async (username: string, hashedPassword: string) => {
-	return db(userTableName).insert({ username, password: hashedPassword });
+	try {
+		return db(userTableName).insert({ username, password: hashedPassword });
+	} catch (error) {
+		console.error('Error creating user:', error);
+		throw new Error('Error creating user');
+	}
 };

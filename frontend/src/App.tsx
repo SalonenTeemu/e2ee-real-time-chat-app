@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import Home from './components/Home';
+import Navbar from './components/Navbar';
 import Login from './components/auth/Login';
 import Register from './components/auth/Register';
 import Chat from './components/chat/Chat';
@@ -14,6 +15,7 @@ function App() {
 	return (
 		<Router>
 			<AuthProvider>
+				<Navbar />
 				<div className="main-content">
 					<Routes>
 						<Route path="/" element={<Home />} />

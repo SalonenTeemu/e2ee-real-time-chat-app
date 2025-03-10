@@ -10,14 +10,13 @@
 		"dev": "concurrently \"npm run dev --prefix backend\" \"npm run dev --prefix frontend\"",
 		"lint:frontend": "cd frontend && npm run lint",
 		"lint:backend": "cd backend && npm run lint",
-		"lint": "npm run lint -prefix frontend && npm run lint:backend",
-		"format": "prettier --write ."
+		"lint": "npm run lint:frontend && npm run lint:backend",
+		"format": "npm run format -prefix frontend && npm run format -prefix backend"
 	},
 	"author": "",
 	"license": "ISC",
 	"devDependencies": {
-		"prettier": "^3.5.1",
-		"prettier-plugin-tailwindcss": "^0.6.11"
+		"prettier": "^3.5.1"
 	},
 	"dependencies": {
 		"concurrently": "^9.1.2"

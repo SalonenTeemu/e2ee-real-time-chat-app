@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext';
 import { validateRegisterAndLogin } from '../../utils/validate';
 
 /**
@@ -8,6 +9,7 @@ import { validateRegisterAndLogin } from '../../utils/validate';
  * @returns {JSX.Element} The Login component.
  */
 const Login = () => {
+	const authContext = useAuth();
 	const [username, setUsername] = useState('');
 	const [password, setPassword] = useState('');
 	const [errorMessage, setErrorMessage] = useState('');
@@ -41,6 +43,7 @@ const Login = () => {
 			});
 
 			if (res.ok) {
+				await authContext.fetchUser();
 				alert('Welcome!');
 				navigate('/chat');
 			} else {

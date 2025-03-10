@@ -1,15 +1,11 @@
 # e2e-encrypted-real-time-chat-app
 
 TODO:
-logout
-refresh
-profile fetch
-validate frontend
+profile fetch backend endpoint
+fix navbar
 menu to logout and showing username
+refresh backend endpoint
 
-- Homepage
-- Login and register pages
-- API requests for login and register
 - Chat page: user list, starting a chat, real-time messaging, chat history
 - Notifications
 - JSDocs

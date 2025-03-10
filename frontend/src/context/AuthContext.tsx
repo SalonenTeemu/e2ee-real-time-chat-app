@@ -6,6 +6,7 @@ import { User } from '../utils/types';
 interface AuthContextType {
 	user: User | null;
 	logout: () => void;
+	fetchUser: () => void;
 	setUser: (user: User | null) => void;
 }
 
@@ -88,7 +89,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 		return () => clearInterval(interval);
 	}, [user, logout]);
 
-	return <AuthContext.Provider value={{ user, logout, setUser }}>{children}</AuthContext.Provider>;
+	return <AuthContext.Provider value={{ user, logout, setUser, fetchUser }}>{children}</AuthContext.Provider>;
 };
 
 /**
