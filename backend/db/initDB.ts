@@ -1,4 +1,5 @@
 import db from './knex';
+import { USER } from '../utils/constants';
 
 const schemaName = 'chat';
 export const userTableName = `${schemaName}.users`;
@@ -31,7 +32,7 @@ const createTables = async () => {
 			table.uuid('id').defaultTo(db.raw('gen_random_uuid()')).primary();
 			table.string('username', 50).unique().notNullable();
 			table.string('password', 255).notNullable();
-			table.string('role', 20).defaultTo('user').notNullable();
+			table.string('role', 20).defaultTo(USER).notNullable();
 		});
 	}
 

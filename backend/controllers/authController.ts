@@ -1,8 +1,9 @@
 import { Request, Response } from 'express';
 import bcrypt from 'bcrypt';
 import { validateRegisterAndLogin } from '../utils/validate';
-import { createUser, getUserByUsername } from '../db/queries/user';
+import { createUser, getUserByUsername, getUserById } from '../db/queries/user';
 import { createTokens, revokeARefreshToken } from '../services/authService';
+import { CustomRequest } from '../middleware/user';
 
 const isProduction = process.env.NODE_ENV === 'production';
 
@@ -90,5 +91,31 @@ export const logout = async (req: Request, res: Response) => {
 	} catch (error) {
 		console.error('Error logging out:', error);
 		res.status(500).json({ message: 'Error logging out' });
+	}
+};
+
+/**
+ * Responds to a GET request to get the user profile.
+ *
+ * @param req The request object
+ * @param res The response object
+ * @returns The response
+ */
+export const getUserProfile = async (req: CustomRequest, res: Response) => {
+	try {
+		const reqUser = req.user;
+		if (!reqUser || !reqUser.id) {
+			res.status(401).json({ message: 'Unauthorized' });
+			return;
+		}
+		const user = await getUserById(reqUser.id);
+		if (!user) {
+			res.status(404).json({ message: 'User not found' });
+			return;
+		}
+		res.status(200).json({ message: { id: user.id, username: user.username, role: user.role } });
+	} catch (error) {
+		console.error('Error getting user profile:', error);
+		res.status(500).json({ message: 'Error getting user profile' });
 	}
 };

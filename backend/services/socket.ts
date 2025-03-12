@@ -1,7 +1,7 @@
 import { Server } from 'socket.io';
 import http from 'http';
-import jwt from 'jsonwebtoken';
 import cookie from 'cookie';
+import { verifyAccessToken } from './authService';
 
 export const setupSocket = (server: http.Server) => {
 	const io = new Server(server, {
@@ -26,9 +26,12 @@ export const setupSocket = (server: http.Server) => {
 				return next(new Error('Authentication error: No token found in cookies'));
 			}
 
-			const decoded = jwt.verify(token, process.env.JWT_SECRET!);
+			const decoded = verifyAccessToken(token);
+			if (!decoded) {
+				return next(new Error('Authentication error: Invalid token'));
+			}
 			socket.data.user = decoded;
-			next();
+			return next();
 		} catch (error) {
 			console.error(error);
 			return next(new Error('Authentication error: Invalid token or cookie parsing failed'));

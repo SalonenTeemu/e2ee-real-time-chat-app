@@ -17,10 +17,10 @@ const refreshExpiration = env.REFRESH_TOKEN_EXPIRATION || '7d';
  */
 export async function createTokens(user: User) {
 	try {
-		const accessToken = jwt.sign({ userId: user.id, role: user.role }, secret, {
+		const accessToken = jwt.sign({ id: user.id, role: user.role }, secret, {
 			expiresIn: expiration,
 		});
-		const refreshToken = jwt.sign({ userId: user.id, role: user.role }, refreshSecret, {
+		const refreshToken = jwt.sign({ id: user.id, role: user.role }, refreshSecret, {
 			expiresIn: refreshExpiration,
 		});
 		await addRefreshToken(user.id, refreshToken);
@@ -37,7 +37,7 @@ export async function createTokens(user: User) {
  * @param token The access token
  * @returns The user object, or null if the token is invalid
  */
-export async function verifyAccessToken(token: string) {
+export function verifyAccessToken(token: string) {
 	try {
 		const decoded = jwt.verify(token, secret);
 		if (!decoded) {

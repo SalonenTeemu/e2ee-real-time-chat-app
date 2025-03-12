@@ -1,9 +1,6 @@
 # e2e-encrypted-real-time-chat-app
 
 TODO:
-profile fetch backend endpoint
-fix navbar
-menu to logout and showing username
 refresh backend endpoint
 
 - Chat page: user list, starting a chat, real-time messaging, chat history
