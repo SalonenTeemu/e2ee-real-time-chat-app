@@ -1,7 +1,6 @@
 # e2e-encrypted-real-time-chat-app
 
 TODO:
-refresh backend endpoint
 
 - Chat page: user list, starting a chat, real-time messaging, chat history
 - Notifications

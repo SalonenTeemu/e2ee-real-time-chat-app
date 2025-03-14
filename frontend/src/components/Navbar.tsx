@@ -24,11 +24,11 @@ const Navbar = () => {
 				<div className="left-0 text-2xl font-bold text-white">E2E-Encrypted Chat App</div>
 
 				<div className="absolute left-1/2 -translate-x-1/2 transform space-x-6">
-					<Link to="/" className="font-semibold text-white hover:text-gray-200">
+					<Link to="/" className="text-lg font-semibold text-white hover:text-gray-400">
 						Home
 					</Link>
 					{user && (
-						<Link to="/chat" className="font-semibold text-white hover:text-gray-200">
+						<Link to="/chat" className="text-lg font-semibold text-white hover:text-gray-400">
 							Chat
 						</Link>
 					)}
@@ -58,7 +58,7 @@ const Navbar = () => {
 								<div className="absolute right-0 mt-2 w-48 rounded-md bg-white shadow-lg">
 									<button
 										onClick={handleLogout}
-										className="w-full rounded-md px-4 py-2 text-center text-gray-700 hover:bg-gray-200"
+										className="w-full rounded-md px-4 py-2 text-center text-gray-700 hover:bg-gray-400"
 									>
 										Logout
 									</button>
@@ -67,10 +67,10 @@ const Navbar = () => {
 						</>
 					) : (
 						<div className="space-x-4">
-							<Link to="/login" className="font-semibold text-white hover:text-gray-200">
+							<Link to="/login" className="font-semibold text-white hover:text-gray-400">
 								Login
 							</Link>
-							<Link to="/register" className="font-semibold text-white hover:text-gray-200">
+							<Link to="/register" className="font-semibold text-white hover:text-gray-400">
 								Register
 							</Link>
 						</div>

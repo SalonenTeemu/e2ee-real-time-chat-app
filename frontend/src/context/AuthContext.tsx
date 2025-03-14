@@ -73,7 +73,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 			if (!user) return;
 
 			try {
-				const res = await fetch('/api/auth/refresh', {
+				const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/auth/refresh`, {
 					method: 'POST',
 					credentials: 'include',
 				});

@@ -43,7 +43,7 @@ export function verifyAccessToken(token: string) {
 		if (!decoded) {
 			return null;
 		}
-		return decoded;
+		return decoded as User;
 	} catch (error) {
 		console.error('Error verifying access token:', error);
 		return null;
@@ -65,7 +65,7 @@ export async function verifyRefreshToken(token: string) {
 		if (!refreshToken || refreshToken.is_revoked) {
 			return null;
 		}
-		return decoded;
+		return decoded as User;
 	} catch (error) {
 		console.error('Error verifying refresh token:', error);
 		return null;

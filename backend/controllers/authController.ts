@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import bcrypt from 'bcrypt';
 import { validateRegisterAndLogin } from '../utils/validate';
 import { createUser, getUserByUsername, getUserById } from '../db/queries/user';
-import { createTokens, revokeARefreshToken } from '../services/authService';
+import { createTokens, revokeARefreshToken, verifyRefreshToken } from '../services/authService';
 import { CustomRequest } from '../middleware/user';
 
 const isProduction = process.env.NODE_ENV === 'production';
@@ -117,5 +117,35 @@ export const getUserProfile = async (req: CustomRequest, res: Response) => {
 	} catch (error) {
 		console.error('Error getting user profile:', error);
 		res.status(500).json({ message: 'Error getting user profile' });
+	}
+};
+
+/**
+ * Responds to a POST request to refresh the tokens.
+ *
+ * @param req The request object
+ * @param res The response object
+ * @returns The response
+ */
+export const refresh = async (req: CustomRequest, res: Response) => {
+	try {
+		const oldRefreshToken = req.cookies.refresh_token;
+		if (!oldRefreshToken) {
+			res.status(401).json({ message: 'Unauthorized' });
+			return;
+		}
+		const user = await verifyRefreshToken(oldRefreshToken);
+		if (!user) {
+			res.status(401).json({ message: 'Invalid or expired refresh token' });
+			return;
+		}
+		revokeARefreshToken(oldRefreshToken);
+		const { accessToken, refreshToken } = await createTokens(user);
+		res.cookie('access_token', accessToken, { httpOnly: true, sameSite: 'strict', secure: isProduction, maxAge: 15 * 60 * 1000 });
+		res.cookie('refresh_token', refreshToken, { httpOnly: true, sameSite: 'strict', secure: isProduction, maxAge: 7 * 24 * 60 * 60 * 1000 });
+		res.status(200).json({ message: 'Tokens refreshed' });
+	} catch (error) {
+		console.error('Error refreshing token:', error);
+		res.status(500).json({ message: 'Error refreshing token' });
 	}
 };
