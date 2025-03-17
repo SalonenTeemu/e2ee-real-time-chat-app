@@ -13,8 +13,8 @@ This project was developed as part of the COMP.SEC.300 Secure Programming course
 
 ## TODO
 
-- Show active users
-- Select user to start a chat
+- Show active users (registered users?)
+- Select user to start a chat (clicking a user opens a chat window?)
 - Saving chats and message history
 - Key exchange between users (X25519 (Elliptic Curve Diffie-Hellman))
 - Generate shared secret using ECDH (Elliptic Curve Diffie-Hellman)
