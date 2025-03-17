@@ -1,5 +1,5 @@
 /**
- * CORS middleware.
+ * CORS middleware options.
  */
 export const corsOptions = {
 	origin: process.env.FRONTEND_URL,

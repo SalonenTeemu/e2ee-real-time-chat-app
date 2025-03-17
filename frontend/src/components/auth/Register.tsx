@@ -12,7 +12,6 @@ const Register = () => {
 	const [password, setPassword] = useState('');
 	const [confirmPassword, setConfirmPassword] = useState('');
 	const [errorMessage, setErrorMessage] = useState('');
-	const [successMessage, setSuccessMessage] = useState('');
 	const navigate = useNavigate();
 
 	/**
@@ -22,7 +21,6 @@ const Register = () => {
 		e.preventDefault();
 
 		setErrorMessage('');
-		setSuccessMessage('');
 
 		const validation = validateRegisterAndLogin(username, password);
 		if (!validation.success) {
@@ -48,7 +46,6 @@ const Register = () => {
 			});
 
 			if (res.ok) {
-				setSuccessMessage('Registration successful. Please log in.');
 				alert('Registration successful. Please log in.');
 				navigate('/login');
 			} else {
@@ -108,9 +105,8 @@ const Register = () => {
 					</div>
 
 					{errorMessage && <p className="mb-4 text-center text-sm text-red-500">{errorMessage}</p>}
-					{successMessage && <p className="mb-4 text-center text-sm text-green-500">{successMessage}</p>}
 
-					<button type="submit" className="w-full rounded-lg bg-green-500 py-2 text-white hover:bg-green-600">
+					<button type="submit" className="w-full rounded-lg bg-green-600 py-2 text-white hover:bg-green-700">
 						Register
 					</button>
 				</form>

@@ -21,14 +21,14 @@ const Navbar = () => {
 	return (
 		<nav className="bg-gray-800 p-4">
 			<div className="mx-auto flex w-full items-center justify-between">
-				<div className="left-0 text-2xl font-bold text-white">E2E-Encrypted Chat App</div>
+				<div className="left-0 text-2xl font-bold text-white">Real-Time Chat App</div>
 
-				<div className="absolute left-1/2 -translate-x-1/2 transform space-x-6">
-					<Link to="/" className="text-lg font-semibold text-white hover:text-gray-400">
+				<div className="absolute left-1/2 -translate-x-1/2 transform space-x-6 text-lg">
+					<Link to="/" className="font-semibold text-white hover:text-gray-400">
 						Home
 					</Link>
 					{user && (
-						<Link to="/chat" className="text-lg font-semibold text-white hover:text-gray-400">
+						<Link to="/chat" className="font-semibold text-white hover:text-gray-400">
 							Chat
 						</Link>
 					)}
@@ -67,10 +67,10 @@ const Navbar = () => {
 						</>
 					) : (
 						<div className="space-x-4">
-							<Link to="/login" className="font-semibold text-white hover:text-gray-400">
+							<Link to="/login" className="text-lg font-semibold text-white hover:text-gray-400">
 								Login
 							</Link>
-							<Link to="/register" className="font-semibold text-white hover:text-gray-400">
+							<Link to="/register" className="text-lg font-semibold text-white hover:text-gray-400">
 								Register
 							</Link>
 						</div>

@@ -1,5 +1,5 @@
 {
-	"name": "e2e-encrypted-real-time-chat-app",
+	"name": "real-time-chat-app",
 	"version": "1.0.0",
 	"description": "Secure programming exercise work",
 	"scripts": {

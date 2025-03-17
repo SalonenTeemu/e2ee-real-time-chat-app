@@ -4,9 +4,9 @@
  * @param username The username to validate
  * @returns The result of the validation
  */
-function validateUsername(username: string): boolean {
+const validateUsername = (username: string): boolean => {
 	return username.length >= 4 && username.length <= 50;
-}
+};
 
 /**
  * Validate a password.
@@ -14,9 +14,9 @@ function validateUsername(username: string): boolean {
  * @param password The password to validate
  * @returns The result of the validation
  */
-function validatePassword(password: string): boolean {
+const validatePassword = (password: string): boolean => {
 	return password.length >= 6 && password.length <= 100 && /[a-z]/.test(password) && /[A-Z]/.test(password) && /[0-9]/.test(password);
-}
+};
 
 /**
  * Validate a username and password for registration and login.
@@ -25,7 +25,7 @@ function validatePassword(password: string): boolean {
  * @param password The password to validate
  * @returns The result of the validation
  */
-export function validateRegisterAndLogin(username: string, password: string): { success: boolean; message?: string } {
+export const validateRegisterAndLogin = (username: string, password: string): { success: boolean; message?: string } => {
 	if (!username || !password) {
 		return { success: false, message: 'Username and password are required.' };
 	}
@@ -39,4 +39,4 @@ export function validateRegisterAndLogin(username: string, password: string): { 
 		};
 	}
 	return { success: true };
-}
+};

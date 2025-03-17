@@ -2,6 +2,9 @@ import { Request, Response, NextFunction } from 'express';
 import { verifyAccessToken } from '../services/authService';
 import { GUEST } from '../utils/constants';
 
+/**
+ * Custom request object to include the user.
+ */
 export interface CustomRequest extends Request {
 	user?: any;
 }

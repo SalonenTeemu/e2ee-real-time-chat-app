@@ -11,7 +11,7 @@ import Chat from './components/chat/Chat';
  *
  * @returns {JSX.Element} The App component.
  */
-function App() {
+const App = () => {
 	return (
 		<Router>
 			<AuthProvider>
@@ -27,6 +27,6 @@ function App() {
 			</AuthProvider>
 		</Router>
 	);
-}
+};
 
 export default App;

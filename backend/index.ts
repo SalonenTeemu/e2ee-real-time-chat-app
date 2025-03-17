@@ -1,6 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import http from 'http';
+import helmet from 'helmet';
 import cookieParser from 'cookie-parser';
 import { initializeDatabase } from './db/initDB';
 import authRoutes from './routes/authRoutes';
@@ -12,6 +13,7 @@ const app = express();
 
 // Middleware
 app.use(cors(corsOptions));
+app.use(helmet());
 app.use(express.json());
 app.use(cookieParser());
 app.use(authenticateUserMiddleware);

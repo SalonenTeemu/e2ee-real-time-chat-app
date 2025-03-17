@@ -1,7 +1,7 @@
 import db from './knex';
 import { USER } from '../utils/constants';
 
-const schemaName = 'chat';
+const schemaName = 'chat-app';
 export const userTableName = `${schemaName}.users`;
 export const messageTableName = `${schemaName}.messages`;
 export const refreshTokenTableName = `${schemaName}.refresh_tokens`;

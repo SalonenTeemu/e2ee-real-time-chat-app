@@ -8,7 +8,7 @@ import { refreshTokenTableName } from '../initDB';
  * @param token The refresh token
  * @returns The refresh token
  */
-export async function addRefreshToken(user_id: string, token: string) {
+export const addRefreshToken = async (user_id: string, token: string) => {
 	try {
 		const expires_at = new Date(Date.now() + 1000 * 60 * 60 * 24 * 7);
 		return await db(refreshTokenTableName).insert({ user_id, token, expires_at });
@@ -16,7 +16,7 @@ export async function addRefreshToken(user_id: string, token: string) {
 		console.error('Error inserting record:', error);
 		throw new Error(`Error inserting  refresh token: ${error}`);
 	}
-}
+};
 
 /**
  * Retrieve a refresh token from the database.
@@ -24,14 +24,14 @@ export async function addRefreshToken(user_id: string, token: string) {
  * @param token The refresh token
  * @returns The refresh token
  */
-export async function getRefreshToken(token: string) {
+export const getRefreshToken = async (token: string) => {
 	try {
 		return await db(refreshTokenTableName).where({ token }).first();
 	} catch (error) {
 		console.error('Error getting refresh token:', error);
 		throw new Error(`Error getting refresh token: ${error}`);
 	}
-}
+};
 
 /**
  * Revoke a refresh token.
@@ -39,11 +39,11 @@ export async function getRefreshToken(token: string) {
  * @param token The refresh token
  * @returns The refresh token
  */
-export async function revokeRefreshToken(token: string) {
+export const revokeRefreshToken = async (token: string) => {
 	try {
 		return await db(refreshTokenTableName).where({ token }).update({ is_revoked: true });
 	} catch (error) {
 		console.error('Error revoking refresh token:', error);
 		throw new Error(`Error revoking refresh token: ${error}`);
 	}
-}
+};
