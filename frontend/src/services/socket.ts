@@ -22,4 +22,14 @@ socket.on('disconnect', (reason) => {
 	}
 });
 
+socket.on('connect_error', (error) => {
+	console.error('Connection error:', error.message);
+	alert('Connection error. Please refresh the page.');
+});
+
+socket.on('error', (error) => {
+	console.error('Server error:', error);
+	alert('Server error occurred. Try again later.');
+});
+
 export default socket;

@@ -43,7 +43,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 		}
 	};
 
-	// Fetch the user on initial render
+	// Fetch the user on mount
 	useEffect(() => {
 		fetchUser();
 	}, []);

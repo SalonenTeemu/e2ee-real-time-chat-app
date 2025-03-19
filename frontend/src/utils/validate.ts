@@ -53,3 +53,13 @@ export const validateRegisterAndLogin = (username: string, password: string): { 
 export const validateUserSearchTerm = (searchTerm: string): boolean => {
 	return searchTerm.length >= 1 && searchTerm.length <= 50;
 };
+
+/**
+ * Validate a message.
+ *
+ * @param message The message to validate
+ * @returns The result of the validation
+ */
+export const validateMessage = (message: string): boolean => {
+	return message.length >= 1 && message.length <= 1000;
+};

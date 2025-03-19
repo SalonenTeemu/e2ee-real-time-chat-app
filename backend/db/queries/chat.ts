@@ -1,5 +1,5 @@
 import db from '../knex';
-import { chatTableName } from '../initDB';
+import { chatTableName, userTableName } from '../initDB';
 
 /**
  * Returns a chat by the user IDs.
@@ -14,6 +14,27 @@ export const getChatByUsers = async (userId1: string, userId2: string) => {
 	} catch (error) {
 		console.error('Error getting chat:', error);
 		throw new Error(`Error getting chat: ${error}`);
+	}
+};
+
+/**
+ * Returns the chats for a user, including the other user's username.
+ *
+ * @param userId The user ID
+ * @returns The chats for the user with the other user's username
+ */
+export const getChatsByUserId = async (userId: string) => {
+	try {
+		const chats = await db(chatTableName)
+			.join(`${userTableName} as u1`, 'u1.id', '=', `${chatTableName}.user1_id`)
+			.join(`${userTableName} as u2`, 'u2.id', '=', `${chatTableName}.user2_id`)
+			.where({ user1_id: userId })
+			.orWhere({ user2_id: userId })
+			.select(`${chatTableName}.*`, db.raw(`CASE WHEN user1_id = ? THEN u2.username ELSE u1.username END as other_username`, [userId]));
+		return chats;
+	} catch (error) {
+		console.error('Error getting chats:', error);
+		throw new Error(`Error getting chats: ${error}`);
 	}
 };
 
