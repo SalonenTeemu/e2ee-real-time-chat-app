@@ -11,7 +11,6 @@ const Chat = () => {
 	const [message, setMessage] = useState('');
 	const [messages, setMessages] = useState<string[]>([]);
 
-	// Search users
 	const searchUsers = async () => {
 		if (!searchTerm.trim() || !validateUserSearchTerm(searchTerm)) {
 			alert('Invalid search term');
@@ -33,7 +32,6 @@ const Chat = () => {
 		}
 	};
 
-	// Start or fetch chat
 	const startChat = async (otherUserId: string) => {
 		try {
 			const res = await fetch('/api/chat/start', {
@@ -50,10 +48,8 @@ const Chat = () => {
 			}
 			setChatId(data.chatId);
 
-			// Join the chat room in Socket.IO
 			socket.emit('joinChat', data.chatId);
 
-			// Listen for messages in the specific room
 			socket.on('receiveMessage', (data) => {
 				setMessages((prev) => [...prev, data]);
 			});

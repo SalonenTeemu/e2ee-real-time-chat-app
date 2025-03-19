@@ -3,6 +3,7 @@ import { USER } from '../utils/constants';
 
 const schemaName = 'chat-app';
 export const userTableName = `${schemaName}.users`;
+export const chatTableName = `${schemaName}.chats`;
 export const messageTableName = `${schemaName}.messages`;
 export const refreshTokenTableName = `${schemaName}.refresh_tokens`;
 
@@ -36,9 +37,19 @@ const createTables = async () => {
 		});
 	}
 
+	if (!(await db.schema.withSchema(schemaName).hasTable('chats'))) {
+		await db.schema.withSchema(schemaName).createTable('chats', (table) => {
+			table.uuid('id').defaultTo(db.raw('gen_random_uuid()')).primary();
+			table.uuid('user1_id').references('id').inTable(userTableName).notNullable();
+			table.uuid('user2_id').references('id').inTable(userTableName).notNullable();
+			table.timestamp('created_at').defaultTo(db.fn.now());
+		});
+	}
+
 	if (!(await db.schema.withSchema(schemaName).hasTable('messages'))) {
 		await db.schema.withSchema(schemaName).createTable('messages', (table) => {
 			table.uuid('id').defaultTo(db.raw('gen_random_uuid()')).primary();
+			table.uuid('chat_id').references('id').inTable('chats').notNullable();
 			table.uuid('sender_id').references('id').inTable(userTableName).notNullable();
 			table.uuid('receiver_id').references('id').inTable(userTableName).notNullable();
 			table.text('content').notNullable();

@@ -46,26 +46,22 @@ export const setupSocket = (server: http.Server) => {
 	});
 
 	io.on('connection', (socket) => {
-		console.log('User connected:', socket.data.user.id);
+		console.log('User connected:', socket.data.user.username);
 
-		socket.on('sendMessage', (message) => {
-			io.emit('receiveMessage', { user: socket.data.user.id, message });
+		socket.on('joinChat', (chatId) => {
+			socket.join(chatId);
+			console.log(`User joined chat room: ${chatId}`);
+		});
+
+		socket.on('sendMessage', ({ chatId, message }) => {
+			io.to(chatId).emit('receiveMessage', {
+				user: socket.data.user.username,
+				message,
+			});
 		});
 
 		socket.on('disconnect', () => {
-			console.log('User disconnected:', socket.data.user.id);
-		});
-	});
-
-	io.on('connection', (socket) => {
-		console.log('User connected:', socket.data.user.id);
-
-		socket.on('sendMessage', (message) => {
-			io.emit('receiveMessage', { user: socket.data.user.id, message });
-		});
-
-		socket.on('disconnect', () => {
-			console.log('User disconnected:', socket.data.user.id);
+			console.log('User disconnected:', socket.data.user.username);
 		});
 	});
 };

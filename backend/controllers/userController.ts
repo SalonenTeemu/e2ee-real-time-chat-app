@@ -4,7 +4,7 @@ import { validateUserSearchTerm } from '../utils/validate';
 import { searchUsersByUsername } from '../db/queries/user';
 
 /**
- * Search for users by their username.
+ * Responds to a GET request to search for users by username.
  *
  * @param req The request object
  * @param res The response object
