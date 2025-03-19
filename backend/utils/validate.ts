@@ -40,3 +40,13 @@ export const validateRegisterAndLogin = (username: string, password: string): { 
 	}
 	return { success: true };
 };
+
+/**
+ * Validate a user search term.
+ *
+ * @param searchTerm The user search term to validate
+ * @returns The result of the validation
+ */
+export const validateUserSearchTerm = (searchTerm: string): boolean => {
+	return searchTerm.length >= 1 && searchTerm.length <= 50;
+};

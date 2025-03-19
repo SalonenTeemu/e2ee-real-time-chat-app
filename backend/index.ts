@@ -5,6 +5,7 @@ import helmet from 'helmet';
 import cookieParser from 'cookie-parser';
 import { initializeDatabase } from './db/initDB';
 import authRoutes from './routes/authRoutes';
+import userRoutes from './routes/userRoutes';
 import { setupSocket } from './services/socket';
 import { authenticateUserMiddleware } from './middleware/user';
 import { corsOptions } from './middleware/cors';
@@ -20,6 +21,7 @@ app.use(authenticateUserMiddleware);
 
 // Routes
 app.use('/api/auth', authRoutes);
+app.use('/api/users', userRoutes);
 
 // Create HTTP server and pass it to WebSockets
 const server = http.createServer(app);

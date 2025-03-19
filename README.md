@@ -2,7 +2,7 @@
 
 This is a real-time end-to-end encrypted chat application built with a Node.js + Express.js backend and a React + TailwindCSS frontend.
 
-This project is developed as part of the COMP.SEC.300 Secure Programming course exercise work.
+The project is created for the COMP.SEC.300 Secure programming course exercise work.
 
 ## Planned Features
 
@@ -13,7 +13,6 @@ This project is developed as part of the COMP.SEC.300 Secure Programming course 
 
 ## TODO
 
-- Show active users (registered users?)
 - Select user to start a chat (clicking a user opens a chat window?)
 - Saving chats and message history
 - Key exchange between users (X25519 (Elliptic Curve Diffie-Hellman))

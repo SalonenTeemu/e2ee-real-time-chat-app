@@ -47,3 +47,18 @@ export const createUser = async (username: string, hashedPassword: string) => {
 		throw new Error('Error creating user');
 	}
 };
+
+/**
+ * Search for users by their username.
+ *
+ * @param searchTerm The username search term
+ * @returns The users with usernames that match the search term
+ */
+export const searchUsersByUsername = async (searchTerm: string) => {
+	try {
+		return db(userTableName).where('username', 'ilike', `%${searchTerm}%`).select('id', 'username');
+	} catch (error) {
+		console.error('Error searching users by username:', error);
+		throw new Error('Error searching users by username');
+	}
+};
