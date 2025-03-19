@@ -13,6 +13,7 @@ The project is created for the COMP.SEC.300 Secure programming course exercise w
 
 ## TODO
 
+- Library to check common password strengths
 - Select user to start a chat (clicking a user opens a chat window?)
 - Saving chats and message history
 - Key exchange between users (X25519 (Elliptic Curve Diffie-Hellman))

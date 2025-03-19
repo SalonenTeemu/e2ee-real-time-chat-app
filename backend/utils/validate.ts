@@ -1,3 +1,5 @@
+import { passwordStrength } from 'check-password-strength';
+
 /**
  * Validate a username.
  *
@@ -15,7 +17,8 @@ const validateUsername = (username: string): boolean => {
  * @returns The result of the validation
  */
 const validatePassword = (password: string): boolean => {
-	return password.length >= 6 && password.length <= 100 && /[a-z]/.test(password) && /[A-Z]/.test(password) && /[0-9]/.test(password);
+	const strength = passwordStrength(password).id;
+	return strength == 3 && password.length <= 100;
 };
 
 /**
@@ -35,7 +38,7 @@ export const validateRegisterAndLogin = (username: string, password: string): { 
 	if (!validatePassword(password)) {
 		return {
 			success: false,
-			message: 'Password must be between 6 and 100 characters and contain at least one lowercase letter, one uppercase letter, and one number',
+			message: 'Password must be between 12 and 100 characters and have lower case, upper case, number, and special character.',
 		};
 	}
 	return { success: true };

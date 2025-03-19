@@ -15,6 +15,7 @@
 	"dependencies": {
 		"bcrypt": "^5.1.1",
 		"chat-app": "file:..",
+		"check-password-strength": "^3.0.0",
 		"cookie": "^1.0.2",
 		"cookie-parser": "^1.4.7",
 		"cors": "^2.8.5",
