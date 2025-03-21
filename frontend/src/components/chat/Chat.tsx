@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { format, isValid } from 'date-fns';
 import socket from '../../services/socket';
 import { useAuth } from '../../context/AuthContext';
 import { validateUserSearchTerm, validateMessage } from '../../utils/validate';
@@ -50,7 +51,6 @@ const Chat = () => {
 			if (selectedChat === data.chatId) {
 				const sharedKey = await getSharedKey(data.chatId);
 				const decryptedMessage = await decryptMessage(data.content, sharedKey);
-
 				setMessages((prev) => [...prev, { senderId: data.senderId, content: decryptedMessage, createdAt: data.createdAt }]);
 			}
 		};
@@ -111,10 +111,14 @@ const Chat = () => {
 				alert(`Error: ${data.message}.`);
 				return;
 			}
-			setSelectedChat(data.message.chatId);
-			setChats((prev) => [...prev, { id: data.message.chatId, username: data.message.username }]);
-
-			socket.emit('joinChat', data.chatId);
+			setChats((prev) => {
+				const isDuplicate = prev.some((chat) => chat.id === data.message.chatId);
+				if (!isDuplicate) {
+					return [...prev, { id: data.message.chatId, username: data.message.username }];
+				}
+				return prev;
+			});
+			openChat(data.message.chatId);
 
 			socket.on('receiveMessage', (data) => {
 				setMessages((prev) => [...prev, data]);
@@ -131,6 +135,7 @@ const Chat = () => {
 	 * @param chatId The chat ID
 	 */
 	const openChat = async (chatId: string) => {
+		closeChat();
 		setSelectedChat(chatId);
 		socket.emit('joinChat', chatId);
 
@@ -162,6 +167,14 @@ const Chat = () => {
 	};
 
 	/**
+	 * Closes the selected chat.
+	 */
+	const closeChat = () => {
+		setSelectedChat(null);
+		socket.emit('leaveChat', selectedChat);
+	};
+
+	/**
 	 * Send a message related to the selected chat encrypted with the shared key.
 	 */
 	const sendMessage = async () => {
@@ -179,8 +192,6 @@ const Chat = () => {
 					content: encryptedMessage,
 				});
 
-				console.log('Message sent:', encryptedMessage);
-
 				setMessage('');
 			} catch (error) {
 				alert('Error encrypting message');
@@ -190,6 +201,28 @@ const Chat = () => {
 			alert('Invalid message');
 		}
 	};
+
+	/**
+	 * Group the messages by date.
+	 */
+	const groupedMessages = messages.reduce(
+		(acc, msg) => {
+			const messageDate = new Date(msg.createdAt);
+			if (!isValid(messageDate)) {
+				console.log(msg);
+
+				console.error('Invalid date:', msg.createdAt);
+				return acc;
+			}
+			const dateKey = format(messageDate, 'yyyy-MM-dd');
+			if (!acc[dateKey]) {
+				acc[dateKey] = [];
+			}
+			acc[dateKey].push(msg);
+			return acc;
+		},
+		{} as { [key: string]: { senderId: string; content: string; createdAt: string }[] }
+	);
 
 	if (!user) {
 		return <p className="mt-16 text-center text-xl text-red-500">You need to be logged in to view this page.</p>;
@@ -202,7 +235,7 @@ const Chat = () => {
 					<h3 className="mb-2 text-xl font-semibold text-gray-800">Active Chats</h3>
 					<ul className="rounded-lg border border-gray-300">
 						{chats.map((chat) => (
-							<li key={chat.id + chat.username} className="flex items-center justify-between border-b border-gray-300 p-2">
+							<li key={`${chat.id}-${chat.username}`} className="flex items-center justify-between border-b border-gray-300 p-2">
 								<span>Chat with {chat.username}</span>
 								<button onClick={() => openChat(chat.id)} className="rounded-lg bg-blue-500 px-4 py-1 text-white hover:bg-blue-600">
 									Open Chat
@@ -257,17 +290,29 @@ const Chat = () => {
 			<div className="w-2/3 p-6">
 				{selectedChat && (
 					<div>
-						<h3 className="mb-2 text-xl font-semibold text-gray-800">
-							Chat with {chats.find((chat) => chat.id === selectedChat)?.username}
+						<h3 className="mb-2 flex items-center justify-between text-xl font-semibold text-gray-800">
+							<span>Chat with {chats.find((chat) => chat.id === selectedChat)?.username}</span>
+							<button onClick={() => closeChat()} className="rounded-lg bg-red-500 px-4 py-2 text-base text-white hover:bg-red-900">
+								Close Chat
+							</button>
 						</h3>
+
 						<ul className="mb-2 h-64 overflow-y-auto rounded-lg border border-gray-300 p-2">
-							{messages.map((msg) => (
-								<li
-									key={`${msg.senderId}-${msg.createdAt}`}
-									className={`mb-1 rounded-lg p-2 ${msg.senderId === user.id ? 'bg-blue-200 text-left' : 'bg-gray-300 text-right'}`}
-								>
-									{msg.content}
-								</li>
+							{Object.keys(groupedMessages).map((date) => (
+								<div key={date}>
+									<li className="mb-1 rounded-lg bg-gray-700 p-1 text-center text-gray-500 text-white">
+										{format(new Date(date), 'PP')}
+									</li>
+									{groupedMessages[date].map((msg) => (
+										<li
+											key={`${msg.senderId}-${msg.createdAt}`}
+											className={`mb-1 rounded-lg p-2 ${msg.senderId === user.id ? 'bg-blue-200 text-left' : 'bg-gray-300 text-right'}`}
+										>
+											<div>{msg.content}</div>
+											<div className="text-xs text-gray-500">{format(new Date(msg.createdAt), 'HH:mm')}</div>
+										</li>
+									))}
+								</div>
 							))}
 						</ul>
 						<div className="flex">

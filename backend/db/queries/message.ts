@@ -25,7 +25,7 @@ export const getChatMessagesById = async (chatId: string) => {
  */
 export const saveMessage = async (chatId: string, senderId: string, encryptedContent: string) => {
 	try {
-		const newMessage = await db(messageTableName)
+		const [newMessage] = await db(messageTableName)
 			.insert({
 				chat_id: chatId,
 				sender_id: senderId,

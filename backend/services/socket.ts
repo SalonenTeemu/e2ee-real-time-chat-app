@@ -56,6 +56,11 @@ export const setupSocket = (server: http.Server) => {
 			console.log(`User joined chat room: ${chatId}`);
 		});
 
+		socket.on('leaveChat', (chatId) => {
+			socket.leave(chatId);
+			console.log(`User left chat room: ${chatId}`);
+		});
+
 		socket.on('sendMessage', async ({ chatId, senderId, content }) => {
 			console.log('Message received:', content);
 			const sanitizedMessage = sanitizeMessage(content);

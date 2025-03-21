@@ -1,6 +1,7 @@
 import { Response } from 'express';
 import { CustomRequest } from '../middleware/user';
 import { getChatByUsers, getChatsByUserId, createChat } from '../db/queries/chat';
+import { getUserById } from '../db/queries/user';
 
 /**
  * Responds to a POST request to start a chat.
@@ -15,12 +16,16 @@ export const startChat = async (req: CustomRequest, res: Response): Promise<any>
 
 	try {
 		const existingChat = await getChatByUsers(loggedInUserId, userId);
+		const otherUser = await getUserById(userId);
+		if (!otherUser) {
+			return res.status(404).json({ message: 'User not found' });
+		}
 		if (existingChat) {
-			return res.status(200).json({ message: existingChat.id });
+			return res.status(200).json({ message: { chatId: existingChat.id, username: otherUser.username } });
 		}
 
 		const chatId = await createChat(loggedInUserId, userId);
-		return res.status(201).json({ message: chatId });
+		return res.status(201).json({ message: { chatId, username: otherUser.username } });
 	} catch (error) {
 		console.error('Error starting chat:', error);
 		return res.status(500).json({ message: 'Error starting chat' });

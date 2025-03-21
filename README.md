@@ -13,12 +13,9 @@ The project is created for the COMP.SEC.300 Secure programming course exercise w
 
 ## TODO
 
-- ability to close a chat
-- if starting a chat with someone that already have a chat with -> open that chat instead
 - Key exchange between users (X25519 (Elliptic Curve Diffie-Hellman))
 - Generate shared secret using ECDH (Elliptic Curve Diffie-Hellman)
 - Message decryption: recipient decrypts the message using shared session key
-- Timestamp for each message
 - General and chat-related notifications
 - Detailed logging for security monitoring
 - Rate limiting to prevent abuse

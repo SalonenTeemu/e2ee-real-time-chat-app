@@ -38,7 +38,9 @@ const Navbar = () => {
 					{user ? (
 						<>
 							<button className="flex items-center space-x-2" onClick={() => setDropdownOpen(!dropdownOpen)}>
-								<span>Logged in as: {user.username}</span>
+								<span>
+									Logged in as: <span className="font-semibold">{user.username}</span>
+								</span>
 								<svg
 									className="h-4 w-4"
 									xmlns="http://www.w3.org/2000/svg"
