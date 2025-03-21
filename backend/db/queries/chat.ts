@@ -2,6 +2,21 @@ import db from '../knex';
 import { chatTableName, userTableName } from '../initDB';
 
 /**
+ * Returns a chat by the chat ID.
+ *
+ * @param chatId The chat ID
+ * @returns The chat if it exists
+ */
+export const getChatById = async (chatId: string) => {
+	try {
+		return await db(chatTableName).where({ id: chatId }).first();
+	} catch (error) {
+		console.error('Error getting chat:', error);
+		throw new Error(`Error getting chat: ${error}`);
+	}
+};
+
+/**
  * Returns a chat by the user IDs.
  *
  * @param userId1 The user ID of the first user

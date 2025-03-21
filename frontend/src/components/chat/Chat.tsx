@@ -3,6 +3,8 @@ import socket from '../../services/socket';
 import { useAuth } from '../../context/AuthContext';
 import { validateUserSearchTerm, validateMessage } from '../../utils/validate';
 import { sanitizeMessage } from '../../utils/sanitize';
+import { decryptMessage, encryptMessage } from '../../utils/encryption';
+import { getSharedKey } from '../../utils/keys';
 
 /**
  * The Chat component.
@@ -15,8 +17,10 @@ const Chat = () => {
 	const [users, setUsers] = useState<{ id: string; username: string }[]>([]);
 	const [chats, setChats] = useState<{ id: string; username: string }[]>([]);
 	const [selectedChat, setSelectedChat] = useState<string | null>(null);
-	const [messages, setMessages] = useState<{ senderId: string; content: string }[]>([]);
+	const [messages, setMessages] = useState<{ senderId: string; content: string; createdAt: string }[]>([]);
 	const [message, setMessage] = useState('');
+	const [isSearchVisible, setSearchVisible] = useState(false);
+	const [hasSearched, setHasSearched] = useState(false);
 
 	useEffect(() => {
 		/**
@@ -39,10 +43,27 @@ const Chat = () => {
 			}
 		};
 
+		/**
+		 * Handles incoming messages via socket by decrypting them and adding them to the messages state.
+		 */
+		const handleReceiveMessage = async (data: { chatId: string; senderId: string; content: string; createdAt: string }) => {
+			if (selectedChat === data.chatId) {
+				const sharedKey = await getSharedKey(data.chatId);
+				const decryptedMessage = await decryptMessage(data.content, sharedKey);
+
+				setMessages((prev) => [...prev, { senderId: data.senderId, content: decryptedMessage, createdAt: data.createdAt }]);
+			}
+		};
+
 		if (user) {
 			getChats();
+			socket.on('receiveMessage', handleReceiveMessage); // Add socket listener
 		}
-	}, [user]);
+
+		return () => {
+			socket.off('receiveMessage', handleReceiveMessage); // Clean up socket listener
+		};
+	}, [user, selectedChat]);
 
 	/**
 	 * Retrieves the users based on the search term.
@@ -63,6 +84,7 @@ const Chat = () => {
 				return;
 			}
 			setUsers(data.message);
+			setHasSearched(true);
 		} catch (error) {
 			alert('Error fetching users');
 			console.error('Error fetching users:', error);
@@ -104,106 +126,164 @@ const Chat = () => {
 	};
 
 	/**
-	 * Opens a chat.
+	 * Opens a chat and retrieves the messages for the chat using the chat ID and the shared key.
 	 *
 	 * @param chatId The chat ID
 	 */
 	const openChat = async (chatId: string) => {
 		setSelectedChat(chatId);
-
 		socket.emit('joinChat', chatId);
 
-		socket.off('receiveMessage'); // Clear previous listeners
-		socket.on('receiveMessage', (data) => {
-			if (data && data.senderId && data.content) {
-				setMessages((prev) => [...prev, data]);
+		try {
+			const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/message/${chatId}`, {
+				credentials: 'include',
+			});
+
+			const data = await res.json();
+			if (!res.ok) {
+				alert(`Error: ${data.message}.`);
+				return;
 			}
-		});
+
+			const sharedKey = await getSharedKey(chatId);
+
+			const decryptedMessages = await Promise.all(
+				data.message.map(async (msg: { senderId: string; content: string }) => ({
+					...msg,
+					content: await decryptMessage(msg.content, sharedKey),
+				}))
+			);
+
+			setMessages(decryptedMessages);
+		} catch (error) {
+			alert('Error fetching messages');
+			console.error('Error fetching messages:', error);
+		}
 	};
 
 	/**
-	 * Send a message related to the selected chat.
+	 * Send a message related to the selected chat encrypted with the shared key.
 	 */
-	const sendMessage = () => {
+	const sendMessage = async () => {
 		if (!user) return;
-		if (message.trim() !== '' && selectedChat && validateMessage(message)) {
-			const sanitizedMessage = sanitizeMessage(message);
-			socket.emit('sendMessage', { chatId: selectedChat, senderId: user.id, content: sanitizedMessage });
-			setMessages((prev) => [...prev, { senderId: user.id, content: sanitizedMessage }]);
-			setMessage('');
+
+		const sanitizedMessage = sanitizeMessage(message);
+		if (message.trim() !== '' && selectedChat && validateMessage(sanitizedMessage)) {
+			try {
+				const sharedKey = await getSharedKey(selectedChat);
+				const encryptedMessage = await encryptMessage(sanitizedMessage, sharedKey);
+
+				socket.emit('sendMessage', {
+					chatId: selectedChat,
+					senderId: user.id,
+					content: encryptedMessage,
+				});
+
+				console.log('Message sent:', encryptedMessage);
+
+				setMessage('');
+			} catch (error) {
+				alert('Error encrypting message');
+				console.error('Encryption error:', error);
+			}
 		} else {
 			alert('Invalid message');
 		}
 	};
 
 	if (!user) {
-		return <p className="mt-16 text-center font-bold text-red-500">You need to be logged in to view this page.</p>;
+		return <p className="mt-16 text-center text-xl text-red-500">You need to be logged in to view this page.</p>;
 	}
 
 	return (
-		<div className="flex min-h-screen flex-col items-center justify-center bg-gray-100 p-6">
-			<h2 className="mb-4 text-3xl font-bold text-gray-800">Chat</h2>
-
-			<div className="mb-6 w-full max-w-md">
-				<input
-					type="text"
-					placeholder="Search for users..."
-					value={searchTerm}
-					onChange={(e) => setSearchTerm(e.target.value)}
-					className="mb-2 w-full rounded-lg border border-gray-300 p-2"
-				/>
-				<button onClick={searchUsers} className="w-full rounded-lg bg-blue-500 px-4 py-2 text-white hover:bg-blue-600">
-					Search
-				</button>
-				<ul className="mt-4">
-					{users.map((user) => (
-						<li key={user.id} className="flex items-center justify-between border-b border-gray-300 p-2">
-							<span>{user.username}</span>
-							<button onClick={() => startChat(user.id)} className="rounded-lg bg-green-500 px-4 py-1 text-white hover:bg-green-600">
-								Start Chat
-							</button>
-						</li>
-					))}
-				</ul>
-			</div>
-
-			<div className="mb-6 w-full max-w-md">
-				<h3 className="mb-2 text-xl font-semibold text-gray-800">Active Chats</h3>
-				<ul className="rounded-lg border border-gray-300">
-					{chats.map((chat) => (
-						<li key={chat.id} className="flex items-center justify-between border-b border-gray-300 p-2">
-							<span>Chat with {chat.username}</span>
-							<button onClick={() => openChat(chat.id)} className="rounded-lg bg-blue-500 px-4 py-1 text-white hover:bg-blue-600">
-								Open Chat
-							</button>
-						</li>
-					))}
-				</ul>
-			</div>
-
-			{selectedChat && (
-				<div className="w-full max-w-md">
-					<h3 className="mb-2 text-xl font-semibold text-gray-800">Chat Window</h3>
-					<ul className="mb-2 h-64 overflow-y-auto rounded-lg border border-gray-300 p-2">
-						{messages.map((msg, i) => (
-							<li key={i} className="mb-1 rounded-lg bg-gray-200 p-2">
-								<strong>{msg.senderId === user.id ? 'You' : chats.find((chat) => chat.id === selectedChat)?.username}:</strong>{' '}
-								{msg.content}
+		<div className="flex min-h-screen bg-gray-100">
+			<div className="w-1/3 bg-white p-6 shadow-md">
+				<div className="mb-6">
+					<h3 className="mb-2 text-xl font-semibold text-gray-800">Active Chats</h3>
+					<ul className="rounded-lg border border-gray-300">
+						{chats.map((chat) => (
+							<li key={chat.id + chat.username} className="flex items-center justify-between border-b border-gray-300 p-2">
+								<span>Chat with {chat.username}</span>
+								<button onClick={() => openChat(chat.id)} className="rounded-lg bg-blue-500 px-4 py-1 text-white hover:bg-blue-600">
+									Open Chat
+								</button>
 							</li>
 						))}
 					</ul>
-					<div className="flex">
-						<input
-							value={message}
-							onChange={(e) => setMessage(e.target.value)}
-							className="mr-2 flex-grow rounded-lg border border-gray-300 p-2"
-						/>
-						<button onClick={sendMessage} className="rounded-lg bg-blue-500 px-4 py-2 text-white hover:bg-blue-600">
-							Send
-						</button>
-					</div>
 				</div>
-			)}
+				<button
+					onClick={() => {
+						setSearchVisible((prev) => !prev);
+					}}
+					className="mb-4 w-full rounded-lg bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
+				>
+					{isSearchVisible ? 'Hide Search' : 'Search for users to chat with'}
+				</button>
+
+				{isSearchVisible && (
+					<div className="mb-6">
+						<input
+							type="text"
+							placeholder="Search for users to chat with..."
+							value={searchTerm}
+							onChange={(e) => setSearchTerm(e.target.value)}
+							className="mb-2 w-full rounded-lg border border-gray-300 p-2"
+						/>
+						<button onClick={searchUsers} className="w-full rounded-lg bg-blue-500 px-4 py-2 text-white hover:bg-blue-600">
+							Search
+						</button>
+						{hasSearched && users.length === 0 && (
+							<div className="mt-4">
+								<p className="mb-2 text-center text-lg font-semibold text-gray-800">No users found with the search term.</p>
+							</div>
+						)}
+						<ul className="mt-4">
+							{users.map((user) => (
+								<li key={user.id} className="flex items-center justify-between border-b border-gray-300 p-2">
+									<span>{user.username}</span>
+									<button
+										onClick={() => startChat(user.id)}
+										className="rounded-lg bg-green-500 px-4 py-1 text-white hover:bg-green-600"
+									>
+										Start Chat
+									</button>
+								</li>
+							))}
+						</ul>
+					</div>
+				)}
+			</div>
+
+			<div className="w-2/3 p-6">
+				{selectedChat && (
+					<div>
+						<h3 className="mb-2 text-xl font-semibold text-gray-800">
+							Chat with {chats.find((chat) => chat.id === selectedChat)?.username}
+						</h3>
+						<ul className="mb-2 h-64 overflow-y-auto rounded-lg border border-gray-300 p-2">
+							{messages.map((msg) => (
+								<li
+									key={`${msg.senderId}-${msg.createdAt}`}
+									className={`mb-1 rounded-lg p-2 ${msg.senderId === user.id ? 'bg-blue-200 text-left' : 'bg-gray-300 text-right'}`}
+								>
+									{msg.content}
+								</li>
+							))}
+						</ul>
+						<div className="flex">
+							<input
+								value={message}
+								onChange={(e) => setMessage(e.target.value)}
+								className="mr-2 flex-grow rounded-lg border border-gray-300 p-2"
+								placeholder="Write a message..."
+							/>
+							<button onClick={sendMessage} className="rounded-lg bg-blue-500 px-4 py-2 text-white hover:bg-blue-600">
+								Send
+							</button>
+						</div>
+					</div>
+				)}
+			</div>
 		</div>
 	);
 };

@@ -1,3 +1,4 @@
+import bcrypt from 'bcrypt';
 import db from './knex';
 import { USER } from '../utils/constants';
 
@@ -52,7 +53,6 @@ const createTables = async () => {
 			table.uuid('id').defaultTo(db.raw('gen_random_uuid()')).primary();
 			table.uuid('chat_id').references('id').inTable(chatTableName).notNullable();
 			table.uuid('sender_id').references('id').inTable(userTableName).notNullable();
-			table.uuid('receiver_id').references('id').inTable(userTableName).notNullable();
 			table.text('content').notNullable().checkLength('<=', 1000);
 			table.timestamp('created_at').defaultTo(db.fn.now());
 		});
@@ -80,6 +80,8 @@ const insertTestData = async () => {
 			{ username: 'user1', password: '$2b$10$7z0F6cK0VYjY9TzVnF2o4eP3x8w6Qk1zHtZ6K2F1JU2d8pLZ9U1a6', role: USER },
 			{ username: 'user2', password: '$2b$10$7z0F6cK0VYjY9TzVnF2o4eP3x8w6Qk1zHtZ6K2F1JU2d8pLZ9U1a6', role: USER },
 			{ username: 'user3', password: '$2b$10$7z0F6cK0VYjY9TzVnF2o4eP3x8w6Qk1zHtZ6K2F1JU2d8pLZ9U1a6', role: USER },
+			{ username: 'test', password: bcrypt.hashSync('Password123-', 10), role: USER },
+			{ username: 'testi', password: bcrypt.hashSync('Password123-', 10), role: USER },
 		]);
 	}
 };

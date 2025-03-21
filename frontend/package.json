@@ -17,6 +17,7 @@
 		"check-password-strength": "^3.0.0",
 		"dompurify": "^3.2.4",
 		"e2e-encrypted-real-time-chat-app": "file:..",
+		"libsodium-wrappers": "^0.7.15",
 		"react": "^19.0.0",
 		"react-dom": "^19.0.0",
 		"react-router-dom": "^7.2.0",
@@ -26,6 +27,7 @@
 	},
 	"devDependencies": {
 		"@eslint/js": "^9.21.0",
+		"@types/libsodium-wrappers": "^0.7.14",
 		"@types/node": "^22.13.9",
 		"@types/react": "^19.0.10",
 		"@types/react-dom": "^19.0.4",

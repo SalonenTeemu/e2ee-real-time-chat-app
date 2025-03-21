@@ -2,6 +2,9 @@ import { Server } from 'socket.io';
 import http from 'http';
 import * as cookie from 'cookie';
 import { verifyAccessToken } from './authService';
+import { sanitizeMessage } from '../utils/sanitize';
+import { encryptMessage } from '../utils/encryption';
+import { saveMessage } from '../db/queries/message';
 
 /**
  * Setup the socket.io server
@@ -53,10 +56,18 @@ export const setupSocket = (server: http.Server) => {
 			console.log(`User joined chat room: ${chatId}`);
 		});
 
-		socket.on('sendMessage', ({ chatId, message }) => {
+		socket.on('sendMessage', async ({ chatId, senderId, content }) => {
+			console.log('Message received:', content);
+			const sanitizedMessage = sanitizeMessage(content);
+			const encryptedMessage = encryptMessage(sanitizedMessage);
+
+			const newMessage: any = await saveMessage(chatId, senderId, encryptedMessage);
+
 			io.to(chatId).emit('receiveMessage', {
-				user: socket.data.user.username,
-				message,
+				chatId,
+				senderId,
+				content: sanitizedMessage,
+				createdAt: newMessage.created_at,
 			});
 		});
 

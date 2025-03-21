@@ -7,6 +7,7 @@ import { initializeDatabase } from './db/initDB';
 import authRoutes from './routes/authRoutes';
 import userRoutes from './routes/userRoutes';
 import chatRoutes from './routes/chatRoutes';
+import messageRoutes from './routes/messageRoutes';
 import { setupSocket } from './services/socket';
 import { authenticateUserMiddleware } from './middleware/user';
 import { corsOptions } from './middleware/cors';
@@ -24,6 +25,7 @@ app.use(authenticateUserMiddleware);
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/chat', chatRoutes);
+app.use('/api/message', messageRoutes);
 
 // Create HTTP server and pass it to WebSockets
 const server = http.createServer(app);

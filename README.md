@@ -13,12 +13,10 @@ The project is created for the COMP.SEC.300 Secure programming course exercise w
 
 ## TODO
 
-- Saving and retrieving messages
-- Sanitize messages also on backend
+- ability to close a chat
+- if starting a chat with someone that already have a chat with -> open that chat instead
 - Key exchange between users (X25519 (Elliptic Curve Diffie-Hellman))
 - Generate shared secret using ECDH (Elliptic Curve Diffie-Hellman)
-- Message encryption on client using XChaCha20-Poly1305 when sending a message
-- Encrypt messages in the database for second layer of protection (AES-256-GCM)
 - Message decryption: recipient decrypts the message using shared session key
 - Timestamp for each message
 - General and chat-related notifications
