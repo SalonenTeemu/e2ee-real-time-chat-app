@@ -5,7 +5,7 @@ import { useAuth } from '../../context/AuthContext';
 import { validateUserSearchTerm, validateMessage } from '../../utils/validate';
 import { sanitizeMessage } from '../../utils/sanitize';
 import { decryptMessage, encryptMessage } from '../../utils/encryption';
-import { getSharedKey } from '../../utils/keys';
+import { getSharedKey } from '../../utils/key';
 
 /**
  * The Chat component.
@@ -29,7 +29,7 @@ const Chat = () => {
 		 */
 		const getChats = async () => {
 			try {
-				const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/chat`, {
+				const res = await fetch(`http://localhost:${import.meta.env.VITE_BACKEND_PORT || 5000}/api/chat`, {
 					credentials: 'include',
 				});
 				const data = await res.json();
@@ -75,7 +75,7 @@ const Chat = () => {
 		}
 
 		try {
-			const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/users/search?searchTerm=${searchTerm}`, {
+			const res = await fetch(`http://localhost:${import.meta.env.VITE_BACKEND_PORT || 5000}/api/users/search?searchTerm=${searchTerm}`, {
 				credentials: 'include',
 			});
 			const data = await res.json();
@@ -98,7 +98,7 @@ const Chat = () => {
 	 */
 	const startChat = async (otherUserId: string) => {
 		try {
-			const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/chat/start`, {
+			const res = await fetch(`http://localhost:${import.meta.env.VITE_BACKEND_PORT || 5000}/api/chat/start`, {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',
@@ -120,6 +120,7 @@ const Chat = () => {
 			});
 			openChat(data.message.chatId);
 
+			await getSharedKey(data.message.chatId);
 			socket.on('receiveMessage', (data) => {
 				setMessages((prev) => [...prev, data]);
 			});
@@ -140,7 +141,7 @@ const Chat = () => {
 		socket.emit('joinChat', chatId);
 
 		try {
-			const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/message/${chatId}`, {
+			const res = await fetch(`http://localhost:${import.meta.env.VITE_BACKEND_PORT || 5000}/api/message/${chatId}`, {
 				credentials: 'include',
 			});
 

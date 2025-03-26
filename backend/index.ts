@@ -8,6 +8,7 @@ import authRoutes from './routes/authRoutes';
 import userRoutes from './routes/userRoutes';
 import chatRoutes from './routes/chatRoutes';
 import messageRoutes from './routes/messageRoutes';
+import keyRoutes from './routes/keyRoutes';
 import { setupSocket } from './services/socket';
 import { authenticateUserMiddleware } from './middleware/user';
 import { corsOptions } from './middleware/cors';
@@ -26,12 +27,13 @@ app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/chat', chatRoutes);
 app.use('/api/message', messageRoutes);
+app.use('/api/key', keyRoutes);
 
 // Create HTTP server and pass it to WebSockets
 const server = http.createServer(app);
 setupSocket(server);
 
-server.listen(5000, () => {
-	initializeDatabase();
-	console.log(`Server running on ${process.env.BACKEND_URL}`);
+server.listen(process.env.BACKEND_PORT || 5000, async () => {
+	await initializeDatabase();
+	console.log(`Server running on http://localhost:${process.env.BACKEND_PORT || 5000}`);
 });

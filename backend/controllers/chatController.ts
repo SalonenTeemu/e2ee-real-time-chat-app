@@ -24,8 +24,8 @@ export const startChat = async (req: CustomRequest, res: Response): Promise<any>
 			return res.status(200).json({ message: { chatId: existingChat.id, username: otherUser.username } });
 		}
 
-		const chatId = await createChat(loggedInUserId, userId);
-		return res.status(201).json({ message: { chatId, username: otherUser.username } });
+		const chat = await createChat(loggedInUserId, userId);
+		return res.status(201).json({ message: { chatId: chat.id, username: otherUser.username } });
 	} catch (error) {
 		console.error('Error starting chat:', error);
 		return res.status(500).json({ message: 'Error starting chat' });

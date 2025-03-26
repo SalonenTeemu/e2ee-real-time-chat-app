@@ -3,7 +3,7 @@ import { io } from 'socket.io-client';
 /**
  * Socket.io client instance
  */
-const socket = io(import.meta.env.VITE_BACKEND_URL, {
+const socket = io(`http://localhost:${import.meta.env.VITE_BACKEND_PORT || 5000}`, {
 	transports: ['websocket'],
 	reconnection: true,
 	reconnectionAttempts: 5,

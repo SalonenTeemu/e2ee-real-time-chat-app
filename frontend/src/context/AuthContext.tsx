@@ -27,7 +27,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 	 */
 	const fetchUser = async () => {
 		try {
-			const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/auth/me`, {
+			const res = await fetch(`http://localhost:${import.meta.env.VITE_BACKEND_PORT || 5000}/api/auth/me`, {
 				method: 'GET',
 				credentials: 'include',
 			});
@@ -53,7 +53,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 	 */
 	const logout = useCallback(async () => {
 		try {
-			await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/auth/logout`, {
+			await fetch(`http://localhost:${import.meta.env.VITE_BACKEND_PORT || 5000}/api/auth/logout`, {
 				method: 'POST',
 				credentials: 'include',
 			});
@@ -73,7 +73,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 			if (!user) return;
 
 			try {
-				const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/auth/refresh`, {
+				const res = await fetch(`http://localhost:${import.meta.env.VITE_BACKEND_PORT || 5000}/api/auth/refresh`, {
 					method: 'POST',
 					credentials: 'include',
 				});

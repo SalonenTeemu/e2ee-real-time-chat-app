@@ -2,9 +2,12 @@ import knex, { Knex } from 'knex';
 import dotenv from 'dotenv';
 
 // Load environment variables
-dotenv.config();
+dotenv.config({ path: '../.env' });
 
 const env = process.env;
+
+console.log(env.DB_HOST);
+console.log('Current working directory:', process.cwd());
 
 /**
  * The database connection.
@@ -12,11 +15,11 @@ const env = process.env;
 const db: Knex = knex({
 	client: 'pg',
 	connection: {
-		host: env.DB_HOST,
+		host: env.DB_HOST || 'localhost',
 		port: parseInt(env.DB_PORT || '5432'),
-		database: env.DB_NAME,
-		user: env.DB_USER,
-		password: env.DB_PASSWORD,
+		database: env.DB_NAME || 'chat',
+		user: env.DB_USER || 'postgres',
+		password: env.DB_PASSWORD || 'password',
 	},
 	pool: { min: 2, max: 10 },
 });

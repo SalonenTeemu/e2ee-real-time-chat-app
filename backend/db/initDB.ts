@@ -7,6 +7,7 @@ export const userTableName = `${schemaName}.users`;
 export const chatTableName = `${schemaName}.chats`;
 export const messageTableName = `${schemaName}.messages`;
 export const refreshTokenTableName = `${schemaName}.refresh_tokens`;
+export const publicKeyTableName = `${schemaName}.public_keys`;
 
 /**
  * Initialize the database by creating the schema and tables if they don't exist
@@ -18,9 +19,10 @@ export const initializeDatabase = async () => {
 		await db.schema.createSchemaIfNotExists(schemaName);
 
 		await createTables();
-		await insertTestData();
-
 		console.log('Tables created');
+
+		await insertTestData();
+		console.log('Test data inserted');
 	} catch (err: unknown) {
 		console.error('Error connecting to the database or creating tables:', err);
 	}
@@ -68,6 +70,15 @@ const createTables = async () => {
 			table.timestamp('created_at').defaultTo(db.fn.now());
 		});
 	}
+
+	if (!(await db.schema.withSchema(schemaName).hasTable('public_keys'))) {
+		await db.schema.withSchema(schemaName).createTable('public_keys', (table) => {
+			table.uuid('id').defaultTo(db.raw('gen_random_uuid()')).primary();
+			table.uuid('user_id').references('id').inTable(userTableName).notNullable().onDelete('CASCADE');
+			table.string('public_key', 255).notNullable();
+			table.timestamp('created_at').defaultTo(db.fn.now());
+		});
+	}
 };
 
 /**
@@ -82,6 +93,12 @@ const insertTestData = async () => {
 			{ username: 'user3', password: '$2b$10$7z0F6cK0VYjY9TzVnF2o4eP3x8w6Qk1zHtZ6K2F1JU2d8pLZ9U1a6', role: USER },
 			{ username: 'test', password: bcrypt.hashSync('Password123-', 10), role: USER },
 			{ username: 'testi', password: bcrypt.hashSync('Password123-', 10), role: USER },
+		]);
+		const user_ids = await db(userTableName).select('id').whereIn('username', ['user1', 'user2', 'user3']);
+		await db(publicKeyTableName).insert([
+			{ user_id: user_ids[0].id, public_key: '4Hv4ssnTvP_jgANOr8lGaV4a8VNro0K8KzWnlKS-Pwk' },
+			{ user_id: user_ids[1].id, public_key: '323Ifkc6kVfniDPnOHrVq8bXtFSkytNkdpUsYksPiDc' },
+			{ user_id: user_ids[2].id, public_key: 'nE2NK7uTcvzo6v6FM2Biy-l6Geu_FUnpcCb7lzrYzQE' },
 		]);
 	}
 };

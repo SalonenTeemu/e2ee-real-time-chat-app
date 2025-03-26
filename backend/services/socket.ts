@@ -14,7 +14,7 @@ import { saveMessage } from '../db/queries/message';
 export const setupSocket = (server: http.Server) => {
 	const io = new Server(server, {
 		cors: {
-			origin: process.env.FRONTEND_URL,
+			origin: `http://localhost:${process.env.FRONTEND_PORT || 3000}`,
 			methods: ['GET', 'POST'],
 			credentials: true,
 		},
@@ -48,7 +48,7 @@ export const setupSocket = (server: http.Server) => {
 		}
 	});
 
-	io.on('connection', (socket) => {
+	io.on('connect', (socket) => {
 		console.log('User connected:', socket.data.user.username);
 
 		socket.on('joinChat', (chatId) => {

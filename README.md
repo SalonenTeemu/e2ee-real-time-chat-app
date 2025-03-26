@@ -13,6 +13,7 @@ The project is created for the COMP.SEC.300 Secure programming course exercise w
 
 ## TODO
 
+- Cache shared keys
 - Key exchange between users (X25519 (Elliptic Curve Diffie-Hellman))
 - Generate shared secret using ECDH (Elliptic Curve Diffie-Hellman)
 - Message decryption: recipient decrypts the message using shared session key
@@ -43,7 +44,7 @@ This project uses PostgreSQL as the database. Ensure you have PostgreSQL install
    npm run install:all
    ```
 
-3. Create a `.env` file in both the `backend` and `frontend` directories. Use the `.env.example` file in the project root as a reference for required variables.
+3. Create a `.env` file in the project root directory. Use the `.env.example` file in the project root as a reference for required variables.
 
 ## Running the Application
 

@@ -30,7 +30,7 @@ const Login = () => {
 		}
 
 		try {
-			const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/auth/login`, {
+			const res = await fetch(`http://localhost:${import.meta.env.VITE_BACKEND_PORT || 5000}/api/auth/login`, {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',
