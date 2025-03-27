@@ -41,7 +41,7 @@ export const getUserByUsername = async (username: string) => {
  */
 export const createUser = async (username: string, hashedPassword: string) => {
 	try {
-		return db(userTableName).insert({ username, password: hashedPassword });
+		return db(userTableName).insert({ username, password: hashedPassword }).returning('id');
 	} catch (error) {
 		console.error('Error creating user:', error);
 		throw new Error('Error creating user');

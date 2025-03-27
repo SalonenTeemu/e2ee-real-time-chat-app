@@ -13,6 +13,7 @@ The project is created for the COMP.SEC.300 Secure programming course exercise w
 
 ## TODO
 
+- Encrypt private key before storing in browser
 - Cache shared keys
 - Key exchange between users (X25519 (Elliptic Curve Diffie-Hellman))
 - Generate shared secret using ECDH (Elliptic Curve Diffie-Hellman)
@@ -22,6 +23,7 @@ The project is created for the COMP.SEC.300 Secure programming course exercise w
 - Rate limiting to prevent abuse
 - Unit testing
 - Docker setup?
+- MFA?
 - CI/CD Pipeline with security features:
   - SBOM generation
   - Vulnerability scanning (e.g., Snyk, Trivy)

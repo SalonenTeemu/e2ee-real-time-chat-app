@@ -119,8 +119,6 @@ const Chat = () => {
 				return prev;
 			});
 			openChat(data.message.chatId);
-
-			await getSharedKey(data.message.chatId);
 			socket.on('receiveMessage', (data) => {
 				setMessages((prev) => [...prev, data]);
 			});
@@ -148,6 +146,11 @@ const Chat = () => {
 			const data = await res.json();
 			if (!res.ok) {
 				alert(`Error: ${data.message}.`);
+				return;
+			}
+
+			if (data.message.length === 0) {
+				alert('No messages found for this chat. Start a conversation!');
 				return;
 			}
 

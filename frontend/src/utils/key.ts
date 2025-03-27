@@ -1,47 +1,64 @@
 import sodium from 'libsodium-wrappers';
+import { getFromDB, saveToDB } from './db';
 
 /**
- * Derives a shared key for a chat.
+ * Retrieves the recipient's public key from the server using the chat ID.
  *
- * @param {string} chatId The chat ID.
- * @returns {Uint8Array} The derived shared key (32 bytes).
+ * @param chatId The chat ID to retrieve the recipient's public key for
+ * @returns The recipient's public key as a Uint8Array
  */
+const getRecipientPublicKey = async (chatId: string): Promise<Uint8Array> => {
+	const res = await fetch(`http://localhost:${import.meta.env.VITE_BACKEND_PORT || 5000}/api/key/recipient/${chatId}`, {
+		credentials: 'include',
+	});
+
+	const data = await res.json();
+	if (!res.ok) {
+		throw new Error('Failed to retrieve recipient public key');
+	}
+
+	return sodium.from_base64(data.publicKey);
+};
+
 export const getSharedKey = async (chatId: string) => {
+	await sodium.ready;
+
 	try {
-		await sodium.ready;
-
-		// Generate a new client key pair
-		const clientKeyPair = sodium.crypto_kx_keypair();
-
-		// Save client's public key to backend (Base64-encoded)
-		await fetch(`http://localhost:${import.meta.env.VITE_BACKEND_PORT || 5000}/api/key/${chatId}`, {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-			},
-			credentials: 'include',
-			body: JSON.stringify({ clientPublicKey: sodium.to_base64(clientKeyPair.publicKey) }),
-		});
-
-		// Fetch the recipient's public key
-		const recipientRes = await fetch(`http://localhost:${import.meta.env.VITE_BACKEND_PORT || 5000}/api/key/recipient/${chatId}`, {
-			credentials: 'include',
-		});
-
-		const recipientData = await recipientRes.json();
-		if (!recipientRes.ok) {
+		const recipientPublicKey = await getRecipientPublicKey(chatId);
+		if (!recipientPublicKey) {
 			throw new Error('Failed to retrieve recipient public key');
 		}
 
-		// Decode the recipient's public key from Base64
-		const recipientPublicKey = sodium.from_base64(recipientData.publicKey);
+		const userPrivateKey = await getPrivateKey();
 
-		// Derive the shared key
-		const sharedKey = sodium.crypto_kx_client_session_keys(clientKeyPair.publicKey, clientKeyPair.privateKey, recipientPublicKey).sharedRx;
+		const sharedKey = sodium.crypto_scalarmult(userPrivateKey, recipientPublicKey);
+
 		return sharedKey;
 	} catch (error) {
-		console.error('Error getting shared key:', error);
-		alert('Error deriving shared key. Please try again.');
-		throw new Error('Error getting shared key');
+		console.error('Error retrieving shared key:', error);
+		throw error;
 	}
+};
+
+export const createKeyPair = async () => {
+	await sodium.ready;
+
+	const keyPair = sodium.crypto_box_keypair();
+	const privateKey = sodium.to_base64(keyPair.privateKey);
+	const publicKey = sodium.to_base64(keyPair.publicKey);
+
+	await saveToDB('privateKey', privateKey);
+
+	return { privateKey, publicKey };
+};
+
+export const getPrivateKey = async () => {
+	await sodium.ready;
+
+	const privateKeyBase64 = (await getFromDB('privateKey')) as string;
+	if (!privateKeyBase64) {
+		throw new Error('Private key not found in IndexedDB');
+	}
+
+	return sodium.from_base64(privateKeyBase64 || '');
 };

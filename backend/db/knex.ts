@@ -6,9 +6,6 @@ dotenv.config({ path: '../.env' });
 
 const env = process.env;
 
-console.log(env.DB_HOST);
-console.log('Current working directory:', process.cwd());
-
 /**
  * The database connection.
  */

@@ -63,3 +63,20 @@ export const validateUserSearchTerm = (searchTerm: string): boolean => {
 export const validateMessage = (message: string): boolean => {
 	return message.length >= 1 && message.length <= 1000;
 };
+
+/**
+ * Validate a public key.
+ *
+ * @param publicKey The public key to validate
+ * @returns The result of the validation
+ */
+export const validatePublicKey = (publicKey: string): { success: boolean; message?: string } => {
+	if (!publicKey) {
+		return { success: false, message: 'Public key is required' };
+	}
+	const publicKeyBuffer = Buffer.from(publicKey, 'base64');
+	if (publicKeyBuffer.length !== 32) {
+		return { success: false, message: 'Invalid public key length' };
+	}
+	return { success: true };
+};

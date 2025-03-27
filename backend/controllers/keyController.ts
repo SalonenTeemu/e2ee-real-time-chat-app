@@ -4,37 +4,32 @@ import { getChatById } from '../db/queries/chat';
 import { getPublicKeyByUserId, saveUserPublicKey } from '../db/queries/key';
 
 /**
- * Responds to a POST request to save the client's public key.
+ * Responds to a POST request to save the user's public key.
  *
  * @param req The request object
  * @param res The response object
  * @returns The response
  */
 export const savePublicKey = async (req: CustomRequest, res: Response): Promise<any> => {
-	const { chatId } = req.params;
 	const { id: userId } = req.user;
-	const { clientPublicKey } = req.body;
+	const { publicKey } = req.body;
 
-	if (!chatId) {
-		return res.status(400).json({ message: 'Chat ID is required' });
+	if (!publicKey) {
+		return res.status(400).json({ message: 'Public key is required' });
 	}
 
-	if (!clientPublicKey) {
-		return res.status(400).json({ message: 'Client public key is required' });
+	if (!userId) {
+		return res.status(400).json({ message: 'User ID is required' });
 	}
 
 	try {
-		const chat = await getChatById(chatId);
-		if (!chat) {
-			return res.status(404).json({ message: 'Chat not found' });
+		const key = await getPublicKeyByUserId(userId);
+		if (key) {
+			return res.status(400).json({ message: 'Public key already exists' });
+		} else {
+			await saveUserPublicKey(userId, publicKey);
+			return res.status(200).json({ message: 'Public key saved successfully' });
 		}
-		if (chat.user1_id !== userId && chat.user2_id !== userId) {
-			return res.status(403).json({ message: 'Unauthorized' });
-		}
-
-		await saveUserPublicKey(userId, clientPublicKey);
-
-		return res.status(200).json({ message: 'Public key saved successfully' });
 	} catch (error) {
 		console.error('Error starting key exchange:', error);
 		return res.status(500).json({ message: 'Error starting key exchange' });

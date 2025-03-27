@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { validateRegisterAndLogin } from '../../utils/validate';
+import { createKeyPair } from '../../utils/key';
 
 /**
  * The Register component.
@@ -34,6 +35,11 @@ const Register = () => {
 		}
 
 		try {
+			const { publicKey } = await createKeyPair();
+			if (!publicKey) {
+				setErrorMessage('Failed to generate key pair.');
+				return;
+			}
 			const res = await fetch(`http://localhost:${import.meta.env.VITE_BACKEND_PORT || 5000}/api/auth/register`, {
 				method: 'POST',
 				headers: {
@@ -42,6 +48,7 @@ const Register = () => {
 				body: JSON.stringify({
 					username,
 					password,
+					publicKey,
 				}),
 			});
 

@@ -24,6 +24,9 @@ socket.on('disconnect', (reason) => {
 
 socket.on('connect_error', (error) => {
 	console.error('Connection error:', error.message);
+	if (error.message === 'xhr poll error') {
+		socket.connect();
+	}
 	alert('Connection error. Please refresh the page.');
 });
 

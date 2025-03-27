@@ -1,9 +1,10 @@
 import { Request, Response } from 'express';
 import bcrypt from 'bcrypt';
-import { validateRegisterAndLogin } from '../utils/validate';
+import { validatePublicKey, validateRegisterAndLogin } from '../utils/validate';
 import { createUser, getUserByUsername, getUserById } from '../db/queries/user';
 import { createTokens, revokeARefreshToken, verifyRefreshToken } from '../services/authService';
 import { CustomRequest } from '../middleware/user';
+import { saveUserPublicKey } from '../db/queries/key';
 
 const isProduction = process.env.NODE_ENV === 'production';
 
@@ -16,10 +17,15 @@ const isProduction = process.env.NODE_ENV === 'production';
  */
 export const register = async (req: Request, res: Response) => {
 	try {
-		const { username, password } = req.body;
+		const { username, password, publicKey } = req.body;
 		const validation = validateRegisterAndLogin(username, password);
 		if (!validation.success) {
 			res.status(400).json({ message: validation.message });
+			return;
+		}
+		const publicKeyValidation = validatePublicKey(publicKey);
+		if (!publicKeyValidation.success) {
+			res.status(400).json({ message: publicKeyValidation.message });
 			return;
 		}
 		const user = await getUserByUsername(username);
@@ -28,7 +34,14 @@ export const register = async (req: Request, res: Response) => {
 			return;
 		}
 		const hashedPassword = await bcrypt.hash(password, 10);
-		await createUser(username, hashedPassword);
+		const newUser = await createUser(username, hashedPassword);
+		if (!newUser) {
+			res.status(500).json({ message: 'Error creating user' });
+			return;
+		}
+		const userId = newUser[0].id;
+		await saveUserPublicKey(userId, publicKey);
+
 		res.status(201).json({ message: 'User created' });
 	} catch (error) {
 		console.error('Error registering user:', error);

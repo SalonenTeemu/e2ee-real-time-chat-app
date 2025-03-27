@@ -88,11 +88,9 @@ const insertTestData = async () => {
 	const userCount = await db(userTableName).count('id').first();
 	if (userCount?.count === '0') {
 		await db(userTableName).insert([
-			{ username: 'user1', password: '$2b$10$7z0F6cK0VYjY9TzVnF2o4eP3x8w6Qk1zHtZ6K2F1JU2d8pLZ9U1a6', role: USER },
-			{ username: 'user2', password: '$2b$10$7z0F6cK0VYjY9TzVnF2o4eP3x8w6Qk1zHtZ6K2F1JU2d8pLZ9U1a6', role: USER },
-			{ username: 'user3', password: '$2b$10$7z0F6cK0VYjY9TzVnF2o4eP3x8w6Qk1zHtZ6K2F1JU2d8pLZ9U1a6', role: USER },
-			{ username: 'test', password: bcrypt.hashSync('Password123-', 10), role: USER },
-			{ username: 'testi', password: bcrypt.hashSync('Password123-', 10), role: USER },
+			{ username: 'user1', password: bcrypt.hashSync('Password123-', 10), role: USER },
+			{ username: 'user2', password: bcrypt.hashSync('Password123-', 10), role: USER },
+			{ username: 'user3', password: bcrypt.hashSync('Password123-', 10), role: USER },
 		]);
 		const user_ids = await db(userTableName).select('id').whereIn('username', ['user1', 'user2', 'user3']);
 		await db(publicKeyTableName).insert([
