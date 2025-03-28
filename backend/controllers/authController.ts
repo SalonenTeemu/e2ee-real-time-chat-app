@@ -42,7 +42,7 @@ export const register = async (req: Request, res: Response) => {
 		const userId = newUser[0].id;
 		await saveUserPublicKey(userId, publicKey);
 
-		res.status(201).json({ message: 'User created' });
+		res.status(201).json({ message: 'User registered successfully' });
 	} catch (error) {
 		console.error('Error registering user:', error);
 		res.status(500).json({ message: 'Error registering user' });

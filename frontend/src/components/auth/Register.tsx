@@ -35,7 +35,7 @@ const Register = () => {
 		}
 
 		try {
-			const { publicKey } = await createKeyPair();
+			const publicKey = await createKeyPair(password);
 			if (!publicKey) {
 				setErrorMessage('Failed to generate key pair.');
 				return;

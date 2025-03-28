@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { validateRegisterAndLogin } from '../../utils/validate';
+import { getAndDecryptPrivateKey } from '../../utils/key';
 
 /**
  * The Login component.
@@ -44,6 +45,7 @@ const Login = () => {
 
 			if (res.ok) {
 				await authContext.fetchUser();
+				await getAndDecryptPrivateKey(password);
 				alert('Welcome!');
 				navigate('/chat');
 			} else {

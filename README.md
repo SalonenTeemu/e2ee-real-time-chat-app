@@ -13,11 +13,11 @@ The project is created for the COMP.SEC.300 Secure programming course exercise w
 
 ## TODO
 
-- Encrypt private key before storing in browser
-- Cache shared keys
-- Key exchange between users (X25519 (Elliptic Curve Diffie-Hellman))
-- Generate shared secret using ECDH (Elliptic Curve Diffie-Hellman)
-- Message decryption: recipient decrypts the message using shared session key
+- Connect automatically to socket again
+- Use userId in the encryptedPrivateKey key name in indexedDB?
+- Error messages when the passport given for derivation is wrong
+- HTTPS
+- Use CryptoKey in saving key in memory?
 - General and chat-related notifications
 - Detailed logging for security monitoring
 - Rate limiting to prevent abuse

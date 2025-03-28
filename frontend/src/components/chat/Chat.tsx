@@ -119,9 +119,6 @@ const Chat = () => {
 				return prev;
 			});
 			openChat(data.message.chatId);
-			socket.on('receiveMessage', (data) => {
-				setMessages((prev) => [...prev, data]);
-			});
 		} catch (error) {
 			alert('Error starting chat');
 			console.error('Error starting chat:', error);
@@ -150,7 +147,6 @@ const Chat = () => {
 			}
 
 			if (data.message.length === 0) {
-				alert('No messages found for this chat. Start a conversation!');
 				return;
 			}
 
@@ -175,6 +171,7 @@ const Chat = () => {
 	 */
 	const closeChat = () => {
 		setSelectedChat(null);
+		setMessages([]);
 		socket.emit('leaveChat', selectedChat);
 	};
 
@@ -302,23 +299,30 @@ const Chat = () => {
 						</h3>
 
 						<ul className="mb-2 h-64 overflow-y-auto rounded-lg border border-gray-300 p-2">
-							{Object.keys(groupedMessages).map((date) => (
-								<div key={date}>
-									<li className="mb-1 rounded-lg bg-gray-700 p-1 text-center text-gray-500 text-white">
-										{format(new Date(date), 'PP')}
-									</li>
-									{groupedMessages[date].map((msg) => (
-										<li
-											key={`${msg.senderId}-${msg.createdAt}`}
-											className={`mb-1 rounded-lg p-2 ${msg.senderId === user.id ? 'bg-blue-200 text-left' : 'bg-gray-300 text-right'}`}
-										>
-											<div>{msg.content}</div>
-											<div className="text-xs text-gray-500">{format(new Date(msg.createdAt), 'HH:mm')}</div>
+							{messages.length === 0 ? (
+								<li className="mt-4 text-center text-gray-500">No messages yet</li>
+							) : (
+								Object.keys(groupedMessages).map((date) => (
+									<div key={date}>
+										<li className="mb-1 rounded-lg bg-gray-700 p-1 text-center text-gray-500 text-white">
+											{format(new Date(date), 'PP')}
 										</li>
-									))}
-								</div>
-							))}
+										{groupedMessages[date].map((msg) => (
+											<li
+												key={`${msg.senderId}-${msg.createdAt}`}
+												className={`mb-1 rounded-lg p-2 ${
+													msg.senderId === user.id ? 'bg-blue-200 text-left' : 'bg-gray-300 text-right'
+												}`}
+											>
+												<div>{msg.content}</div>
+												<div className="text-xs text-gray-500">{format(new Date(msg.createdAt), 'HH:mm')}</div>
+											</li>
+										))}
+									</div>
+								))
+							)}
 						</ul>
+
 						<div className="flex">
 							<input
 								value={message}

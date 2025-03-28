@@ -1,6 +1,7 @@
 import { createContext, useState, useContext, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { User } from '../utils/types';
+import { clearKeys } from '../utils/key';
 
 // Define the auth context type
 interface AuthContextType {
@@ -57,7 +58,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 				method: 'POST',
 				credentials: 'include',
 			});
+			// Set the user to null and clear keys
 			setUser(null);
+			clearKeys();
 			navigate('/');
 		} catch (error) {
 			console.error('Error logging out:', error);

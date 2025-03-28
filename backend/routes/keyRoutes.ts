@@ -1,5 +1,5 @@
 import express from 'express';
-import { savePublicKey, getRecipientPublicKey } from '../controllers/keyController';
+import { getRecipientPublicKey } from '../controllers/keyController';
 import { authorizeRole } from '../middleware/user';
 import { ADMIN, USER } from '../utils/constants';
 
