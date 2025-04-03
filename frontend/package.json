@@ -19,6 +19,7 @@
 		"dompurify": "^3.2.4",
 		"e2e-encrypted-real-time-chat-app": "file:..",
 		"libsodium-wrappers": "^0.7.15",
+		"lucide-react": "^0.487.0",
 		"react": "^19.0.0",
 		"react-dom": "^19.0.0",
 		"react-router-dom": "^7.2.0",

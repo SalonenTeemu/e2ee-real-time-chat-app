@@ -20,6 +20,9 @@ export const setupSocket = (server: http.Server) => {
 		},
 	});
 
+	// Store socket connections by user ID
+	const userSockets: Record<string, string> = {};
+
 	io.use((socket, next) => {
 		try {
 			const cookieHeader = socket.handshake.headers?.cookie;
@@ -49,35 +52,47 @@ export const setupSocket = (server: http.Server) => {
 	});
 
 	io.on('connect', (socket) => {
-		console.log('User connected:', socket.data.user.username);
+		console.log(`User ${socket.data.user.id} connected`);
 
-		socket.on('joinChat', (chatId) => {
-			socket.join(chatId);
-			console.log(`User joined chat room: ${chatId}`);
-		});
+		// Store the socket ID for the user
+		userSockets[socket.data.user.id] = socket.id;
 
-		socket.on('leaveChat', (chatId) => {
-			socket.leave(chatId);
-			console.log(`User left chat room: ${chatId}`);
-		});
+		socket.on('sendMessage', async ({ chatId, content }) => {
+			const senderId = socket.data.user.id;
+			console.log(`User ${senderId} sent a message to chat ${chatId}`);
 
-		socket.on('sendMessage', async ({ chatId, senderId, content }) => {
-			console.log('Message received:', content);
+			// Sanitize and encrypt the message before saving it
 			const sanitizedMessage = sanitizeMessage(content);
 			const encryptedMessage = encryptMessage(sanitizedMessage);
 
-			const newMessage: any = await saveMessage(chatId, senderId, encryptedMessage);
+			const newMessage = await saveMessage(chatId, senderId, encryptedMessage);
 
-			io.to(chatId).emit('receiveMessage', {
+			// Send to sender
+			io.to(userSockets[senderId]).emit('receiveMessage', {
 				chatId,
 				senderId,
 				content: sanitizedMessage,
 				createdAt: newMessage.created_at,
 			});
+
+			// Send to recipient if they are online
+			const recipientId = newMessage.recipientId;
+			if (userSockets[recipientId]) {
+				io.to(userSockets[recipientId]).emit('receiveMessage', {
+					chatId,
+					senderId,
+					content: sanitizedMessage,
+					createdAt: newMessage.created_at,
+				});
+			} else {
+				console.log(`User ${recipientId} is offline. Message saved so they can retrieve it later.`);
+			}
 		});
 
 		socket.on('disconnect', () => {
-			console.log('User disconnected:', socket.data.user.username);
+			console.log(`User ${socket.data.user.id} disconnected`);
+			// Remove socket ID from the userSockets map on disconnect
+			delete userSockets[socket.data.user.id];
 		});
 	});
 };

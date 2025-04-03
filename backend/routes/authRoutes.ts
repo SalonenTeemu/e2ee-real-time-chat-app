@@ -9,6 +9,6 @@ authRoutes.post('/register', register);
 authRoutes.post('/login', login);
 authRoutes.post('/logout', logout);
 authRoutes.get('/me', authorizeRole([USER, ADMIN]), getUserProfile);
-authRoutes.post('/refresh', authorizeRole([USER, ADMIN]), refresh);
+authRoutes.post('/refresh', refresh);
 
 export default authRoutes;

@@ -38,7 +38,7 @@ export const validateRegisterAndLogin = (username: string, password: string): { 
 	if (!validatePassword(password)) {
 		return {
 			success: false,
-			message: 'Password must be between 12 and 100 characters and have lower case, upper case, number, and special character.',
+			message: 'Password must be between 12 and 100 characters and have lower case, upper case, number, and a special character.',
 		};
 	}
 	return { success: true };

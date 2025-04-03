@@ -92,11 +92,5 @@ const insertTestData = async () => {
 			{ username: 'user2', password: bcrypt.hashSync('Password123-', 10), role: USER },
 			{ username: 'user3', password: bcrypt.hashSync('Password123-', 10), role: USER },
 		]);
-		const user_ids = await db(userTableName).select('id').whereIn('username', ['user1', 'user2', 'user3']);
-		await db(publicKeyTableName).insert([
-			{ user_id: user_ids[0].id, public_key: '4Hv4ssnTvP_jgANOr8lGaV4a8VNro0K8KzWnlKS-Pwk' },
-			{ user_id: user_ids[1].id, public_key: '323Ifkc6kVfniDPnOHrVq8bXtFSkytNkdpUsYksPiDc' },
-			{ user_id: user_ids[2].id, public_key: 'nE2NK7uTcvzo6v6FM2Biy-l6Geu_FUnpcCb7lzrYzQE' },
-		]);
 	}
 };

@@ -1,7 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { format, isValid } from 'date-fns';
-import socket from '../../services/socket';
+import { connectSocket, disconnectSocket, getSocket } from '../../services/socket';
 import { useAuth } from '../../context/AuthContext';
+import { useNotification } from '../../context/NotificationContext';
 import { validateUserSearchTerm, validateMessage } from '../../utils/validate';
 import { sanitizeMessage } from '../../utils/sanitize';
 import { decryptMessage, encryptMessage } from '../../utils/encryption';
@@ -13,6 +14,7 @@ import { getSharedKey } from '../../utils/key';
  * @returns {JSX.Element} The Chat component.
  */
 const Chat = () => {
+	const notificationContext = useNotification();
 	const { user } = useAuth();
 	const [searchTerm, setSearchTerm] = useState('');
 	const [users, setUsers] = useState<{ id: string; username: string }[]>([]);
@@ -23,54 +25,88 @@ const Chat = () => {
 	const [isSearchVisible, setSearchVisible] = useState(false);
 	const [hasSearched, setHasSearched] = useState(false);
 
+	const selectedChatRef = useRef(selectedChat);
+
+	// Update ref whenever selectedChat changes
 	useEffect(() => {
-		/**
-		 * Retrieves the chats for the current user.
-		 */
-		const getChats = async () => {
-			try {
-				const res = await fetch(`http://localhost:${import.meta.env.VITE_BACKEND_PORT || 5000}/api/chat`, {
-					credentials: 'include',
-				});
-				const data = await res.json();
-				if (!res.ok) {
-					alert(`Error: ${data.message}.`);
-					return;
-				}
-				setChats(data.message);
-			} catch (error) {
-				alert('Error fetching chats');
-				console.error('Error fetching chats:', error);
-			}
-		};
+		selectedChatRef.current = selectedChat;
+	}, [selectedChat]);
 
-		/**
-		 * Handles incoming messages via socket by decrypting them and adding them to the messages state.
-		 */
-		const handleReceiveMessage = async (data: { chatId: string; senderId: string; content: string; createdAt: string }) => {
-			if (selectedChat === data.chatId) {
-				const sharedKey = await getSharedKey(data.chatId);
-				const decryptedMessage = await decryptMessage(data.content, sharedKey);
-				setMessages((prev) => [...prev, { senderId: data.senderId, content: decryptedMessage, createdAt: data.createdAt }]);
-			}
-		};
-
+	useEffect(() => {
 		if (user) {
 			getChats();
-			socket.on('receiveMessage', handleReceiveMessage); // Add socket listener
+			connectSocket(notificationContext, handleReceiveMessage);
 		}
 
 		return () => {
-			socket.off('receiveMessage', handleReceiveMessage); // Clean up socket listener
+			disconnectSocket();
 		};
-	}, [user, selectedChat]);
+	}, [user]);
+
+	/**
+	 * Retrieves the chats for the current user.
+	 */
+	const getChats = async () => {
+		try {
+			const res = await fetch(`http://localhost:${import.meta.env.VITE_BACKEND_PORT || 5000}/api/chat`, {
+				credentials: 'include',
+			});
+			const data = await res.json();
+			if (!res.ok) {
+				notificationContext?.addNotification('error', `Error: ${data.message}.`);
+				return;
+			}
+			setChats(data.message);
+		} catch (error) {
+			notificationContext?.addNotification('error', 'Error fetching chats.');
+			console.error('Error fetching chats:', error);
+		}
+	};
+
+	/**
+	 * Handles incoming messages via socket by decrypting open chat messages and showing notifications for others.
+	 */
+	const handleReceiveMessage = async (data: { chatId: string; senderId: string; content: string; createdAt: string }) => {
+		if (!user) return;
+
+		const sharedKey = await getSharedKey(data.chatId, user.id);
+		const decryptedMessage = await decryptMessage(data.content, sharedKey);
+
+		if (selectedChatRef.current === data.chatId) {
+			setMessages((prevMessages) => [...prevMessages, { senderId: data.senderId, content: decryptedMessage, createdAt: data.createdAt }]);
+		} else {
+			let chat = chats.find((chat) => chat.id === data.chatId);
+			if (!chat) {
+				try {
+					const res = await fetch(`http://localhost:${import.meta.env.VITE_BACKEND_PORT || 5000}/api/chat/${data.chatId}`, {
+						credentials: 'include',
+					});
+					const chatData = await res.json();
+
+					if (res.ok) {
+						chat = { id: chatData.message.chatId, username: chatData.message.username };
+						if (chat) {
+							setChats((prev) => (chat ? [...prev, chat] : prev));
+						}
+					} else {
+						console.error(`Failed to fetch chat details: ${chatData.message}`);
+					}
+				} catch (error) {
+					console.error('Error fetching chat details:', error);
+				}
+			}
+
+			const senderName = chat ? chat.username : 'Unknown';
+			notificationContext?.addNotification('info', `New message from ${senderName}: "${decryptedMessage}"`);
+		}
+	};
 
 	/**
 	 * Retrieves the users based on the search term.
 	 */
 	const searchUsers = async () => {
 		if (!searchTerm.trim() || !validateUserSearchTerm(searchTerm)) {
-			alert('Invalid search term');
+			notificationContext?.addNotification('error', 'Invalid search term.');
 			return;
 		}
 
@@ -80,13 +116,15 @@ const Chat = () => {
 			});
 			const data = await res.json();
 			if (!res.ok) {
-				alert(`Error: ${data.message}.`);
+				notificationContext?.addNotification('error', `Error: ${data.message}.`);
 				return;
 			}
-			setUsers(data.message);
+			// Filter out users there are already chats with
+			const filteredUsers = data.message.filter((user: { username: string }) => !chats.some((chat) => chat.username === user.username));
+			setUsers(filteredUsers);
 			setHasSearched(true);
 		} catch (error) {
-			alert('Error fetching users');
+			notificationContext?.addNotification('error', 'Error fetching users.');
 			console.error('Error fetching users:', error);
 		}
 	};
@@ -108,7 +146,7 @@ const Chat = () => {
 			});
 			const data = await res.json();
 			if (!res.ok) {
-				alert(`Error: ${data.message}.`);
+				notificationContext?.addNotification('error', `Error: ${data.message}.`);
 				return;
 			}
 			setChats((prev) => {
@@ -120,7 +158,7 @@ const Chat = () => {
 			});
 			openChat(data.message.chatId);
 		} catch (error) {
-			alert('Error starting chat');
+			notificationContext?.addNotification('error', 'Error starting chat.');
 			console.error('Error starting chat:', error);
 		}
 	};
@@ -131,9 +169,10 @@ const Chat = () => {
 	 * @param chatId The chat ID
 	 */
 	const openChat = async (chatId: string) => {
-		closeChat();
+		if (!user) return;
+
+		setMessages([]);
 		setSelectedChat(chatId);
-		socket.emit('joinChat', chatId);
 
 		try {
 			const res = await fetch(`http://localhost:${import.meta.env.VITE_BACKEND_PORT || 5000}/api/message/${chatId}`, {
@@ -142,7 +181,7 @@ const Chat = () => {
 
 			const data = await res.json();
 			if (!res.ok) {
-				alert(`Error: ${data.message}.`);
+				notificationContext?.addNotification('error', `Error: ${data.message}.`);
 				return;
 			}
 
@@ -150,7 +189,7 @@ const Chat = () => {
 				return;
 			}
 
-			const sharedKey = await getSharedKey(chatId);
+			const sharedKey = await getSharedKey(chatId, user.id);
 
 			const decryptedMessages = await Promise.all(
 				data.message.map(async (msg: { senderId: string; content: string }) => ({
@@ -161,7 +200,7 @@ const Chat = () => {
 
 			setMessages(decryptedMessages);
 		} catch (error) {
-			alert('Error fetching messages');
+			notificationContext?.addNotification('error', 'Error fetching messages.');
 			console.error('Error fetching messages:', error);
 		}
 	};
@@ -172,34 +211,32 @@ const Chat = () => {
 	const closeChat = () => {
 		setSelectedChat(null);
 		setMessages([]);
-		socket.emit('leaveChat', selectedChat);
 	};
 
 	/**
 	 * Send a message related to the selected chat encrypted with the shared key.
 	 */
 	const sendMessage = async () => {
-		if (!user) return;
+		if (!user || !selectedChat) return;
 
 		const sanitizedMessage = sanitizeMessage(message);
 		if (message.trim() !== '' && selectedChat && validateMessage(sanitizedMessage)) {
 			try {
-				const sharedKey = await getSharedKey(selectedChat);
+				const sharedKey = await getSharedKey(selectedChat, user.id);
 				const encryptedMessage = await encryptMessage(sanitizedMessage, sharedKey);
 
-				socket.emit('sendMessage', {
+				getSocket().emit('sendMessage', {
 					chatId: selectedChat,
-					senderId: user.id,
 					content: encryptedMessage,
 				});
 
 				setMessage('');
 			} catch (error) {
-				alert('Error encrypting message');
+				notificationContext?.addNotification('error', 'Error encrypting message.');
 				console.error('Encryption error:', error);
 			}
 		} else {
-			alert('Invalid message');
+			notificationContext?.addNotification('error', 'Invalid message. Message must be between 1 and 1000 characters.');
 		}
 	};
 
@@ -210,8 +247,6 @@ const Chat = () => {
 		(acc, msg) => {
 			const messageDate = new Date(msg.createdAt);
 			if (!isValid(messageDate)) {
-				console.log(msg);
-
 				console.error('Invalid date:', msg.createdAt);
 				return acc;
 			}

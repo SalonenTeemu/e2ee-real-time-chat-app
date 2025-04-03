@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import { useNotification } from '../../context/NotificationContext';
 import { validateRegisterAndLogin } from '../../utils/validate';
-import { getAndDecryptPrivateKey } from '../../utils/key';
+import { createKeyPair, getAndDecryptPrivateKey } from '../../utils/key';
 
 /**
  * The Login component.
@@ -11,6 +12,7 @@ import { getAndDecryptPrivateKey } from '../../utils/key';
  */
 const Login = () => {
 	const authContext = useAuth();
+	const notificationContext = useNotification();
 	const [username, setUsername] = useState('');
 	const [password, setPassword] = useState('');
 	const [errorMessage, setErrorMessage] = useState('');
@@ -43,17 +45,42 @@ const Login = () => {
 				credentials: 'include',
 			});
 
+			const data = await res.json();
+
 			if (res.ok) {
+				const userId = data.userId;
+				if (data.requiresPublicKey) {
+					// Generate and save the public key
+					const publicKey = await createKeyPair(password, userId);
+					if (!publicKey) {
+						setErrorMessage('Failed to generate public key.');
+						return;
+					}
+
+					// Save the public key to the backend
+					const keyRes = await fetch(`http://localhost:${import.meta.env.VITE_BACKEND_PORT || 5000}/api/key`, {
+						method: 'POST',
+						headers: {
+							'Content-Type': 'application/json',
+						},
+						credentials: 'include',
+						body: JSON.stringify({ publicKey }),
+					});
+
+					if (!keyRes.ok) {
+						setErrorMessage('Failed to save public key.');
+						return;
+					}
+				}
 				await authContext.fetchUser();
-				await getAndDecryptPrivateKey(password);
-				alert('Welcome!');
+				await getAndDecryptPrivateKey(userId, password);
+				notificationContext?.addNotification('success', 'Welcome!');
 				navigate('/chat');
 			} else {
-				const data = await res.json();
 				setErrorMessage(`${data.message}.`);
 			}
 		} catch (error: any) {
-			setErrorMessage(error.response?.data?.message || 'Login failed.');
+			setErrorMessage(error.response?.data?.message || 'Login failed. Try again.');
 		}
 	};
 

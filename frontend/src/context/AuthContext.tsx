@@ -2,6 +2,7 @@ import { createContext, useState, useContext, useEffect, useCallback } from 'rea
 import { useNavigate } from 'react-router-dom';
 import { User } from '../utils/types';
 import { clearKeys } from '../utils/key';
+import { disconnectSocket } from '../services/socket';
 
 // Define the auth context type
 interface AuthContextType {
@@ -58,6 +59,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 				method: 'POST',
 				credentials: 'include',
 			});
+			// Disconnect the socket if it exists
+			disconnectSocket();
+
 			// Set the user to null and clear keys
 			setUser(null);
 			clearKeys();

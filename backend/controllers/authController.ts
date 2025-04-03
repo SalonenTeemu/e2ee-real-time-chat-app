@@ -1,10 +1,10 @@
 import { Request, Response } from 'express';
 import bcrypt from 'bcrypt';
-import { validatePublicKey, validateRegisterAndLogin } from '../utils/validate';
+import { validateRegisterAndLogin } from '../utils/validate';
 import { createUser, getUserByUsername, getUserById } from '../db/queries/user';
 import { createTokens, revokeARefreshToken, verifyRefreshToken } from '../services/authService';
 import { CustomRequest } from '../middleware/user';
-import { saveUserPublicKey } from '../db/queries/key';
+import { getPublicKeyByUserId } from '../db/queries/key';
 
 const isProduction = process.env.NODE_ENV === 'production';
 
@@ -17,15 +17,10 @@ const isProduction = process.env.NODE_ENV === 'production';
  */
 export const register = async (req: Request, res: Response) => {
 	try {
-		const { username, password, publicKey } = req.body;
+		const { username, password } = req.body;
 		const validation = validateRegisterAndLogin(username, password);
 		if (!validation.success) {
 			res.status(400).json({ message: validation.message });
-			return;
-		}
-		const publicKeyValidation = validatePublicKey(publicKey);
-		if (!publicKeyValidation.success) {
-			res.status(400).json({ message: publicKeyValidation.message });
 			return;
 		}
 		const user = await getUserByUsername(username);
@@ -39,9 +34,6 @@ export const register = async (req: Request, res: Response) => {
 			res.status(500).json({ message: 'Error creating user' });
 			return;
 		}
-		const userId = newUser[0].id;
-		await saveUserPublicKey(userId, publicKey);
-
 		res.status(201).json({ message: 'User registered successfully' });
 	} catch (error) {
 		console.error('Error registering user:', error);
@@ -74,10 +66,17 @@ export const login = async (req: Request, res: Response) => {
 			res.status(401).json({ message: 'Incorrect password' });
 			return;
 		}
+		// Check if the user has a public key
+		const publicKey = await getPublicKeyByUserId(user.id);
+
 		const { accessToken, refreshToken } = await createTokens(user);
 		res.cookie('access_token', accessToken, { httpOnly: true, sameSite: 'strict', secure: isProduction, maxAge: 15 * 60 * 1000 });
 		res.cookie('refresh_token', refreshToken, { httpOnly: true, sameSite: 'strict', secure: isProduction, maxAge: 7 * 24 * 60 * 60 * 1000 });
-		res.status(200).json({ message: 'Login successful' });
+		if (!publicKey) {
+			res.status(200).json({ message: 'Login successful, but public key is missing', requiresPublicKey: true, userId: user.id });
+		} else {
+			res.status(200).json({ message: 'Login successful', requiresPublicKey: false, userId: user.id });
+		}
 	} catch (error) {
 		console.error('Error logging in:', error);
 		res.status(500).json({ message: 'Error logging in' });

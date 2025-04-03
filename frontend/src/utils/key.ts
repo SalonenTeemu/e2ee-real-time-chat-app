@@ -57,9 +57,10 @@ const deriveEncryptionKey = async (password: string, salt: Uint8Array) => {
  *
  * @param privateKey The private key to encrypt
  * @param password The password to derive the encryption key
+ * @param userId The user ID to associate with the private key
  * @throws Error if the password is not provided or encryption fails
  */
-const encryptAndStorePrivateKey = async (privateKey: string, password: string) => {
+const encryptAndStorePrivateKey = async (privateKey: string, password: string, userId: string) => {
 	if (!password) {
 		throw new Error('Password is required to encrypt the private key');
 	}
@@ -78,19 +79,19 @@ const encryptAndStorePrivateKey = async (privateKey: string, password: string) =
 		salt: sodium.to_base64(salt),
 		data: sodium.to_base64(new Uint8Array(encryptedPrivateKey)),
 	};
-
-	// Save to IndexedDB
-	await saveToDB('encryptedPrivateKey', encryptedData);
+	// Save to IndexedDB with userId as part of the key
+	await saveToDB(`encryptedPrivateKey_${userId}`, encryptedData);
 };
 
 /**
  * Retrieve and decrypt the private key using the user's password.
  *
+ * @param userId The user ID to retrieve the private key for
  * @param password The password to decrypt the private key. If not provided, a modal will be shown to enter the password.
  * @returns The decrypted private key as a string
  * @throws Error if the password is not provided or decryption fails
  */
-export const getAndDecryptPrivateKey = async (password?: string) => {
+export const getAndDecryptPrivateKey = async (userId: string, password?: string) => {
 	let pswd = password || null;
 	if (!password) {
 		try {
@@ -107,8 +108,8 @@ export const getAndDecryptPrivateKey = async (password?: string) => {
 		throw new Error('Password is required to decrypt the private key');
 	}
 
-	// Retrieve the encrypted private key from IndexedDB
-	const encryptedData = (await getFromDB('encryptedPrivateKey')) as { iv: string; salt: string; data: string };
+	// Retrieve the encrypted private key for the specific userId
+	const encryptedData = (await getFromDB(`encryptedPrivateKey_${userId}`)) as { iv: string; salt: string; data: string };
 	if (!encryptedData) {
 		throw new Error('No encrypted private key found');
 	}
@@ -145,9 +146,10 @@ const CACHE_TIMEOUT = 10 * 60 * 1000; // 10 minutes
  * Retrieve the shared key for encryption/decryption in the chat.
  *
  * @param chatId The chat ID
+ * @param userId The user ID to retrieve the private key for
  * @returns The shared key as a Uint8Array
  */
-export const getSharedKey = async (chatId: string) => {
+export const getSharedKey = async (chatId: string, userId: string) => {
 	await sodium.ready;
 
 	// Check if the shared key is cached and still valid
@@ -156,7 +158,6 @@ export const getSharedKey = async (chatId: string) => {
 		const now = Date.now();
 		// If the cached key is still within the valid timeframe, return it
 		if (now - cached.timestamp < CACHE_TIMEOUT) {
-			console.log(`Using cached shared key for chatId: ${chatId}`);
 			return cached.key;
 		} else {
 			// If the cached key is expired, remove it
@@ -175,7 +176,7 @@ export const getSharedKey = async (chatId: string) => {
 		if (userDecryptedPrivateKey) {
 			userPrivateKey = userDecryptedPrivateKey;
 		} else {
-			userPrivateKey = await getAndDecryptPrivateKey();
+			userPrivateKey = await getAndDecryptPrivateKey(userId);
 		}
 
 		const sharedKey = sodium.crypto_scalarmult(sodium.from_base64(userPrivateKey), recipientPublicKey);
@@ -197,16 +198,17 @@ export const getSharedKey = async (chatId: string) => {
  * Create a new key pair (private and public keys) and encrypt the private key.
  *
  * @param password The password to encrypt the private key
+ * @param userId The user ID to associate with the key pair
  * @returns The generated public key as a string
  */
-export const createKeyPair = async (password: string) => {
+export const createKeyPair = async (password: string, userId: string) => {
 	await sodium.ready;
 
 	const keyPair = sodium.crypto_box_keypair();
 	const privateKey = sodium.to_base64(keyPair.privateKey);
 	const publicKey = sodium.to_base64(keyPair.publicKey);
 
-	await encryptAndStorePrivateKey(privateKey, password);
+	await encryptAndStorePrivateKey(privateKey, password, userId);
 
 	return publicKey;
 };

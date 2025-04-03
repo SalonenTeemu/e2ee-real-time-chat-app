@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useNotification } from '../../context/NotificationContext';
 import { validateRegisterAndLogin } from '../../utils/validate';
-import { createKeyPair } from '../../utils/key';
 
 /**
  * The Register component.
@@ -9,6 +9,7 @@ import { createKeyPair } from '../../utils/key';
  * @returns {JSX.Element} The Register component.
  */
 const Register = () => {
+	const notificationContext = useNotification();
 	const [username, setUsername] = useState('');
 	const [password, setPassword] = useState('');
 	const [confirmPassword, setConfirmPassword] = useState('');
@@ -30,16 +31,11 @@ const Register = () => {
 		}
 
 		if (password !== confirmPassword) {
-			setErrorMessage('Passwords do not match');
+			setErrorMessage('Passwords do not match.');
 			return;
 		}
 
 		try {
-			const publicKey = await createKeyPair(password);
-			if (!publicKey) {
-				setErrorMessage('Failed to generate key pair.');
-				return;
-			}
 			const res = await fetch(`http://localhost:${import.meta.env.VITE_BACKEND_PORT || 5000}/api/auth/register`, {
 				method: 'POST',
 				headers: {
@@ -48,12 +44,11 @@ const Register = () => {
 				body: JSON.stringify({
 					username,
 					password,
-					publicKey,
 				}),
 			});
 
 			if (res.ok) {
-				alert('Registration successful. Please log in.');
+				notificationContext?.addNotification('success', 'Registration successful. Please log in.');
 				navigate('/login');
 			} else {
 				const data = await res.json();

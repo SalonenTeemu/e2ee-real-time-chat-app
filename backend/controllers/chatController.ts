@@ -1,6 +1,6 @@
 import { Response } from 'express';
 import { CustomRequest } from '../middleware/user';
-import { getChatByUsers, getChatsByUserId, createChat } from '../db/queries/chat';
+import { getChatByUsers, getChatsByUserId, createChat, getChatById } from '../db/queries/chat';
 import { getUserById } from '../db/queries/user';
 
 /**
@@ -54,5 +54,31 @@ export const getUserChats = async (req: CustomRequest, res: Response): Promise<a
 	} catch (error) {
 		console.error('Error getting user chats:', error);
 		return res.status(500).json({ message: 'Error getting user chats' });
+	}
+};
+
+/**
+ * Responds to a GET request to get a specific chat.
+ *
+ * @param req The request object
+ * @param res The response object
+ * @returns The chat for the user
+ */
+export const getChat = async (req: CustomRequest, res: Response): Promise<any> => {
+	const { chatId } = req.params;
+	const userId = req.user.id;
+
+	try {
+		const chat = await getChatById(chatId);
+		if (!chat) {
+			return res.status(404).json({ message: 'Chat not found' });
+		}
+		if (chat.user1_id !== userId && chat.user2_id !== userId) {
+			return res.status(403).json({ message: 'Unauthorized' });
+		}
+		res.status(200).json({ message: { chatId: chat.id, username: chat.user1_id === userId ? chat.user2_id : chat.user1_id } });
+	} catch (error) {
+		console.error('Error getting chat:', error);
+		return res.status(500).json({ message: 'Error getting chat' });
 	}
 };

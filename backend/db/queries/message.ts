@@ -1,5 +1,5 @@
 import db from '../knex';
-import { messageTableName } from '../initDB';
+import { chatTableName, messageTableName } from '../initDB';
 
 /**
  * Returns the messages for a chat.
@@ -25,6 +25,16 @@ export const getChatMessagesById = async (chatId: string) => {
  */
 export const saveMessage = async (chatId: string, senderId: string, encryptedContent: string) => {
 	try {
+		// Find the recipient ID based on the chatId and senderId
+		const chat = await db(chatTableName).select('user1_id', 'user2_id').where({ id: chatId }).first();
+
+		if (!chat) {
+			throw new Error('Chat not found');
+		}
+
+		const recipientId = chat.user1_id === senderId ? chat.user2_id : chat.user1_id;
+
+		// Insert the new message
 		const [newMessage] = await db(messageTableName)
 			.insert({
 				chat_id: chatId,
@@ -32,7 +42,9 @@ export const saveMessage = async (chatId: string, senderId: string, encryptedCon
 				content: encryptedContent,
 			})
 			.returning('*');
-		return newMessage;
+
+		// Return the new message along with the recipient ID
+		return { ...newMessage, recipientId };
 	} catch (error) {
 		console.error('Error saving message:', error);
 		throw new Error(`Error saving message: ${error}`);

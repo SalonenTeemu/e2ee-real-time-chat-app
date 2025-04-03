@@ -13,12 +13,12 @@ The project is created for the COMP.SEC.300 Secure programming course exercise w
 
 ## TODO
 
-- Connect automatically to socket again
-- Use userId in the encryptedPrivateKey key name in indexedDB?
-- Error messages when the passport given for derivation is wrong
+- Fix chat-related notifications -> now show sender id instead of username
+- Add error messages when the passport given for derivation is wrong
+- New login on device but has public key -> what should be done?
+- Export/import private key?
 - HTTPS
 - Use CryptoKey in saving key in memory?
-- General and chat-related notifications
 - Detailed logging for security monitoring
 - Rate limiting to prevent abuse
 - Unit testing
