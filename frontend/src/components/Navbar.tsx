@@ -6,7 +6,7 @@ import { ChevronDown, LogOut } from 'lucide-react';
 /**
  * The Navbar component.
  *
- * @returns {JSX.Element} The Navbar component.
+ * @returns {JSX.Element} The Navbar component
  */
 const Navbar = () => {
 	const { user, logout } = useAuth();

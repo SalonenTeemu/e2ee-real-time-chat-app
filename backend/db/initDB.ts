@@ -2,6 +2,7 @@ import bcrypt from 'bcrypt';
 import db from './knex';
 import { USER } from '../utils/constants';
 
+// Define the schema name and table names
 const schemaName = 'chat-app';
 export const userTableName = `${schemaName}.users`;
 export const chatTableName = `${schemaName}.chats`;

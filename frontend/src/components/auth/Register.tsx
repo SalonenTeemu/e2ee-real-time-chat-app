@@ -6,7 +6,7 @@ import { validateRegisterAndLogin } from '../../utils/validate';
 /**
  * The Register component.
  *
- * @returns {JSX.Element} The Register component.
+ * @returns {JSX.Element} The Register component
  */
 const Register = () => {
 	const notificationContext = useNotification();
@@ -24,6 +24,7 @@ const Register = () => {
 
 		setErrorMessage('');
 
+		// Validate username and password
 		const validation = validateRegisterAndLogin(username, password);
 		if (!validation.success) {
 			setErrorMessage(validation.message || 'An error occurred.');

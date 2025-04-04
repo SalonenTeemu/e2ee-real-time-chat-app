@@ -18,6 +18,7 @@ const isProduction = process.env.NODE_ENV === 'production';
 export const register = async (req: Request, res: Response) => {
 	try {
 		const { username, password } = req.body;
+		// Validate the username and password
 		const validation = validateRegisterAndLogin(username, password);
 		if (!validation.success) {
 			res.status(400).json({ message: validation.message });
@@ -28,6 +29,7 @@ export const register = async (req: Request, res: Response) => {
 			res.status(400).json({ message: 'Username already exists' });
 			return;
 		}
+		// Hash the password with bcrypt
 		const hashedPassword = await bcrypt.hash(password, 10);
 		const newUser = await createUser(username, hashedPassword);
 		if (!newUser) {
@@ -51,6 +53,7 @@ export const register = async (req: Request, res: Response) => {
 export const login = async (req: Request, res: Response) => {
 	try {
 		const { username, password } = req.body;
+		// Validate the username and password
 		const validation = validateRegisterAndLogin(username, password);
 		if (!validation.success) {
 			res.status(400).json({ message: validation.message });
@@ -61,6 +64,7 @@ export const login = async (req: Request, res: Response) => {
 			res.status(401).json({ message: 'Username not found' });
 			return;
 		}
+		// Check if the password is correct using bcrypt
 		const correctPassword = await bcrypt.compare(password, user.password);
 		if (!correctPassword) {
 			res.status(401).json({ message: 'Incorrect password' });
@@ -69,9 +73,13 @@ export const login = async (req: Request, res: Response) => {
 		// Check if the user has a public key
 		const publicKey = await getPublicKeyByUserId(user.id);
 
+		// Create tokens for the user and set them as cookies
 		const { accessToken, refreshToken } = await createTokens(user);
 		res.cookie('access_token', accessToken, { httpOnly: true, sameSite: 'strict', secure: isProduction, maxAge: 15 * 60 * 1000 });
 		res.cookie('refresh_token', refreshToken, { httpOnly: true, sameSite: 'strict', secure: isProduction, maxAge: 7 * 24 * 60 * 60 * 1000 });
+
+		// Respond with a success message and the user ID
+		// If the user does not have a public key yet (first login), set requiresPublicKey to true
 		if (!publicKey) {
 			res.status(200).json({ message: 'Login successful, but public key is missing', requiresPublicKey: true, userId: user.id });
 		} else {
@@ -94,9 +102,11 @@ export const logout = async (req: Request, res: Response) => {
 	try {
 		const cookies = req.cookies;
 		const refreshToken = cookies.refresh_token;
+		// Revoke the refresh token if it exists
 		if (refreshToken) {
 			await revokeARefreshToken(refreshToken);
 		}
+		// Clear the cookies
 		res.clearCookie('access_token', { httpOnly: true, sameSite: 'strict', secure: isProduction, maxAge: 0 });
 		res.clearCookie('refresh_token', { httpOnly: true, sameSite: 'strict', secure: isProduction, maxAge: 0 });
 		res.status(200).json({ message: 'Logout successful' });
@@ -146,13 +156,17 @@ export const refresh = async (req: CustomRequest, res: Response) => {
 			res.status(401).json({ message: 'Unauthorized' });
 			return;
 		}
+		// Verify the refresh token and get the user from it
 		const user = await verifyRefreshToken(oldRefreshToken);
 		if (!user) {
 			res.status(401).json({ message: 'Invalid or expired refresh token' });
 			return;
 		}
-		revokeARefreshToken(oldRefreshToken);
+		// Revoke the old refresh token and create new tokens
+		await revokeARefreshToken(oldRefreshToken);
 		const { accessToken, refreshToken } = await createTokens(user);
+
+		// Set the new tokens as cookies
 		res.cookie('access_token', accessToken, { httpOnly: true, sameSite: 'strict', secure: isProduction, maxAge: 15 * 60 * 1000 });
 		res.cookie('refresh_token', refreshToken, { httpOnly: true, sameSite: 'strict', secure: isProduction, maxAge: 7 * 24 * 60 * 60 * 1000 });
 		res.status(200).json({ message: 'Tokens refreshed' });

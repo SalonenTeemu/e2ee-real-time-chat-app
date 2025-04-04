@@ -4,6 +4,7 @@ import { User } from '../utils/types';
 
 const env = process.env;
 
+// Secrets and expiration times for JWT tokens
 const secret = env.JWT_SECRET || 'secret';
 const refreshSecret = env.JWT_REFRESH_SECRET || 'refreshSecret';
 const expiration = env.ACCESS_TOKEN_EXPIRATION || '15m';
@@ -14,15 +15,18 @@ const refreshExpiration = env.REFRESH_TOKEN_EXPIRATION || '7d';
  *
  * @param user The user object
  * @returns The access token and refresh token
+ * @throws Error if there is an issue creating the tokens
  */
 export const createTokens = async (user: User) => {
 	try {
+		// Create the access token and refresh token using jsonwebtoken
 		const accessToken = jwt.sign({ id: user.id, role: user.role }, secret, {
 			expiresIn: expiration,
 		});
 		const refreshToken = jwt.sign({ id: user.id, role: user.role }, refreshSecret, {
 			expiresIn: refreshExpiration,
 		});
+		// Save the refresh token to the database
 		await addRefreshToken(user.id, refreshToken);
 		return { accessToken, refreshToken };
 	} catch (error) {
@@ -39,6 +43,7 @@ export const createTokens = async (user: User) => {
  */
 export const verifyAccessToken = (token: string) => {
 	try {
+		// Verify the access token using jsonwebtoken
 		const decoded = jwt.verify(token, secret);
 		if (!decoded) {
 			return null;
@@ -57,10 +62,12 @@ export const verifyAccessToken = (token: string) => {
  */
 export const verifyRefreshToken = async (token: string) => {
 	try {
+		// Verify the refresh token using jsonwebtoken
 		const decoded = jwt.verify(token, refreshSecret);
 		if (!decoded) {
 			return null;
 		}
+		// Retrieve the refresh token from the database to check if it is revoked
 		const refreshToken = await getRefreshToken(token);
 		if (!refreshToken || refreshToken.is_revoked) {
 			return null;
@@ -76,6 +83,7 @@ export const verifyRefreshToken = async (token: string) => {
  * Revokes a refresh token.
  *
  * @param token The refresh token
+ * @throws Error if there is an issue revoking the token
  */
 export const revokeARefreshToken = async (token: string) => {
 	try {

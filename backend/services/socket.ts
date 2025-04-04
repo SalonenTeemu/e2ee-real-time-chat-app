@@ -7,7 +7,7 @@ import { encryptMessage } from '../utils/encryption';
 import { saveMessage } from '../db/queries/message';
 
 /**
- * Setup the socket.io server
+ * Setup the socket.io server.
  *
  * @param server {http.Server} The server instance
  */
@@ -23,6 +23,7 @@ export const setupSocket = (server: http.Server) => {
 	// Store socket connections by user ID
 	const userSockets: Record<string, string> = {};
 
+	// Middleware to authenticate users using JWT from cookies
 	io.use((socket, next) => {
 		try {
 			const cookieHeader = socket.handshake.headers?.cookie;
@@ -38,11 +39,13 @@ export const setupSocket = (server: http.Server) => {
 				return next(new Error('Authentication error: No token found in cookies'));
 			}
 
+			// Verify the access token
 			const decoded = verifyAccessToken(token);
 			if (!decoded) {
 				return next(new Error('Authentication error: Invalid token'));
 			}
 
+			// Attach the user data to the socket object
 			socket.data = { user: decoded };
 			return next();
 		} catch (error) {
@@ -91,7 +94,7 @@ export const setupSocket = (server: http.Server) => {
 
 		socket.on('disconnect', () => {
 			console.log(`User ${socket.data.user.id} disconnected`);
-			// Remove socket ID from the userSockets map on disconnect
+			// Remove socket ID from the userSockets record on disconnect
 			delete userSockets[socket.data.user.id];
 		});
 	});

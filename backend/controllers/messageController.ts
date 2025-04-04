@@ -26,6 +26,7 @@ export const getChatMessages = async (req: CustomRequest, res: Response): Promis
 			return res.status(403).json({ message: 'Unauthorized' });
 		}
 		const messages = await getChatMessagesById(chatId);
+		// Decrypt the messages
 		const decryptedMessages = messages.map((message: any) => ({
 			senderId: message.sender_id,
 			createdAt: message.created_at,

@@ -6,12 +6,12 @@ import { useNotification } from '../../context/NotificationContext';
 import { validateUserSearchTerm, validateMessage } from '../../utils/validate';
 import { sanitizeMessage } from '../../utils/sanitize';
 import { decryptMessage, encryptMessage } from '../../utils/encryption';
-import { getSharedKey } from '../../utils/key';
+import { getSharedKey } from '../../services/key/keys';
 
 /**
  * The Chat component.
  *
- * @returns {JSX.Element} The Chat component.
+ * @returns {JSX.Element} The Chat component
  */
 const Chat = () => {
 	const notificationContext = useNotification();
@@ -28,16 +28,17 @@ const Chat = () => {
 	const selectedChatRef = useRef(selectedChat);
 	const chatsRef = useRef(chats);
 
-	// Update ref whenever selectedChat changes
+	// Update ref whenever 'selectedChat' changes
 	useEffect(() => {
 		selectedChatRef.current = selectedChat;
 	}, [selectedChat]);
 
-	// Keep the ref updated whenever `chats` changes
+	// Keep the ref updated whenever 'chats' changes
 	useEffect(() => {
 		chatsRef.current = chats;
 	}, [chats]);
 
+	// Fetch chats and connect socket when user is logged in
 	useEffect(() => {
 		if (user) {
 			getChats();
@@ -80,11 +81,13 @@ const Chat = () => {
 
 		const decryptedMessage = await decryptMessage(data.content, sharedKey);
 
+		// Check if the message is for the currently selected chat
 		if (selectedChatRef.current === data.chatId) {
 			setMessages((prevMessages) => [...prevMessages, { senderId: data.senderId, content: decryptedMessage, createdAt: data.createdAt }]);
 		} else {
 			let chat = chatsRef.current.find((chat) => chat.id === data.chatId);
 			if (!chat) {
+				// If chat is not found in the current chats, fetch it from the server
 				try {
 					const res = await fetch(`http://localhost:${import.meta.env.VITE_BACKEND_PORT || 5000}/api/chat/${data.chatId}`, {
 						credentials: 'include',
@@ -104,6 +107,7 @@ const Chat = () => {
 				}
 			}
 
+			// Show notification for the received message
 			const senderName = chat ? chat.username : 'Unknown';
 			notificationContext?.addNotification('info', `${senderName}: ${decryptedMessage}`);
 		}
@@ -113,6 +117,7 @@ const Chat = () => {
 	 * Retrieves the users based on the search term.
 	 */
 	const searchUsers = async () => {
+		// Validate the search term
 		if (!searchTerm.trim() || !validateUserSearchTerm(searchTerm)) {
 			notificationContext?.addNotification('error', 'Invalid search term.');
 			return;
@@ -138,7 +143,7 @@ const Chat = () => {
 	};
 
 	/**
-	 * Starts a chat with the other user.
+	 * Starts a chat with other user.
 	 *
 	 * @param otherUserId The other user's ID
 	 */
@@ -164,6 +169,7 @@ const Chat = () => {
 				}
 				return prev;
 			});
+			// Open the chat after starting it
 			openChat(data.message.chatId);
 		} catch (error) {
 			notificationContext?.addNotification('error', 'Error starting chat.');
@@ -228,6 +234,7 @@ const Chat = () => {
 	const sendMessage = async () => {
 		if (!user || !selectedChat) return;
 
+		// Sanitize the message and validate it
 		const sanitizedMessage = sanitizeMessage(message);
 		if (message.trim() !== '' && selectedChat && validateMessage(sanitizedMessage)) {
 			try {
@@ -252,11 +259,11 @@ const Chat = () => {
 	};
 
 	/**
-	 * Retrieves the shared key for encryption/decryption in the chat.
+	 * Retrieves the shared key for encryption/decryption in the chat. Display error messages based on the error type in case of failure.
 	 *
 	 * @param chatId The chat ID
 	 * @param userId The user ID to retrieve the shared key for
-	 * @returns The shared key as a Uint8Array
+	 * @returns {Uint8Array} The shared key
 	 * @throws {Error} If the shared key cannot be retrieved
 	 */
 	const retrieveSharedKey = async (chatId: string, userId: string) => {
@@ -264,6 +271,7 @@ const Chat = () => {
 			const sharedKey = await getSharedKey(chatId, userId);
 			return sharedKey;
 		} catch (error: any) {
+			// Display error messages based on the error type
 			if (error.message === 'ActionCanceled') {
 				notificationContext?.addNotification('info', 'Password is required to view and send messages.');
 			} else if (error.message === 'IncorrectPassword') {

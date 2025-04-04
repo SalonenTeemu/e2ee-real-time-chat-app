@@ -50,6 +50,7 @@ export const savePublicKey = async (req: CustomRequest, res: Response): Promise<
 	const { publicKey } = req.body;
 	const { id: userId } = req.user;
 
+	// Validate the public key
 	const publicKeyValidation = validatePublicKey(publicKey);
 	if (!publicKeyValidation.success) {
 		return res.status(400).json({ message: publicKeyValidation.message });

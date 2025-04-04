@@ -1,7 +1,7 @@
 import { createContext, useState, useContext, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { User } from '../utils/types';
-import { clearKeys } from '../utils/key';
+import { clearKeys } from '../services/key/keys';
 import { disconnectSocket } from '../services/socket';
 
 // Define the auth context type

@@ -3,12 +3,12 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useNotification } from '../../context/NotificationContext';
 import { validateRegisterAndLogin } from '../../utils/validate';
-import { createKeyPair, getAndDecryptPrivateKey } from '../../utils/key';
+import { createKeyPair, getDecryptedPrivateKey } from '../../services/key/keys';
 
 /**
  * The Login component.
  *
- * @returns {JSX.Element} The Login component.
+ * @returns {JSX.Element} The Login component
  */
 const Login = () => {
 	const authContext = useAuth();
@@ -26,6 +26,7 @@ const Login = () => {
 
 		setErrorMessage('');
 
+		// Validate username and password
 		const validation = validateRegisterAndLogin(username, password);
 		if (!validation.success) {
 			setErrorMessage(validation.message || 'An error occurred.');
@@ -72,15 +73,16 @@ const Login = () => {
 						return;
 					}
 				}
+				// Fetch the user data and decrypt the private key
 				await authContext.fetchUser();
-				await getAndDecryptPrivateKey(userId, password);
+				await getDecryptedPrivateKey(userId, password);
 				notificationContext?.addNotification('success', 'Welcome!');
 				navigate('/chat');
 			} else {
 				setErrorMessage(`${data.message}.`);
 			}
 		} catch (error: any) {
-			setErrorMessage(error.response?.data?.message || 'Login failed. Try again.');
+			setErrorMessage(error.response?.data?.message || 'Login failed. Please try again.');
 		}
 	};
 

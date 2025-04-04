@@ -1,6 +1,6 @@
 # real-time-chat-app
 
-This is a real-time end-to-end encrypted chat application built with a Node.js + Express.js backend and a React + TailwindCSS frontend.
+This is a real-time end-to-end encrypted chat application built with a Node.js + Express.js + Socket.io backend and a React + Socket.io client + TailwindCSS frontend.
 
 The project is created for the COMP.SEC.300 Secure programming course exercise work.
 
@@ -13,10 +13,8 @@ The project is created for the COMP.SEC.300 Secure programming course exercise w
 
 ## TODO
 
-- New login on device but has public key -> what should be done?
+- New login on device but already has public key -> what should be done?
 - Export/import private key?
-- HTTPS
-- Use CryptoKey in saving key in memory?
 - Detailed logging for security monitoring
 - Rate limiting to prevent abuse
 - Unit testing

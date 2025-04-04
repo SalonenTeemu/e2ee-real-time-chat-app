@@ -16,6 +16,7 @@ const openDB = () => {
 				throw new Error('event.target is null');
 			}
 			const db = target.result;
+			// Check if the object store already exists and create it if not
 			if (!db.objectStoreNames.contains(STORE_NAME)) {
 				db.createObjectStore(STORE_NAME);
 			}
@@ -30,7 +31,7 @@ const openDB = () => {
  * Saves a value to the IndexedDB database under the specified key.
  *
  * @param key The key to save the value under
- * @param value  he value to save
+ * @param value The value to save
  */
 export const saveToDB = async (key: string, value: any) => {
 	const db = (await openDB()) as IDBDatabase;

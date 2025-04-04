@@ -6,6 +6,7 @@ import { chatTableName, userTableName } from '../initDB';
  *
  * @param chatId The chat ID
  * @returns The chat if it exists
+ * @throws Error if there is an issue retrieving the chat
  */
 export const getChatById = async (chatId: string) => {
 	try {
@@ -22,6 +23,7 @@ export const getChatById = async (chatId: string) => {
  * @param userId1 The user ID of the first user
  * @param userId2 The user ID of the second user
  * @returns The chat if it exists
+ * @throws Error if there is an issue retrieving the chat
  */
 export const getChatByUsers = async (userId1: string, userId2: string) => {
 	try {
@@ -37,6 +39,7 @@ export const getChatByUsers = async (userId1: string, userId2: string) => {
  *
  * @param userId The user ID
  * @returns The chats for the user with the other user's username
+ * @throws Error if there is an issue retrieving the chats
  */
 export const getChatsByUserId = async (userId: string) => {
 	try {
@@ -59,6 +62,7 @@ export const getChatsByUserId = async (userId: string) => {
  * @param userId1 The user ID of the first user
  * @param userId2 The user ID of the second user
  * @returns The chat ID
+ * @throws Error if there is an issue creating the chat
  */
 export const createChat = async (userId1: string, userId2: string) => {
 	try {

@@ -44,6 +44,7 @@ export const getUserChats = async (req: CustomRequest, res: Response): Promise<a
 
 	try {
 		const chats = await getChatsByUserId(userId);
+		// Format the chats to include only the necessary information and sort them by username
 		const formattedChats = chats
 			.map((chat: any) => ({
 				id: chat.id,

@@ -11,5 +11,6 @@ const purify = DOMPurify(window);
  * @returns The sanitized message
  */
 export const sanitizeMessage = (message: string): string => {
+	// Sanitize the message using DOMPurify
 	return purify.sanitize(message);
 };

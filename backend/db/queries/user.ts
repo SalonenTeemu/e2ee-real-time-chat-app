@@ -38,6 +38,8 @@ export const getUserByUsername = async (username: string) => {
  *
  * @param username The username of the user
  * @param hashedPassword The hashed password of the user
+ * @returns The ID of the newly created user
+ * @throws Error if there is an issue creating the user
  */
 export const createUser = async (username: string, hashedPassword: string) => {
 	try {
@@ -53,6 +55,7 @@ export const createUser = async (username: string, hashedPassword: string) => {
  *
  * @param searchTerm The username search term
  * @returns The users with usernames that match the search term
+ * @throws Error if there is an issue retrieving the users
  */
 export const searchUsersByUsername = async (searchTerm: string) => {
 	try {

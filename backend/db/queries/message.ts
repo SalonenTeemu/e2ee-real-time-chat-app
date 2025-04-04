@@ -6,6 +6,7 @@ import { chatTableName, messageTableName } from '../initDB';
  *
  * @param chatId The chat ID
  * @returns The messages for the chat
+ * @throws Error if there is an issue retrieving the messages
  */
 export const getChatMessagesById = async (chatId: string) => {
 	try {
@@ -22,6 +23,8 @@ export const getChatMessagesById = async (chatId: string) => {
  * @param chatId The chat ID
  * @param senderId The sender ID
  * @param encryptedContent The encrypted message content
+ * @returns The saved message along with the recipient ID
+ * @throws Error if there is an issue saving the message
  */
 export const saveMessage = async (chatId: string, senderId: string, encryptedContent: string) => {
 	try {

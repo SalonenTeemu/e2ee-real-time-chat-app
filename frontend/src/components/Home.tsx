@@ -4,7 +4,7 @@ import { useAuth } from '../context/AuthContext';
 /**
  * The Home component.
  *
- * @returns {JSX.Element} The Home component.
+ * @returns {JSX.Element} The Home component
  */
 const Home = () => {
 	const { user } = useAuth();

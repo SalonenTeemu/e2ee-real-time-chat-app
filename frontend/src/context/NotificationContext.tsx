@@ -13,7 +13,7 @@ const NotificationContext = createContext<NotificationContextType | undefined>(u
 /**
  * The NotificationProvider component provides the notification functions to its children.
  *
- * @returns The NotificationProvider component
+ * @returns The NotificationProvider component.
  */
 export function NotificationProvider({ children }: { children: React.ReactNode }) {
 	const [notifications, setNotifications] = useState<{ id: number; type: 'success' | 'error' | 'info'; message: string }[]>([]);

@@ -20,16 +20,18 @@ export const authenticateUserMiddleware = (req: CustomRequest, res: Response, ne
 			next();
 			return;
 		}
+		// Verify the access token and get the user
 		const user = verifyAccessToken(accessToken);
 		req.user = user;
 	} catch {
+		// If the token is invalid, set the user to null
 		req.user = { id: null, role: GUEST };
 	}
 	next();
 };
 
 /**
- * Authorizes a role.
+ * Authorizes roles to access a route.
  *
  * @param roles The roles to authorize
  */

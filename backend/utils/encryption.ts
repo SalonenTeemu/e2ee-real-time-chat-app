@@ -1,7 +1,9 @@
 import crypto from 'crypto';
 
 const ALGORITHM = 'aes-256-gcm';
-const ENCRYPTION_KEY = process.env.DB_ENCRYPTION_KEY || '5537c2abc506de279e641bc797a7e05d1d9eaa3d68bec3e47968f090a25872eb'; // Must be 256 bits (32 characters)
+
+// Key for encrypting and decrypting messages. Please add your own key in the .env file (must be 256 bits (32 characters)). This is just a placeholder key.
+const ENCRYPTION_KEY = process.env.DB_ENCRYPTION_KEY || '5537c2abc506de279e641bc797a7e05d1d9eaa3d68bec3e47968f090a25872eb';
 
 const IV_LENGTH = 12; // Recommended for GCM
 

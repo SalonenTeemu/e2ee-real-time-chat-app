@@ -15,7 +15,7 @@ export const saveUserPublicKey = async (userId: string, publicKey: string) => {
  * Retrieve the public key of a user.
  *
  * @param userId The user ID
- * @returns The public key of the user
+ * @returns The public key of the user if it exists, otherwise null
  */
 export const getPublicKeyByUserId = async (userId: string) => {
 	const record = await db(publicKeyTableName).where({ user_id: userId }).first();

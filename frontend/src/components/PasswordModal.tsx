@@ -11,8 +11,8 @@ interface PasswordModalProps {
 /**
  * The PasswordModal component.
  *
- * @param param0 The props for the PasswordModal component.
- * @returns {JSX.Element} The rendered PasswordModal component.
+ * @param param0 The props for the PasswordModal component
+ * @returns {JSX.Element} The PasswordModal component
  */
 const PasswordModal: React.FC<PasswordModalProps> = ({ onSubmit, onClose }) => {
 	const [password, setPassword] = useState('');
@@ -23,6 +23,7 @@ const PasswordModal: React.FC<PasswordModalProps> = ({ onSubmit, onClose }) => {
 	 */
 	const handleSubmit = () => {
 		setErrorMessage('');
+		// Validate the password
 		if (!validatePassword(password)) {
 			setErrorMessage(
 				'Invalid password. Password must be between 12 and 100 characters and have lower case, upper case, number, and a special character.'
@@ -76,7 +77,7 @@ const PasswordModal: React.FC<PasswordModalProps> = ({ onSubmit, onClose }) => {
 /**
  * Shows the password modal.
  *
- * @returns A promise that resolves with the password entered by the user or null if cancelled.
+ * @returns A promise that resolves with the password entered by the user or null if cancelled
  */
 export const showPasswordModal = (): Promise<string | null> => {
 	return new Promise((resolve) => {

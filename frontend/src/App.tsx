@@ -10,7 +10,7 @@ import Chat from './components/chat/Chat';
 /**
  * The main component of the application.
  *
- * @returns {JSX.Element} The App component.
+ * @returns {JSX.Element} The App component
  */
 const App = () => {
 	return (

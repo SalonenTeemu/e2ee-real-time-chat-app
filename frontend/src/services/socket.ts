@@ -3,7 +3,10 @@ import { io, Socket } from 'socket.io-client';
 let socket: Socket | null = null;
 
 /**
- * Initializes the socket connection and listens for events.
+ * Initialize the socket connection to the server and set up event listeners.
+ *
+ * @param notificationContext The context to use for notifications
+ * @param handleReceiveMessage The function to handle received messages
  */
 export const connectSocket = (notificationContext: any, handleReceiveMessage: (data: any) => void) => {
 	if (!socket) {
