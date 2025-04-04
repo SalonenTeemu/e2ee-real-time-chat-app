@@ -98,43 +98,48 @@ export const getAndDecryptPrivateKey = async (userId: string, password?: string)
 			// Prompt for the user's password to decrypt the private key
 			pswd = await showPasswordModal();
 			if (!pswd) {
-				throw new Error('Password is required');
+				throw new Error('ActionCanceled');
 			}
 		} catch {
-			throw new Error('Password modal was closed without entering a password');
+			throw new Error('ActionCanceled');
 		}
 	}
 	if (!pswd) {
-		throw new Error('Password is required to decrypt the private key');
+		throw new Error('PasswordRequired');
 	}
 
 	// Retrieve the encrypted private key for the specific userId
 	const encryptedData = (await getFromDB(`encryptedPrivateKey_${userId}`)) as { iv: string; salt: string; data: string };
 	if (!encryptedData) {
-		throw new Error('No encrypted private key found');
+		throw new Error('NoEncryptedKey');
 	}
 
 	const iv = sodium.from_base64(encryptedData.iv);
 	const salt = sodium.from_base64(encryptedData.salt);
 	const encryptedPrivateKey = sodium.from_base64(encryptedData.data);
 
-	// Derive the decryption key using the password and salt
-	const encryptionKey = await deriveEncryptionKey(pswd, salt);
+	try {
+		// Derive the decryption key using the password and salt
+		const encryptionKey = await deriveEncryptionKey(pswd, salt);
 
-	// Decrypt the private key
-	const decryptedPrivateKey = await window.crypto.subtle.decrypt({ name: 'AES-GCM', iv }, encryptionKey, encryptedPrivateKey);
+		// Decrypt the private key
+		const decryptedPrivateKey = await window.crypto.subtle.decrypt({ name: 'AES-GCM', iv }, encryptionKey, encryptedPrivateKey);
 
-	userDecryptedPrivateKey = new TextDecoder().decode(decryptedPrivateKey);
+		userDecryptedPrivateKey = new TextDecoder().decode(decryptedPrivateKey);
 
-	setTimeout(
-		() => {
-			userDecryptedPrivateKey = null; // Clear from memory after timeout
-			console.log('Private key cleared from memory.');
-		},
-		15 * 60 * 1000 // 15 minutes
-	);
+		setTimeout(
+			() => {
+				userDecryptedPrivateKey = null; // Clear from memory after timeout
+				console.log('Private key cleared from memory.');
+			},
+			15 * 60 * 1000 // 15 minutes
+		);
 
-	return userDecryptedPrivateKey;
+		return userDecryptedPrivateKey;
+	} catch (error) {
+		console.error('Error decrypting private key:', error);
+		throw new Error('IncorrectPassword');
+	}
 };
 
 // Cache for shared keys to avoid repeated calls to the server.
@@ -169,7 +174,7 @@ export const getSharedKey = async (chatId: string, userId: string) => {
 		// Retrieve the recipient's public key from the server
 		const recipientPublicKey = await getRecipientPublicKey(chatId);
 		if (!recipientPublicKey) {
-			throw new Error('Failed to retrieve recipient public key');
+			throw new Error('RecipientPublicKeyNotFound');
 		}
 
 		let userPrivateKey;

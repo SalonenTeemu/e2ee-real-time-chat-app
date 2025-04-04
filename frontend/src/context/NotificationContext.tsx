@@ -59,7 +59,7 @@ function NotificationContainer({ notifications }: { notifications: { id: number;
 // Notification Component
 function Notification({ id, type, message }: { id: number; type: 'success' | 'error' | 'info'; message: string }) {
 	const { removeNotification } = useNotification()!;
-	const bgColor = type === 'success' ? 'bg-green-500' : type === 'error' ? 'bg-red-500' : 'bg-blue-300';
+	const bgColor = type === 'success' ? 'bg-green-500' : type === 'error' ? 'bg-red-500' : 'bg-blue-400';
 	const textColor = type === 'success' || type === 'info' ? 'text-slate-950' : 'text-slate-50';
 	const buttonHoverTextColor = type === 'success' || type === 'info' ? 'hover:text-slate-50' : 'hover:text-slate-950';
 

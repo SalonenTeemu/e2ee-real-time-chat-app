@@ -76,7 +76,11 @@ export const getChat = async (req: CustomRequest, res: Response): Promise<any> =
 		if (chat.user1_id !== userId && chat.user2_id !== userId) {
 			return res.status(403).json({ message: 'Unauthorized' });
 		}
-		res.status(200).json({ message: { chatId: chat.id, username: chat.user1_id === userId ? chat.user2_id : chat.user1_id } });
+		const otherUsername = await getUserById(chat.user1_id === userId ? chat.user2_id : chat.user1_id);
+		if (!otherUsername) {
+			return res.status(404).json({ message: 'Chat user not found' });
+		}
+		return res.status(200).json({ message: { chatId: chat.id, username: otherUsername.username } });
 	} catch (error) {
 		console.error('Error getting chat:', error);
 		return res.status(500).json({ message: 'Error getting chat' });

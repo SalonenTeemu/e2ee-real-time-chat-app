@@ -16,7 +16,7 @@ const validateUsername = (username: string): boolean => {
  * @param password The password to validate
  * @returns The result of the validation
  */
-const validatePassword = (password: string): boolean => {
+export const validatePassword = (password: string): boolean => {
 	const strength = passwordStrength(password).id;
 	return strength == 3 && password.length <= 100;
 };

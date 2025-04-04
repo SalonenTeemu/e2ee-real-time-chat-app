@@ -38,9 +38,10 @@ export const connectSocket = (notificationContext: any, handleReceiveMessage: (d
 
 		// Listen for receiveMessage event here and forward it to the handler function
 		socket.on('receiveMessage', (data) => {
-			console.log('Socket received message:', data);
 			handleReceiveMessage(data);
 		});
+	} else if (!socket.connected) {
+		socket.connect();
 	}
 };
 

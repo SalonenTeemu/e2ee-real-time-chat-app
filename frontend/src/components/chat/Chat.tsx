@@ -26,11 +26,17 @@ const Chat = () => {
 	const [hasSearched, setHasSearched] = useState(false);
 
 	const selectedChatRef = useRef(selectedChat);
+	const chatsRef = useRef(chats);
 
 	// Update ref whenever selectedChat changes
 	useEffect(() => {
 		selectedChatRef.current = selectedChat;
 	}, [selectedChat]);
+
+	// Keep the ref updated whenever `chats` changes
+	useEffect(() => {
+		chatsRef.current = chats;
+	}, [chats]);
 
 	useEffect(() => {
 		if (user) {
@@ -69,13 +75,15 @@ const Chat = () => {
 	const handleReceiveMessage = async (data: { chatId: string; senderId: string; content: string; createdAt: string }) => {
 		if (!user) return;
 
-		const sharedKey = await getSharedKey(data.chatId, user.id);
+		const sharedKey = await retrieveSharedKey(data.chatId, user.id);
+		if (!sharedKey) return;
+
 		const decryptedMessage = await decryptMessage(data.content, sharedKey);
 
 		if (selectedChatRef.current === data.chatId) {
 			setMessages((prevMessages) => [...prevMessages, { senderId: data.senderId, content: decryptedMessage, createdAt: data.createdAt }]);
 		} else {
-			let chat = chats.find((chat) => chat.id === data.chatId);
+			let chat = chatsRef.current.find((chat) => chat.id === data.chatId);
 			if (!chat) {
 				try {
 					const res = await fetch(`http://localhost:${import.meta.env.VITE_BACKEND_PORT || 5000}/api/chat/${data.chatId}`, {
@@ -97,7 +105,7 @@ const Chat = () => {
 			}
 
 			const senderName = chat ? chat.username : 'Unknown';
-			notificationContext?.addNotification('info', `New message from ${senderName}: "${decryptedMessage}"`);
+			notificationContext?.addNotification('info', `${senderName}: ${decryptedMessage}`);
 		}
 	};
 
@@ -189,7 +197,8 @@ const Chat = () => {
 				return;
 			}
 
-			const sharedKey = await getSharedKey(chatId, user.id);
+			const sharedKey = await retrieveSharedKey(chatId, user.id);
+			if (!sharedKey) return;
 
 			const decryptedMessages = await Promise.all(
 				data.message.map(async (msg: { senderId: string; content: string }) => ({
@@ -222,7 +231,9 @@ const Chat = () => {
 		const sanitizedMessage = sanitizeMessage(message);
 		if (message.trim() !== '' && selectedChat && validateMessage(sanitizedMessage)) {
 			try {
-				const sharedKey = await getSharedKey(selectedChat, user.id);
+				const sharedKey = await retrieveSharedKey(selectedChat, user.id);
+				if (!sharedKey) return;
+
 				const encryptedMessage = await encryptMessage(sanitizedMessage, sharedKey);
 
 				getSocket().emit('sendMessage', {
@@ -237,6 +248,33 @@ const Chat = () => {
 			}
 		} else {
 			notificationContext?.addNotification('error', 'Invalid message. Message must be between 1 and 1000 characters.');
+		}
+	};
+
+	/**
+	 * Retrieves the shared key for encryption/decryption in the chat.
+	 *
+	 * @param chatId The chat ID
+	 * @param userId The user ID to retrieve the shared key for
+	 * @returns The shared key as a Uint8Array
+	 * @throws {Error} If the shared key cannot be retrieved
+	 */
+	const retrieveSharedKey = async (chatId: string, userId: string) => {
+		try {
+			const sharedKey = await getSharedKey(chatId, userId);
+			return sharedKey;
+		} catch (error: any) {
+			if (error.message === 'ActionCanceled') {
+				notificationContext?.addNotification('info', 'Password is required to view and send messages.');
+			} else if (error.message === 'IncorrectPassword') {
+				notificationContext?.addNotification('error', 'Incorrect password. Please try again.');
+			} else if (error.message === 'RecipientPublicKeyNotFound') {
+				notificationContext?.addNotification('error', 'Recipient public key not found.');
+			} else if (error.message === 'NoEncryptedKey') {
+				notificationContext?.addNotification('error', 'No encrypted key found.');
+			} else {
+				notificationContext?.addNotification('error', 'Error retrieving shared key.');
+			}
 		}
 	};
 
@@ -296,6 +334,12 @@ const Chat = () => {
 							placeholder="Search for users to chat with..."
 							value={searchTerm}
 							onChange={(e) => setSearchTerm(e.target.value)}
+							onKeyDown={(e) => {
+								if (e.key === 'Enter') {
+									e.preventDefault();
+									searchUsers();
+								}
+							}}
 							className="mb-2 w-full rounded-lg border border-gray-300 p-2"
 						/>
 						<button onClick={searchUsers} className="w-full rounded-lg bg-blue-500 px-4 py-2 text-white hover:bg-blue-600">
@@ -362,6 +406,12 @@ const Chat = () => {
 							<input
 								value={message}
 								onChange={(e) => setMessage(e.target.value)}
+								onKeyDown={(e) => {
+									if (e.key === 'Enter') {
+										e.preventDefault();
+										sendMessage();
+									}
+								}}
 								className="mr-2 flex-grow rounded-lg border border-gray-300 p-2"
 								placeholder="Write a message..."
 							/>

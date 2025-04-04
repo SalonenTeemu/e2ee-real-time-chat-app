@@ -13,8 +13,6 @@ The project is created for the COMP.SEC.300 Secure programming course exercise w
 
 ## TODO
 
-- Fix chat-related notifications -> now show sender id instead of username
-- Add error messages when the passport given for derivation is wrong
 - New login on device but has public key -> what should be done?
 - Export/import private key?
 - HTTPS
