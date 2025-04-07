@@ -31,12 +31,15 @@ export const connectSocket = (notificationContext: any, handleReceiveMessage: (d
 
 		socket.on('connect_error', (error) => {
 			console.error('Connection error:', error.message);
-			notificationContext?.addNotification('error', 'Connection error. Please refresh the page.');
+			notificationContext.addNotification('error', 'Connection error. Please refresh the page.');
 		});
 
 		socket.on('error', (error) => {
-			console.error('Server error:', error);
-			notificationContext?.addNotification('error', 'Server error occurred. Try again later.');
+			if (error.type === 'RateLimit') {
+				notificationContext.addNotification('error', error.message || 'Too many messages. Please slow down.');
+			} else {
+				notificationContext.addNotification('error', 'Server error occurred. Try again later.');
+			}
 		});
 
 		// Listen for receiveMessage event here and forward it to the handler function

@@ -3,6 +3,7 @@ import { format, isValid } from 'date-fns';
 import { connectSocket, disconnectSocket, getSocket } from '../../services/socket';
 import { useAuth } from '../../context/AuthContext';
 import { useNotification } from '../../context/NotificationContext';
+import { fetchWithAuth } from '../../utils/fetch';
 import { validateUserSearchTerm, validateMessage } from '../../utils/validate';
 import { sanitizeMessage } from '../../utils/sanitize';
 import { decryptMessage, encryptMessage } from '../../utils/encryption';
@@ -15,7 +16,8 @@ import { getSharedKey } from '../../services/key/keys';
  */
 const Chat = () => {
 	const notificationContext = useNotification();
-	const { user } = useAuth();
+	const authContext = useAuth();
+	const user = authContext.user;
 	const [searchTerm, setSearchTerm] = useState('');
 	const [users, setUsers] = useState<{ id: string; username: string }[]>([]);
 	const [chats, setChats] = useState<{ id: string; username: string }[]>([]);
@@ -55,17 +57,22 @@ const Chat = () => {
 	 */
 	const getChats = async () => {
 		try {
-			const res = await fetch(`http://localhost:${import.meta.env.VITE_BACKEND_PORT || 5000}/api/chat`, {
-				credentials: 'include',
-			});
+			const res = await fetchWithAuth(
+				`http://localhost:${import.meta.env.VITE_BACKEND_PORT || 5000}/api/chat`,
+				{},
+				notificationContext.addNotification,
+				authContext.logout
+			);
+			if (!res) return;
+
 			const data = await res.json();
 			if (!res.ok) {
-				notificationContext?.addNotification('error', `Error: ${data.message}.`);
+				notificationContext.addNotification('error', `Error: ${data.message}.`);
 				return;
 			}
 			setChats(data.message);
 		} catch (error) {
-			notificationContext?.addNotification('error', 'Error fetching chats.');
+			notificationContext.addNotification('error', 'Error fetching chats.');
 			console.error('Error fetching chats:', error);
 		}
 	};
@@ -89,9 +96,13 @@ const Chat = () => {
 			if (!chat) {
 				// If chat is not found in the current chats, fetch it from the server
 				try {
-					const res = await fetch(`http://localhost:${import.meta.env.VITE_BACKEND_PORT || 5000}/api/chat/${data.chatId}`, {
-						credentials: 'include',
-					});
+					const res = await fetchWithAuth(
+						`http://localhost:${import.meta.env.VITE_BACKEND_PORT || 5000}/api/chat/${data.chatId}`,
+						{},
+						notificationContext.addNotification,
+						authContext.logout
+					);
+					if (!res) return;
 					const chatData = await res.json();
 
 					if (res.ok) {
@@ -109,7 +120,7 @@ const Chat = () => {
 
 			// Show notification for the received message
 			const senderName = chat ? chat.username : 'Unknown';
-			notificationContext?.addNotification('info', `${senderName}: ${decryptedMessage}`);
+			notificationContext.addNotification('info', `${senderName}: ${decryptedMessage}`);
 		}
 	};
 
@@ -117,19 +128,25 @@ const Chat = () => {
 	 * Retrieves the users based on the search term.
 	 */
 	const searchUsers = async () => {
+		const sanitizedSearchTerm = sanitizeMessage(searchTerm);
 		// Validate the search term
-		if (!searchTerm.trim() || !validateUserSearchTerm(searchTerm)) {
-			notificationContext?.addNotification('error', 'Invalid search term.');
+		if (!sanitizedSearchTerm.trim() || !validateUserSearchTerm(sanitizedSearchTerm)) {
+			notificationContext.addNotification('error', 'Invalid search term.');
 			return;
 		}
 
 		try {
-			const res = await fetch(`http://localhost:${import.meta.env.VITE_BACKEND_PORT || 5000}/api/users/search?searchTerm=${searchTerm}`, {
-				credentials: 'include',
-			});
+			const res = await fetchWithAuth(
+				`http://localhost:${import.meta.env.VITE_BACKEND_PORT || 5000}/api/users/search?searchTerm=${sanitizedSearchTerm}`,
+				{},
+				notificationContext.addNotification,
+				authContext.logout
+			);
+			if (!res) return;
+
 			const data = await res.json();
 			if (!res.ok) {
-				notificationContext?.addNotification('error', `Error: ${data.message}.`);
+				notificationContext.addNotification('error', `Error: ${data.message}.`);
 				return;
 			}
 			// Filter out users there are already chats with
@@ -137,7 +154,7 @@ const Chat = () => {
 			setUsers(filteredUsers);
 			setHasSearched(true);
 		} catch (error) {
-			notificationContext?.addNotification('error', 'Error fetching users.');
+			notificationContext.addNotification('error', 'Error fetching users.');
 			console.error('Error fetching users:', error);
 		}
 	};
@@ -149,17 +166,23 @@ const Chat = () => {
 	 */
 	const startChat = async (otherUserId: string) => {
 		try {
-			const res = await fetch(`http://localhost:${import.meta.env.VITE_BACKEND_PORT || 5000}/api/chat/start`, {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json',
+			const res = await fetchWithAuth(
+				`http://localhost:${import.meta.env.VITE_BACKEND_PORT || 5000}/api/chat/start`,
+				{
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json',
+					},
+					body: JSON.stringify({ userId: otherUserId }),
 				},
-				credentials: 'include',
-				body: JSON.stringify({ userId: otherUserId }),
-			});
+				notificationContext.addNotification,
+				authContext.logout
+			);
+			if (!res) return;
+
 			const data = await res.json();
 			if (!res.ok) {
-				notificationContext?.addNotification('error', `Error: ${data.message}.`);
+				notificationContext.addNotification('error', `Error: ${data.message}.`);
 				return;
 			}
 			setChats((prev) => {
@@ -172,7 +195,7 @@ const Chat = () => {
 			// Open the chat after starting it
 			openChat(data.message.chatId);
 		} catch (error) {
-			notificationContext?.addNotification('error', 'Error starting chat.');
+			notificationContext.addNotification('error', 'Error starting chat.');
 			console.error('Error starting chat:', error);
 		}
 	};
@@ -189,13 +212,17 @@ const Chat = () => {
 		setSelectedChat(chatId);
 
 		try {
-			const res = await fetch(`http://localhost:${import.meta.env.VITE_BACKEND_PORT || 5000}/api/message/${chatId}`, {
-				credentials: 'include',
-			});
+			const res = await fetchWithAuth(
+				`http://localhost:${import.meta.env.VITE_BACKEND_PORT || 5000}/api/message/${chatId}`,
+				{},
+				notificationContext.addNotification,
+				authContext.logout
+			);
+			if (!res) return;
 
 			const data = await res.json();
 			if (!res.ok) {
-				notificationContext?.addNotification('error', `Error: ${data.message}.`);
+				notificationContext.addNotification('error', `Error: ${data.message}.`);
 				return;
 			}
 
@@ -215,7 +242,7 @@ const Chat = () => {
 
 			setMessages(decryptedMessages);
 		} catch (error) {
-			notificationContext?.addNotification('error', 'Error fetching messages.');
+			notificationContext.addNotification('error', 'Error fetching messages.');
 			console.error('Error fetching messages:', error);
 		}
 	};
@@ -250,11 +277,11 @@ const Chat = () => {
 
 				setMessage('');
 			} catch (error) {
-				notificationContext?.addNotification('error', 'Error encrypting message.');
+				notificationContext.addNotification('error', 'Error encrypting message.');
 				console.error('Encryption error:', error);
 			}
 		} else {
-			notificationContext?.addNotification('error', 'Invalid message. Message must be between 1 and 1000 characters.');
+			notificationContext.addNotification('error', 'Invalid message. Message must be between 1 and 1000 characters.');
 		}
 	};
 
@@ -273,15 +300,15 @@ const Chat = () => {
 		} catch (error: any) {
 			// Display error messages based on the error type
 			if (error.message === 'ActionCanceled') {
-				notificationContext?.addNotification('info', 'Password is required to view and send messages.');
+				notificationContext.addNotification('info', 'Password is required to view and send messages.');
 			} else if (error.message === 'IncorrectPassword') {
-				notificationContext?.addNotification('error', 'Incorrect password. Please try again.');
+				notificationContext.addNotification('error', 'Incorrect password. Please try again.');
 			} else if (error.message === 'RecipientPublicKeyNotFound') {
-				notificationContext?.addNotification('error', 'Recipient public key not found.');
+				notificationContext.addNotification('error', 'Recipient public key not found.');
 			} else if (error.message === 'NoEncryptedKey') {
-				notificationContext?.addNotification('error', 'No encrypted key found.');
+				notificationContext.addNotification('error', 'No encrypted key found.');
 			} else {
-				notificationContext?.addNotification('error', 'Error retrieving shared key.');
+				notificationContext.addNotification('error', 'Error retrieving shared key.');
 			}
 		}
 	};

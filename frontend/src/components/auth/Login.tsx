@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useNotification } from '../../context/NotificationContext';
+import { fetchWithAuth } from '../../utils/fetch';
 import { validateRegisterAndLogin } from '../../utils/validate';
 import { createKeyPair, getDecryptedPrivateKey } from '../../services/key/keys';
 
@@ -59,16 +60,19 @@ const Login = () => {
 					}
 
 					// Save the public key to the backend
-					const keyRes = await fetch(`http://localhost:${import.meta.env.VITE_BACKEND_PORT || 5000}/api/key`, {
-						method: 'POST',
-						headers: {
-							'Content-Type': 'application/json',
+					const keyRes = await fetchWithAuth(
+						`http://localhost:${import.meta.env.VITE_BACKEND_PORT || 5000}/api/key`,
+						{
+							method: 'POST',
+							headers: {
+								'Content-Type': 'application/json',
+							},
+							body: JSON.stringify({ publicKey }),
 						},
-						credentials: 'include',
-						body: JSON.stringify({ publicKey }),
-					});
-
-					if (!keyRes.ok) {
+						notificationContext.addNotification,
+						authContext.logout
+					);
+					if (!keyRes) {
 						setErrorMessage('Failed to save public key.');
 						return;
 					}
@@ -76,7 +80,7 @@ const Login = () => {
 				// Fetch the user data and decrypt the private key
 				await authContext.fetchUser();
 				await getDecryptedPrivateKey(userId, password);
-				notificationContext?.addNotification('success', 'Welcome!');
+				notificationContext.addNotification('success', 'Welcome!');
 				navigate('/chat');
 			} else {
 				setErrorMessage(`${data.message}.`);

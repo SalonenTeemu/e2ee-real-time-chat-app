@@ -1,5 +1,7 @@
 import { createContext, useState, useContext, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useNotification } from '../context/NotificationContext';
+import { fetchWithAuth } from '../utils/fetch';
 import { User } from '../utils/types';
 import { clearKeys } from '../services/key/keys';
 import { disconnectSocket } from '../services/socket';
@@ -21,6 +23,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
  * @returns The AuthProvider component.
  */
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+	const notificationContext = useNotification();
 	const [user, setUser] = useState<User | null>(null);
 	const navigate = useNavigate();
 
@@ -29,10 +32,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 	 */
 	const fetchUser = async () => {
 		try {
-			const res = await fetch(`http://localhost:${import.meta.env.VITE_BACKEND_PORT || 5000}/api/auth/me`, {
-				method: 'GET',
-				credentials: 'include',
-			});
+			const res = await fetchWithAuth(
+				`http://localhost:${import.meta.env.VITE_BACKEND_PORT || 5000}/api/auth/me`,
+				{},
+				notificationContext.addNotification,
+				logout
+			);
+			if (!res) {
+				return;
+			}
 			const data = await res.json();
 			if (res.ok && data.message) {
 				setUser(data.message);
@@ -100,7 +108,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 };
 
 /**
- * The useAuth hook returns the auth context.
+ * Custom hook to use the auth context.
  *
  * @returns The auth context.
  */

@@ -16,7 +16,6 @@ The project is created for the COMP.SEC.300 Secure programming course exercise w
 - New login on device but already has public key -> what should be done?
 - Export/import private key?
 - Detailed logging for security monitoring
-- Rate limiting to prevent abuse
 - Unit testing
 - Docker setup?
 - MFA?

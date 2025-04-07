@@ -1,6 +1,7 @@
 import { Server } from 'socket.io';
 import http from 'http';
 import * as cookie from 'cookie';
+import { RateLimiterMemory } from 'rate-limiter-flexible';
 import { verifyAccessToken } from './authService';
 import { sanitizeMessage } from '../utils/sanitize';
 import { encryptMessage } from '../utils/encryption';
@@ -18,6 +19,14 @@ export const setupSocket = (server: http.Server) => {
 			methods: ['GET', 'POST'],
 			credentials: true,
 		},
+	});
+
+	/**
+	 * Rate limiter to limit the number of requests from a single user to the socket server.
+	 */
+	const rateLimiter = new RateLimiterMemory({
+		points: 5, // 5 requests
+		duration: 10, // per 10 seconds
 	});
 
 	// Store socket connections by user ID
@@ -55,47 +64,58 @@ export const setupSocket = (server: http.Server) => {
 	});
 
 	io.on('connect', (socket) => {
-		console.log(`User ${socket.data.user.id} connected`);
+		const userId = socket.data.user.id;
+
+		console.log(`User ${userId} connected`);
 
 		// Store the socket ID for the user
-		userSockets[socket.data.user.id] = socket.id;
+		userSockets[userId] = socket.id;
 
 		socket.on('sendMessage', async ({ chatId, content }) => {
-			const senderId = socket.data.user.id;
-			console.log(`User ${senderId} sent a message to chat ${chatId}`);
+			try {
+				await rateLimiter.consume(userId); // Rate limit check
 
-			// Sanitize and encrypt the message before saving it
-			const sanitizedMessage = sanitizeMessage(content);
-			const encryptedMessage = encryptMessage(sanitizedMessage);
+				console.log(`User ${userId} sent a message to chat ${chatId}`);
 
-			const newMessage = await saveMessage(chatId, senderId, encryptedMessage);
+				// Sanitize and encrypt the message before saving it
+				const sanitizedMessage = sanitizeMessage(content);
+				const encryptedMessage = encryptMessage(sanitizedMessage);
 
-			// Send to sender
-			io.to(userSockets[senderId]).emit('receiveMessage', {
-				chatId,
-				senderId,
-				content: sanitizedMessage,
-				createdAt: newMessage.created_at,
-			});
+				const newMessage = await saveMessage(chatId, userId, encryptedMessage);
 
-			// Send to recipient if they are online
-			const recipientId = newMessage.recipientId;
-			if (userSockets[recipientId]) {
-				io.to(userSockets[recipientId]).emit('receiveMessage', {
+				// Send to sender
+				io.to(userSockets[userId]).emit('receiveMessage', {
 					chatId,
-					senderId,
+					userId,
 					content: sanitizedMessage,
 					createdAt: newMessage.created_at,
 				});
-			} else {
-				console.log(`User ${recipientId} is offline. Message saved so they can retrieve it later.`);
+
+				// Send to recipient if they are online
+				const recipientId = newMessage.recipientId;
+				if (userSockets[recipientId]) {
+					io.to(userSockets[recipientId]).emit('receiveMessage', {
+						chatId,
+						userId,
+						content: sanitizedMessage,
+						createdAt: newMessage.created_at,
+					});
+				} else {
+					console.log(`User ${recipientId} is offline. Message saved so they can retrieve it later.`);
+				}
+			} catch {
+				// Rate limit exceeded
+				socket.emit('error', {
+					type: 'RateLimit',
+					message: 'Too many messages. Please slow down.',
+				});
 			}
 		});
 
 		socket.on('disconnect', () => {
-			console.log(`User ${socket.data.user.id} disconnected`);
+			console.log(`User ${userId} disconnected`);
 			// Remove socket ID from the userSockets record on disconnect
-			delete userSockets[socket.data.user.id];
+			delete userSockets[userId];
 		});
 	});
 };

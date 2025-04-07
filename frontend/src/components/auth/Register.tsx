@@ -49,7 +49,7 @@ const Register = () => {
 			});
 
 			if (res.ok) {
-				notificationContext?.addNotification('success', 'Registration successful. Please log in.');
+				notificationContext.addNotification('success', 'Registration successful. Please log in.');
 				navigate('/login');
 			} else {
 				const data = await res.json();

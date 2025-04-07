@@ -12,6 +12,7 @@ import keyRoutes from './routes/keyRoutes';
 import { setupSocket } from './services/socket';
 import { authenticateUserMiddleware } from './middleware/user';
 import { corsOptions } from './middleware/cors';
+import { rateLimiterMiddleware } from './middleware/rateLimiting';
 
 const app = express();
 
@@ -21,6 +22,7 @@ app.use(helmet());
 app.use(express.json());
 app.use(cookieParser());
 app.use(authenticateUserMiddleware);
+app.use(rateLimiterMiddleware);
 
 // Routes
 app.use('/api/auth', authRoutes);
