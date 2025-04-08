@@ -25,7 +25,7 @@ export const setupSocket = (server: http.Server) => {
 	 * Rate limiter to limit the number of requests from a single user to the socket server.
 	 */
 	const rateLimiter = new RateLimiterMemory({
-		points: 5, // 5 requests
+		points: 10, // 5 requests
 		duration: 10, // per 10 seconds
 	});
 
@@ -86,7 +86,7 @@ export const setupSocket = (server: http.Server) => {
 				// Send to sender
 				io.to(userSockets[userId]).emit('receiveMessage', {
 					chatId,
-					userId,
+					senderId: userId,
 					content: sanitizedMessage,
 					createdAt: newMessage.created_at,
 				});
@@ -96,7 +96,7 @@ export const setupSocket = (server: http.Server) => {
 				if (userSockets[recipientId]) {
 					io.to(userSockets[recipientId]).emit('receiveMessage', {
 						chatId,
-						userId,
+						senderId: userId,
 						content: sanitizedMessage,
 						createdAt: newMessage.created_at,
 					});

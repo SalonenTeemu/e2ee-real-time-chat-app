@@ -125,7 +125,7 @@ const Login = () => {
 
 					{errorMessage && <p className="mb-4 text-center text-sm text-red-500">{errorMessage}</p>}
 
-					<button type="submit" className="w-full rounded-lg bg-blue-500 py-2 text-white hover:bg-blue-600">
+					<button type="submit" className="w-full cursor-pointer rounded-lg bg-blue-500 py-2 text-white hover:bg-blue-600">
 						Login
 					</button>
 				</form>

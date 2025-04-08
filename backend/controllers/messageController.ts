@@ -27,11 +27,21 @@ export const getChatMessages = async (req: CustomRequest, res: Response): Promis
 		}
 		const messages = await getChatMessagesById(chatId);
 		// Decrypt the messages
-		const decryptedMessages = messages.map((message: any) => ({
-			senderId: message.sender_id,
-			createdAt: message.created_at,
-			content: decryptMessage(message.content),
-		}));
+		const decryptedMessages = messages
+			.map((message: any) => {
+				try {
+					return {
+						senderId: message.sender_id,
+						createdAt: message.created_at,
+						content: decryptMessage(message.content),
+					};
+				} catch (error) {
+					console.warn(`Failed to decrypt message with ID ${message.id}:`, error);
+					return null; // Exclude messages that cannot be decrypted
+				}
+			})
+			.filter((message) => message !== null); // Remove null entries
+		return res.status(200).json({ message: decryptedMessages });
 		return res.status(200).json({ message: decryptedMessages });
 	} catch (error) {
 		console.error('Error getting chat messages:', error);

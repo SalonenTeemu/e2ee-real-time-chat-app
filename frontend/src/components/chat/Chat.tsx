@@ -233,12 +233,24 @@ const Chat = () => {
 			const sharedKey = await retrieveSharedKey(chatId, user.id);
 			if (!sharedKey) return;
 
-			const decryptedMessages = await Promise.all(
-				data.message.map(async (msg: { senderId: string; content: string }) => ({
-					...msg,
-					content: await decryptMessage(msg.content, sharedKey),
-				}))
-			);
+			const decryptedMessages = [];
+			let errorOccurred = false;
+			for (const msg of data.message) {
+				try {
+					const decryptedContent = await decryptMessage(msg.content, sharedKey);
+					decryptedMessages.push({
+						...msg,
+						content: decryptedContent,
+					});
+				} catch (error) {
+					errorOccurred = true;
+					console.error('Error decrypting message:', error);
+				}
+			}
+
+			if (errorOccurred) {
+				notificationContext.addNotification('info', 'Some messages could not be decrypted and are missing.');
+			}
 
 			setMessages(decryptedMessages);
 		} catch (error) {
@@ -338,15 +350,21 @@ const Chat = () => {
 	}
 
 	return (
-		<div className="flex min-h-screen bg-gray-100">
-			<div className="w-1/3 bg-white p-6 shadow-md">
+		<div className="flex h-screen bg-gray-100">
+			<div className="flex h-full w-1/3 flex-col bg-white p-6 shadow-md">
 				<div className="mb-6">
 					<h3 className="mb-2 text-xl font-semibold text-gray-800">Active Chats</h3>
 					<ul className="rounded-lg border border-gray-300">
-						{chats.map((chat) => (
-							<li key={`${chat.id}-${chat.username}`} className="flex items-center justify-between border-b border-gray-300 p-2">
+						{chats.map((chat, index) => (
+							<li
+								key={`${chat.id}-${chat.username}`}
+								className={`flex items-center justify-between p-2 ${index !== chats.length - 1 ? 'border-b border-gray-300' : ''}`}
+							>
 								<span>Chat with {chat.username}</span>
-								<button onClick={() => openChat(chat.id)} className="rounded-lg bg-blue-500 px-4 py-1 text-white hover:bg-blue-600">
+								<button
+									onClick={() => openChat(chat.id)}
+									className="cursor-pointer rounded-lg bg-blue-500 px-4 py-1 text-white hover:bg-blue-600"
+								>
 									Open Chat
 								</button>
 							</li>
@@ -357,7 +375,7 @@ const Chat = () => {
 					onClick={() => {
 						setSearchVisible((prev) => !prev);
 					}}
-					className="mb-4 w-full rounded-lg bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
+					className="mb-4 w-full cursor-pointer rounded-lg bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
 				>
 					{isSearchVisible ? 'Hide Search' : 'Search for users to chat with'}
 				</button>
@@ -377,7 +395,7 @@ const Chat = () => {
 							}}
 							className="mb-2 w-full rounded-lg border border-gray-300 p-2"
 						/>
-						<button onClick={searchUsers} className="w-full rounded-lg bg-blue-500 px-4 py-2 text-white hover:bg-blue-600">
+						<button onClick={searchUsers} className="w-full cursor-pointer rounded-lg bg-blue-500 px-4 py-2 text-white hover:bg-blue-600">
 							Search
 						</button>
 						{hasSearched && users.length === 0 && (
@@ -391,7 +409,7 @@ const Chat = () => {
 									<span>{user.username}</span>
 									<button
 										onClick={() => startChat(user.id)}
-										className="rounded-lg bg-green-500 px-4 py-1 text-white hover:bg-green-600"
+										className="cursor-pointer rounded-lg bg-green-600 px-4 py-1 text-white hover:bg-green-700"
 									>
 										Start Chat
 									</button>
@@ -402,17 +420,20 @@ const Chat = () => {
 				)}
 			</div>
 
-			<div className="w-2/3 p-6">
+			<div className="flex h-full w-2/3 flex-col p-6 pb-18">
 				{selectedChat && (
-					<div>
+					<div className="flex h-full flex-col">
 						<h3 className="mb-2 flex items-center justify-between text-xl font-semibold text-gray-800">
 							<span>Chat with {chats.find((chat) => chat.id === selectedChat)?.username}</span>
-							<button onClick={() => closeChat()} className="rounded-lg bg-red-500 px-4 py-2 text-base text-white hover:bg-red-900">
+							<button
+								onClick={() => closeChat()}
+								className="cursor-pointer rounded-lg bg-red-500 px-4 py-2 text-base text-white hover:bg-red-900"
+							>
 								Close Chat
 							</button>
 						</h3>
 
-						<ul className="mb-2 h-64 overflow-y-auto rounded-lg border border-gray-300 p-2">
+						<ul className="mb-2 flex-grow overflow-y-auto rounded-lg border border-gray-300 p-2">
 							{messages.length === 0 ? (
 								<li className="mt-4 text-center text-gray-500">No messages yet</li>
 							) : (
@@ -450,7 +471,7 @@ const Chat = () => {
 								className="mr-2 flex-grow rounded-lg border border-gray-300 p-2"
 								placeholder="Write a message..."
 							/>
-							<button onClick={sendMessage} className="rounded-lg bg-blue-500 px-4 py-2 text-white hover:bg-blue-600">
+							<button onClick={sendMessage} className="cursor-pointer rounded-lg bg-blue-500 px-4 py-2 text-white hover:bg-blue-600">
 								Send
 							</button>
 						</div>

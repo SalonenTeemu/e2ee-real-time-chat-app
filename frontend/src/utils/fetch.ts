@@ -1,5 +1,5 @@
 /**
- * Helper function to fetch again in case of 401 or 403 errors and to ahndle rate limiting responses.
+ * Helper function to fetch again in case of 401 or 403 errors and to handle rate limiting responses.
  *
  * @param url The URL to fetch
  * @param options The options to pass to the fetch function

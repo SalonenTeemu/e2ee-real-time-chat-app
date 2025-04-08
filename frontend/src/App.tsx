@@ -18,7 +18,7 @@ const App = () => {
 			<NotificationProvider>
 				<AuthProvider>
 					<Navbar />
-					<div className="main-content">
+					<div className="main-content pt-14">
 						<Routes>
 							<Route path="/" element={<Home />} />
 							<Route path="/login" element={<Login />} />
