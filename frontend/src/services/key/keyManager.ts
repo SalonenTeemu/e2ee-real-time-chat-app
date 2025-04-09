@@ -8,6 +8,7 @@ import { showPasswordModal } from '../../components/PasswordModal';
 class KeyManager {
 	// The decrypted private key for the user
 	private userDecryptedPrivateKey: Uint8Array | null = null;
+
 	// Cache for shared keys to avoid fetching and recomputing them frequently
 	private sharedKeyCache: Record<string, { key: Uint8Array; timestamp: number }> = {};
 
@@ -25,6 +26,9 @@ class KeyManager {
 		let lastInteractionTime = Date.now();
 		document.addEventListener('click', () => (lastInteractionTime = Date.now()));
 		document.addEventListener('keydown', () => (lastInteractionTime = Date.now()));
+		document.addEventListener('visibilitychange', () => {
+			lastInteractionTime = Date.now();
+		});
 
 		// Check for inactivity at regular intervals and clear keys if inactive
 		setInterval(() => {
@@ -54,11 +58,12 @@ class KeyManager {
 
 	/**
 	 * Retrieves the encrypted private key for the user from the Indexed database and decrypts it.
-	 * Uses the password provided or prompts the user for it if not provided.
+	 * Uses the provided password or prompts the user for it if not provided.
 	 *
 	 * @param userId The user ID to retrieve the encrypted private key for
 	 * @param password The password to decrypt the private key (optional)
 	 * @returns The decrypted private key as a Uint8Array
+	 * @throws Error if the decryption fails or if the password is incorrect or canceled
 	 */
 	private async decryptPrivateKey(userId: string, password?: string): Promise<Uint8Array> {
 		let pswd = password || null;
@@ -78,24 +83,35 @@ class KeyManager {
 
 		try {
 			// Retrieve the encrypted private key for the specific userId
-			const encryptedData = (await getFromDB(`encryptedPrivateKey_${userId}`)) as { iv: string; salt: string; data: string };
+			const encryptedData = (await getFromDB(`encryptedPrivateKey_${userId}`)) as { salt: string; nonce: string; data: string };
 			if (!encryptedData) {
 				throw new Error('NoEncryptedKey');
 			}
 
 			// Decode the base64 strings to Uint8Arrays
-			const iv = sodium.from_base64(encryptedData.iv);
 			const salt = sodium.from_base64(encryptedData.salt);
+			const nonce = sodium.from_base64(encryptedData.nonce);
 			const encryptedPrivateKey = sodium.from_base64(encryptedData.data);
 
-			// Derive the encryption key using PBKDF2 and decrypt the private key using AES-GCM
+			// Derive the encryption key using PBKDF2 with the provided password and salt
 			const encryptionKey = await this.deriveEncryptionKey(pswd, salt);
-			const decryptedPrivateKey = await window.crypto.subtle.decrypt({ name: 'AES-GCM', iv }, encryptionKey, encryptedPrivateKey);
+			const rawEncryptionKey = await window.crypto.subtle.exportKey('raw', encryptionKey);
 
-			return new Uint8Array(decryptedPrivateKey);
-		} catch (error) {
+			// Decrypt the private key using crypto_secretbox_open_easy
+			const decryptedPrivateKey = sodium.crypto_secretbox_open_easy(encryptedPrivateKey, nonce, new Uint8Array(rawEncryptionKey));
+
+			if (!decryptedPrivateKey) {
+				throw new Error('IncorrectPassword');
+			}
+
+			return decryptedPrivateKey;
+		} catch (error: any) {
 			console.error('Error decrypting private key:', error);
-			throw new Error('IncorrectPassword');
+			if (error.message === 'NoEncryptedKey') {
+				throw new Error('NoEncryptedKey');
+			} else {
+				throw new Error('IncorrectPassword');
+			}
 		}
 	}
 
@@ -105,16 +121,32 @@ class KeyManager {
 	 * @param password The password to derive the encryption key
 	 * @param salt The salt used for key derivation
 	 * @returns The derived encryption key as a CryptoKey object
+	 * @throws Error if the key derivation fails
 	 */
 	async deriveEncryptionKey(password: string, salt: Uint8Array) {
-		const keyMaterial = await window.crypto.subtle.importKey('raw', new TextEncoder().encode(password), { name: 'PBKDF2' }, false, ['deriveKey']);
-		return await window.crypto.subtle.deriveKey(
-			{ name: 'PBKDF2', salt, iterations: 100000, hash: 'SHA-256' },
-			keyMaterial,
-			{ name: 'AES-GCM', length: 256 },
-			true,
-			['encrypt', 'decrypt']
-		);
+		try {
+			// Import the password as raw data for use in PBKDF2 key derivation
+			const keyMaterial = await window.crypto.subtle.importKey('raw', new TextEncoder().encode(password), { name: 'PBKDF2' }, false, [
+				'deriveKey',
+			]);
+
+			// Derive the encryption key using PBKDF2 with SHA-256
+			return await window.crypto.subtle.deriveKey(
+				{
+					name: 'PBKDF2',
+					salt,
+					iterations: 100000,
+					hash: 'SHA-256',
+				},
+				keyMaterial,
+				{ name: 'AES-GCM', length: 256 }, // AES-GCM key
+				true,
+				['encrypt', 'decrypt']
+			);
+		} catch (error) {
+			console.error('Error deriving encryption key:', error);
+			throw new Error('KeyDerivationFailed');
+		}
 	}
 
 	/**
@@ -123,7 +155,7 @@ class KeyManager {
 	 * @param chatId The chat ID to retrieve the shared key for
 	 * @param userId The user ID to retrieve the private key for
 	 * @returns The shared key as a Uint8Array
-	 * @throws {Error} If the recipient public key is not found or if the private key decryption fails
+	 * @throws Error if the recipient public key is not found or if the private key decryption fails
 	 */
 	async getSharedKey(chatId: string, userId: string): Promise<Uint8Array> {
 		await sodium.ready;
@@ -134,25 +166,30 @@ class KeyManager {
 			return cached.key;
 		}
 
-		// Retrieve the recipient public key
+		// Retrieve the recipient public key for the chat ID from the server
 		const recipientPublicKey = await this.getRecipientPublicKey(chatId);
 		if (!recipientPublicKey) {
 			throw new Error('RecipientPublicKeyNotFound');
 		}
 
-		// Retrieve the decrypted private key for the user
+		// Decrypt and retrieve the user's private key
 		const userPrivateKey = await this.getDecryptedPrivateKey(userId);
 
-		// Generate the shared key using the user's private key and the recipient's public key
+		// Perform X25519 ECDH to compute a shared key
 		const sharedKey = sodium.crypto_scalarmult(userPrivateKey, recipientPublicKey);
 
-		// Clear the private key from memory
+		// Derive a session key from the shared key using a keyed derivation function (KDF)
+		const context = sodium.crypto_generichash(8, chatId); // 8-byte context
+		const sessionKey = sodium.crypto_kdf_derive_from_key(32, 0, sodium.to_base64(context), sharedKey);
+
+		// Clear the private key and shared key from memory
 		sodium.memzero(userPrivateKey);
+		sodium.memzero(sharedKey);
 
-		// Cache the shared key with a timestamp
-		this.sharedKeyCache[chatId] = { key: sharedKey, timestamp: Date.now() };
+		// Cache the session key with a timestamp
+		this.sharedKeyCache[chatId] = { key: sessionKey, timestamp: Date.now() };
 
-		return sharedKey;
+		return sessionKey;
 	}
 
 	/**

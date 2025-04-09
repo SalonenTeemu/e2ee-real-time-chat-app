@@ -29,6 +29,7 @@ const Chat = () => {
 
 	const selectedChatRef = useRef(selectedChat);
 	const chatsRef = useRef(chats);
+	const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
 	// Update ref whenever 'selectedChat' changes
 	useEffect(() => {
@@ -51,6 +52,18 @@ const Chat = () => {
 			disconnectSocket();
 		};
 	}, [user]);
+
+	// Trigger scroll when messages are updated
+	useEffect(() => {
+		scrollToBottom();
+	}, [messages]);
+
+	// Scroll to the bottom of the messages list
+	const scrollToBottom = () => {
+		if (messagesEndRef.current) {
+			messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+		}
+	};
 
 	/**
 	 * Retrieves the chats for the current user.
@@ -316,12 +329,14 @@ const Chat = () => {
 			} else if (error.message === 'IncorrectPassword') {
 				notificationContext.addNotification('error', 'Incorrect password. Please try again.');
 			} else if (error.message === 'RecipientPublicKeyNotFound') {
-				notificationContext.addNotification('error', 'Recipient public key not found.');
+				notificationContext.addNotification('error', 'Recipient has not accessed the application yet and cannot be contacted.');
 			} else if (error.message === 'NoEncryptedKey') {
 				notificationContext.addNotification('error', 'No encrypted key found.');
 			} else {
 				notificationContext.addNotification('error', 'Error retrieving shared key.');
 			}
+			closeChat();
+			return null;
 		}
 	};
 
@@ -456,6 +471,7 @@ const Chat = () => {
 									</div>
 								))
 							)}
+							<div ref={messagesEndRef}></div>
 						</ul>
 
 						<div className="flex">

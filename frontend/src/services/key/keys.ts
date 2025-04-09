@@ -15,22 +15,27 @@ export const encryptAndStorePrivateKey = async (privateKey: Uint8Array, password
 		throw new Error('Password is required to encrypt the private key');
 	}
 
-	// Generate salt and IV
+	// Generate salt and nonce
 	const salt = window.crypto.getRandomValues(new Uint8Array(16));
-	const iv = window.crypto.getRandomValues(new Uint8Array(12));
+	const nonce = sodium.randombytes_buf(sodium.crypto_secretbox_NONCEBYTES);
 
+	// Derive the encryption key using the password and salt
 	const encryptionKey = await keyManager.deriveEncryptionKey(password, salt);
 
-	// Encrypt the private key using AES-GCM
-	const encryptedPrivateKey = await window.crypto.subtle.encrypt({ name: 'AES-GCM', iv }, encryptionKey, privateKey);
+	// Export the raw key material from the CryptoKey
+	const rawKey = new Uint8Array(await window.crypto.subtle.exportKey('raw', encryptionKey));
 
+	// Encrypt the private key using crypto_secretbox_easy
+	const encryptedPrivateKey = sodium.crypto_secretbox_easy(privateKey, nonce, rawKey);
+
+	// Store encrypted data (encryptedPrivateKey) with salt and nonce
 	const encryptedData = {
-		iv: sodium.to_base64(iv),
 		salt: sodium.to_base64(salt),
-		data: sodium.to_base64(new Uint8Array(encryptedPrivateKey)),
+		nonce: sodium.to_base64(nonce),
+		data: sodium.to_base64(encryptedPrivateKey),
 	};
 
-	// Save to IndexedDB with userId as part of the key
+	// Save the data to IndexedDB with userId as part of the key
 	await saveToDB(`encryptedPrivateKey_${userId}`, encryptedData);
 };
 
@@ -60,6 +65,7 @@ export const createKeyPair = async (password: string, userId: string) => {
  * @param chatId The chat ID
  * @param userId The user ID to retrieve the private key for
  * @returns The shared key as a Uint8Array
+ * @throws Error if the shared key retrieval fails
  */
 export const getSharedKey = async (chatId: string, userId: string) => {
 	await sodium.ready;
