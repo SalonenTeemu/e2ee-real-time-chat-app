@@ -25,7 +25,7 @@ export const encryptAndStorePrivateKey = async (privateKey: Uint8Array, password
 	// Export the raw key material from the CryptoKey
 	const rawKey = new Uint8Array(await window.crypto.subtle.exportKey('raw', encryptionKey));
 
-	// Encrypt the private key using crypto_secretbox_easy
+	// Encrypt the private key using crypto_secretbox_easy (XSalsa20-Poly1305)
 	const encryptedPrivateKey = sodium.crypto_secretbox_easy(privateKey, nonce, rawKey);
 
 	// Store encrypted data (encryptedPrivateKey) with salt and nonce

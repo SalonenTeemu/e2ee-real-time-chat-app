@@ -19,7 +19,7 @@ export const encryptMessage = async (message: string, sharedKey: Uint8Array) => 
 		const encrypted = sodium.crypto_aead_xchacha20poly1305_ietf_encrypt(
 			message,
 			null, // Additional authenticated data (optional)
-			null, // Secret key (32 bytes)
+			null, // Secret nonce (optional)
 			nonce, // Nonce (24 bytes)
 			sharedKey // Shared secret key (32 bytes)
 		);
