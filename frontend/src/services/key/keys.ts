@@ -1,5 +1,6 @@
 import sodium from 'libsodium-wrappers';
 import { keyManager } from './keyManager';
+import { mnemonicToPrivateKey } from '../../utils/seed';
 import { saveToDB } from '../../utils/db';
 
 /**
@@ -40,19 +41,19 @@ export const encryptAndStorePrivateKey = async (privateKey: Uint8Array, password
 };
 
 /**
- * Create a new key pair (private and public keys) and encrypt the private key.
+ * Create a key pair (public and private keys) using a mnemonic seed phrase and encrypt and store the private key.
  *
- * @param password The password to encrypt the private key
- * @param userId The user ID to associate with the key pair
- * @returns The generated public key as a string
+ * @param password The password to derive the encryption key
+ * @param userId The user ID to associate with the private key
+ * @param mnemonic The mnemonic seed phrase to generate the key pair
+ * @returns The public key as a Base64 string
  */
-export const createKeyPair = async (password: string, userId: string) => {
+export const createKeyPair = async (password: string, userId: string, mnemonic: string) => {
 	await sodium.ready;
 
-	// Generate a new key pair
-	const keyPair = sodium.crypto_box_keypair();
-	const privateKey = keyPair.privateKey;
-	const publicKey = sodium.to_base64(keyPair.publicKey);
+	const keys = await mnemonicToPrivateKey(mnemonic, password);
+	const privateKey = keys.privateKey;
+	const publicKey = sodium.to_base64(keys.publicKey);
 
 	await encryptAndStorePrivateKey(privateKey, password, userId);
 

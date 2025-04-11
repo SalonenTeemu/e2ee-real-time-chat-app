@@ -42,12 +42,12 @@ export const encryptMessage = async (message: string, sharedKey: Uint8Array) => 
 export const decryptMessage = async (encryptedData: string, sharedKey: Uint8Array) => {
 	await sodium.ready;
 
-	// Split the nonce and encrypted message
-	const [nonceBase64, encryptedBase64] = encryptedData.split(':');
-	const nonce = sodium.from_base64(nonceBase64);
-	const encrypted = sodium.from_base64(encryptedBase64);
-
 	try {
+		// Split the nonce and encrypted message
+		const [nonceBase64, encryptedBase64] = encryptedData.split(':');
+		const nonce = sodium.from_base64(nonceBase64);
+		const encrypted = sodium.from_base64(encryptedBase64);
+
 		// Decrypt the message using XChaCha20-Poly1305
 		const decrypted = sodium.crypto_aead_xchacha20poly1305_ietf_decrypt(null, encrypted, null, nonce, sharedKey);
 		return sodium.to_string(decrypted);

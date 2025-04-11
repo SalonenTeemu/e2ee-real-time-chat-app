@@ -6,6 +6,7 @@ import Navbar from './components/Navbar';
 import Login from './components/auth/Login';
 import Register from './components/auth/Register';
 import Chat from './components/chat/Chat';
+import RestoreWithSeedPhrase from './components/auth-recovery/RestoreWithSeedPhrase';
 
 /**
  * The main component of the application.
@@ -24,6 +25,7 @@ const App = () => {
 							<Route path="/login" element={<Login />} />
 							<Route path="/register" element={<Register />} />
 							<Route path="/chat" element={<Chat />} />
+							<Route path="/restore-with-phrase" element={<RestoreWithSeedPhrase />} />
 						</Routes>
 					</div>
 				</AuthProvider>

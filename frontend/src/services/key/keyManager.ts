@@ -1,6 +1,6 @@
 import sodium from 'libsodium-wrappers';
 import { getFromDB } from '../../utils/db';
-import { showPasswordModal } from '../../components/PasswordModal';
+import { showPasswordModal } from '../../components/auth-recovery/PasswordModal';
 
 /**
  * KeyManager class to handle key management, including private key decryption and shared key generation.
@@ -175,7 +175,6 @@ class KeyManager {
 		// Decrypt and retrieve the user's private key
 		const userPrivateKey = await this.getDecryptedPrivateKey(userId);
 
-		// Perform X25519 ECDH to compute a shared key
 		const sharedKey = sodium.crypto_scalarmult(userPrivateKey, recipientPublicKey);
 
 		// Derive a session key from the shared key using a keyed derivation function (KDF)

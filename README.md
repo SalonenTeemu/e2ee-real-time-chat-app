@@ -13,8 +13,10 @@ The project is created for the COMP.SEC.300 Secure programming course exercise w
 
 ## TODO
 
-- New login on device but already has public key -> what should be done?
-- Export/import private key?
+- update the restore with seed page to have a field for every word (24 words) but so that the entire phrase can be pasted. Improve the password field to highlight that its the account one. check the given password from backend before accepting and notify if its wrong.
+- update documentation to reflect the changes
+- specify types and JSDOCs
+
 - Logging for security monitoring
 - Unit testing
 - Docker setup?

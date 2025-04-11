@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { createRoot } from 'react-dom/client';
-import { validatePassword } from '../utils/validate';
+import { validatePassword } from '../../utils/validate';
 
 // Define the props for the PasswordModal component
 interface PasswordModalProps {

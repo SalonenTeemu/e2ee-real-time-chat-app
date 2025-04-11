@@ -5,6 +5,9 @@ import { useNotification } from '../../context/NotificationContext';
 import { fetchWithAuth } from '../../utils/fetch';
 import { validateRegisterAndLogin } from '../../utils/validate';
 import { createKeyPair, getDecryptedPrivateKey } from '../../services/key/keys';
+import { generateSeedPhrase } from '../../utils/seed';
+import { getFromDB } from '../../utils/db';
+import SeedPhraseModal from '../auth-recovery/SeedPhraseModal';
 
 /**
  * The Login component.
@@ -12,12 +15,43 @@ import { createKeyPair, getDecryptedPrivateKey } from '../../services/key/keys';
  * @returns {JSX.Element} The Login component
  */
 const Login = () => {
+	const navigate = useNavigate();
 	const authContext = useAuth();
 	const notificationContext = useNotification();
 	const [username, setUsername] = useState('');
 	const [password, setPassword] = useState('');
 	const [errorMessage, setErrorMessage] = useState('');
-	const navigate = useNavigate();
+	const [isModalOpen, setIsModalOpen] = useState(false);
+	const [seedPhrase, setSeedPhrase] = useState('');
+	const [acknowledgePromise, setAcknowledgePromise] = useState<(() => void) | null>(null);
+
+	/**
+	 * Handles the opening of the seed phrase modal.
+	 *
+	 * @param generatedSeedPhrase The generated seed phrase to be displayed in the modal.
+	 * @returns The promise that resolves when the modal is acknowledged.
+	 */
+	const openSeedPhraseModal = async (generatedSeedPhrase: string) => {
+		setSeedPhrase(generatedSeedPhrase);
+		setIsModalOpen(true);
+
+		// Return a promise that resolves when the modal is acknowledged
+		return new Promise<void>((resolve) => {
+			setAcknowledgePromise(() => resolve);
+		});
+	};
+
+	/**
+	 * Handles the closing of the seed phrase modal.
+	 */
+	const closeSeedPhraseModal = () => {
+		setIsModalOpen(false);
+		setSeedPhrase('');
+		if (acknowledgePromise) {
+			acknowledgePromise(); // Resolve the promise
+			setAcknowledgePromise(null);
+		}
+	};
 
 	/**
 	 * Handles the login form submission.
@@ -50,12 +84,17 @@ const Login = () => {
 			const data = await res.json();
 
 			if (res.ok) {
+				await authContext.fetchUser();
 				const userId = data.userId;
 				if (data.requiresPublicKey) {
-					// Generate and save the public key
-					const publicKey = await createKeyPair(password, userId);
+					// Generate a new seed phrase and alert the user if this is the first login
+					const generatedSeedPhrase = await generateSeedPhrase();
+					await openSeedPhraseModal(generatedSeedPhrase);
+
+					// Generate and save the public and private keys
+					const publicKey = await createKeyPair(password, userId, generatedSeedPhrase);
 					if (!publicKey) {
-						setErrorMessage('Failed to generate public key.');
+						setErrorMessage('Failed to generate key pair.');
 						return;
 					}
 
@@ -74,6 +113,14 @@ const Login = () => {
 					);
 					if (!keyRes) {
 						setErrorMessage('Failed to save public key.');
+						return;
+					}
+				} else {
+					// Check if the private key exists in IndexedDB
+					const privateKeyExists = await getFromDB(`encryptedPrivateKey_${userId}`);
+					if (!privateKeyExists) {
+						// If the private key does not exist, navigate to the restore page to crete it based on the seed phrase
+						navigate('/restore-with-phrase');
 						return;
 					}
 				}
@@ -129,6 +176,8 @@ const Login = () => {
 						Login
 					</button>
 				</form>
+
+				{isModalOpen && <SeedPhraseModal seedPhrase={seedPhrase} onAcknowledge={closeSeedPhraseModal} />}
 
 				<div className="mt-4 text-center">
 					<p className="text-gray-600">

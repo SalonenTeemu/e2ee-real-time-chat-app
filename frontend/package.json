@@ -13,6 +13,8 @@
 	},
 	"dependencies": {
 		"@tailwindcss/vite": "^4.0.9",
+		"bip39": "^3.1.0",
+		"buffer": "^6.0.3",
 		"chat-app": "file:..",
 		"check-password-strength": "^3.0.0",
 		"date-fns": "^4.1.0",
@@ -25,9 +27,11 @@
 		"react-router-dom": "^7.2.0",
 		"real-time-chat-app": "file:..",
 		"socket.io-client": "^4.8.1",
-		"tailwindcss": "^4.0.9"
+		"tailwindcss": "^4.0.9",
+		"tweetnacl": "^1.0.3"
 	},
 	"devDependencies": {
+		"@esbuild-plugins/node-globals-polyfill": "^0.2.3",
 		"@eslint/js": "^9.21.0",
 		"@types/libsodium-wrappers": "^0.7.14",
 		"@types/node": "^22.13.9",
