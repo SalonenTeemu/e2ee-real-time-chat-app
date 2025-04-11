@@ -75,7 +75,6 @@ export const getSharedKey = async (chatId: string, userId: string) => {
 		const sharedKey = await keyManager.getSharedKey(chatId, userId);
 		return sharedKey;
 	} catch (error) {
-		console.error('Error retrieving shared key:', error);
 		throw error;
 	}
 };

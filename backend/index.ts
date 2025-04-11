@@ -13,6 +13,7 @@ import { setupSocket } from './services/socket';
 import { authenticateUserMiddleware } from './middleware/user';
 import { corsOptions } from './middleware/cors';
 import { rateLimiterMiddleware } from './middleware/rateLimiting';
+import './utils/tokenCleanupCron';
 
 const app = express();
 

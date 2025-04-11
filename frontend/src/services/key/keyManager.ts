@@ -106,7 +106,6 @@ class KeyManager {
 
 			return decryptedPrivateKey;
 		} catch (error: any) {
-			console.error('Error decrypting private key:', error);
 			if (error.message === 'NoEncryptedKey') {
 				throw new Error('NoEncryptedKey');
 			} else {

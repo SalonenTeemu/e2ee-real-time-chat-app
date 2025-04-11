@@ -27,10 +27,13 @@
 		"jsdom": "^26.0.0",
 		"jsonwebtoken": "^9.0.2",
 		"knex": "^3.1.0",
+		"node-cron": "^3.0.3",
 		"pg": "^8.13.3",
 		"rate-limiter-flexible": "^7.0.0",
 		"real-time-chat-app": "file:..",
-		"socket.io": "^4.8.1"
+		"socket.io": "^4.8.1",
+		"winston": "^3.17.0",
+		"winston-daily-rotate-file": "^5.0.0"
 	},
 	"devDependencies": {
 		"@eslint/js": "^9.20.0",
@@ -40,6 +43,7 @@
 		"@types/express": "^5.0.0",
 		"@types/jsdom": "^21.1.7",
 		"@types/jsonwebtoken": "^9.0.9",
+		"@types/node-cron": "^3.0.11",
 		"eslint": "^8.57.1",
 		"globals": "^15.15.0",
 		"nodemon": "^3.1.9",

@@ -6,9 +6,9 @@ import { Buffer } from 'buffer';
 /**
  * Generate a random seed phrase using BIP39.
  *
- * @returns {string} The generated seed phrase, which is a mnemonic string of 24 words
+ * @returns {string | null} The generated seed phrase or null if an error occurs
  */
-export const generateSeedPhrase = async (): Promise<string> => {
+export const generateSeedPhrase = async (): Promise<string | null> => {
 	try {
 		await sodium.ready;
 		const entropy = sodium.randombytes_buf(32); // 256-bit entropy (32 bytes) for 24-word mnemonic
@@ -16,7 +16,7 @@ export const generateSeedPhrase = async (): Promise<string> => {
 		return bip39.entropyToMnemonic(entropyBuffer);
 	} catch (error) {
 		console.error('Error generating seed phrase:', error);
-		return 'Error generating seed phrase';
+		return null;
 	}
 };
 

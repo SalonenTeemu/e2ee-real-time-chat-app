@@ -89,7 +89,12 @@ const Login = () => {
 				if (data.requiresPublicKey) {
 					// Generate a new seed phrase and alert the user if this is the first login
 					const generatedSeedPhrase = await generateSeedPhrase();
-					await openSeedPhraseModal(generatedSeedPhrase);
+					if (generatedSeedPhrase) {
+						await openSeedPhraseModal(generatedSeedPhrase);
+					} else {
+						setErrorMessage('Failed to generate seed phrase.');
+						return;
+					}
 
 					// Generate and save the public and private keys
 					const publicKey = await createKeyPair(password, userId, generatedSeedPhrase);

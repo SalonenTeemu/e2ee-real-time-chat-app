@@ -4,29 +4,27 @@ This is a real-time end-to-end encrypted chat application built with a Node.js +
 
 The project is created for the COMP.SEC.300 Secure programming course exercise work.
 
-## Planned Features
+## Features
 
-- User registration and login
+- User registration and login with strong passwords required
 - Real-time E2E-encrypted messaging between authenticated users using Socket.io
 - Secure message storage
 - Role-based access control for enhanced security
+- Message sanitazion
+- Rate limiting
+- Security logging
 
 ## TODO
 
-console errors to console.log
-
 - update documentation to reflect the changes
-console errors to console.log
-- job runner to claer revoked feresh tokens
 
 - Logging for security monitoring
 - Unit testing
-- Docker setup?
-- MFA?
 - CI/CD Pipeline with security features:
   - SBOM generation
   - Vulnerability scanning (e.g., Snyk, Trivy)
   - Dependency-check to track outdated or insecure dependencies
+- Update README.md
 
 ## Installation
 

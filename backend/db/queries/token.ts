@@ -50,3 +50,15 @@ export const revokeRefreshToken = async (token: string) => {
 		throw new Error(`Error revoking refresh token: ${error}`);
 	}
 };
+
+/**
+ * Delete expired and revoked refresh tokens from the database.
+ */
+export const deleteExpiredAndRevokedTokens = async () => {
+	try {
+		await db(refreshTokenTableName).where('expires_at', '<', new Date()).orWhere('is_revoked', true).del();
+	} catch (error) {
+		console.error('Error deleting expired and revoked tokens:', error);
+		throw new Error(`Error deleting expired and revoked tokens: ${error}`);
+	}
+};
