@@ -28,7 +28,7 @@ const Login = () => {
 	/**
 	 * Handles the opening of the seed phrase modal.
 	 *
-	 * @param generatedSeedPhrase The generated seed phrase to be displayed in the modal.
+	 * @param {string} generatedSeedPhrase The generated seed phrase to be displayed in the modal.
 	 * @returns The promise that resolves when the modal is acknowledged.
 	 */
 	const openSeedPhraseModal = async (generatedSeedPhrase: string) => {

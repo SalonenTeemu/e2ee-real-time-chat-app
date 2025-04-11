@@ -20,7 +20,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 /**
  * The AuthProvider component provides the auth context to its children.
  *
- * @returns The AuthProvider component.
+ * @returns {JSX.Element} The AuthProvider component
  */
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 	const notificationContext = useNotification();
@@ -110,7 +110,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 /**
  * Custom hook to use the auth context.
  *
- * @returns The auth context.
+ * @returns {AuthContextType} The auth context
  */
 export const useAuth = (): AuthContextType => {
 	const context = useContext(AuthContext);

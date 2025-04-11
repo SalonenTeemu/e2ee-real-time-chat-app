@@ -10,7 +10,7 @@ import { saveMessage } from '../db/queries/message';
 /**
  * Setup the socket.io server.
  *
- * @param server {http.Server} The server instance
+ * @param {http.Server} server The HTTP server to attach the socket.io server to
  */
 export const setupSocket = (server: http.Server) => {
 	const io = new Server(server, {

@@ -7,8 +7,8 @@ const purify = DOMPurify(window);
 /**
  * Sanitizes a message.
  *
- * @param message The message to sanitize
- * @returns The sanitized message
+ * @param {string} message The message to sanitize
+ * @returns {string} The sanitized message
  */
 export const sanitizeMessage = (message: string): string => {
 	// Sanitize the message using DOMPurify

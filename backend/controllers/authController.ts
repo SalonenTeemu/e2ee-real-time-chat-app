@@ -9,10 +9,10 @@ import { getPublicKeyByUserId } from '../db/queries/key';
 const isProduction = process.env.NODE_ENV === 'production';
 
 /**
- * Responds to a POST request to register a user.
+ * Responds to a POST request to register a new user.
  *
- * @param req The request object
- * @param res The response object
+ * @param {Request} req The request object
+ * @param {Response} res The response object
  * @returns The response
  */
 export const register = async (req: Request, res: Response) => {
@@ -46,8 +46,8 @@ export const register = async (req: Request, res: Response) => {
 /**
  * Responds to a POST request to log in a user.
  *
- * @param req The request object
- * @param res The response object
+ * @param {Request} req The request object
+ * @param {Response} res The response object
  * @returns The response
  */
 export const login = async (req: Request, res: Response) => {
@@ -94,8 +94,8 @@ export const login = async (req: Request, res: Response) => {
 /**
  * Responds to a POST request to log out a user.
  *
- * @param req The request object
- * @param res The response object
+ * @param {Request} req The request object
+ * @param {Response} res The response object
  * @returns The response
  */
 export const logout = async (req: Request, res: Response) => {
@@ -119,8 +119,8 @@ export const logout = async (req: Request, res: Response) => {
 /**
  * Responds to a GET request to get the user profile.
  *
- * @param req The request object
- * @param res The response object
+ * @param {CustomRequest} req The request object
+ * @param {Response} res The response object
  * @returns The response
  */
 export const getUserProfile = async (req: CustomRequest, res: Response) => {
@@ -145,8 +145,8 @@ export const getUserProfile = async (req: CustomRequest, res: Response) => {
 /**
  * Responds to a POST request to refresh the tokens.
  *
- * @param req The request object
- * @param res The response object
+ * @param {CustomRequest} req The request object
+ * @param {Response} res The response object
  * @returns The response
  */
 export const refresh = async (req: CustomRequest, res: Response) => {
@@ -179,8 +179,8 @@ export const refresh = async (req: CustomRequest, res: Response) => {
 /**
  * Responds to a POST request to verify the user's password.
  *
- * @param req The request object
- * @param res The response object
+ * @param {CustomRequest} req The request object
+ * @param {Response} res The response object
  * @returns The response
  */
 export const verifyPassword = async (req: CustomRequest, res: Response) => {

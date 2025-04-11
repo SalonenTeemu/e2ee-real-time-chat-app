@@ -42,9 +42,9 @@ class KeyManager {
 	/**
 	 * Retrieves the decrypted private key for the user. If the key is already decrypted, it returns the cached version.
 	 *
-	 * @param userId The user ID to retrieve the decrypted private key for
-	 * @param password The password to decrypt the private key (optional)
-	 * @returns The decrypted private key as a Uint8Array
+	 * @param {string} userId The user ID to retrieve the private key for
+	 * @param {string} password The password to decrypt the private key (optional)
+	 * @returns {Uint8Array} The decrypted private key
 	 */
 	public async getDecryptedPrivateKey(userId: string, password?: string): Promise<Uint8Array> {
 		if (this.userDecryptedPrivateKey) {
@@ -60,10 +60,10 @@ class KeyManager {
 	 * Retrieves the encrypted private key for the user from the Indexed database and decrypts it.
 	 * Uses the provided password or prompts the user for it if not provided.
 	 *
-	 * @param userId The user ID to retrieve the encrypted private key for
-	 * @param password The password to decrypt the private key (optional)
-	 * @returns The decrypted private key as a Uint8Array
-	 * @throws Error if the decryption fails or if the password is incorrect or canceled
+	 * @param {string} userId The user ID to retrieve the private key for
+	 * @param {string} password The password to decrypt the private key (optional)
+	 * @returns {Uint8Array} The decrypted private key
+	 * @throws {Error} If the decryption fails or if the password is incorrect or canceled
 	 */
 	private async decryptPrivateKey(userId: string, password?: string): Promise<Uint8Array> {
 		let pswd = password || null;
@@ -118,10 +118,10 @@ class KeyManager {
 	/**
 	 * Derives an encryption key using PBKDF2 with the provided password and salt.
 	 *
-	 * @param password The password to derive the encryption key
-	 * @param salt The salt used for key derivation
-	 * @returns The derived encryption key as a CryptoKey object
-	 * @throws Error if the key derivation fails
+	 * @param {string} password The password used for key derivation
+	 * @param {Uint8Array} salt The salt used for key derivation
+	 * @returns {CryptoKey} The derived encryption key
+	 * @throws {Error} If the key derivation fails
 	 */
 	async deriveEncryptionKey(password: string, salt: Uint8Array) {
 		try {
@@ -152,10 +152,10 @@ class KeyManager {
 	/**
 	 * Retrieves the shared key for encryption/decryption in the chat.
 	 *
-	 * @param chatId The chat ID to retrieve the shared key for
-	 * @param userId The user ID to retrieve the private key for
-	 * @returns The shared key as a Uint8Array
-	 * @throws Error if the recipient public key is not found or if the private key decryption fails
+	 * @param {string} chatId The chat ID to retrieve the shared key for
+	 * @param {string} userId The user ID to retrieve the shared key for
+	 * @returns {Uint8Array} The shared key
+	 * @throws {Error} If the recipient public key is not found or if the private key decryption fails
 	 */
 	async getSharedKey(chatId: string, userId: string): Promise<Uint8Array> {
 		await sodium.ready;
@@ -194,8 +194,8 @@ class KeyManager {
 	/**
 	 * Retrieves the recipient public key for a given chat ID from the server.
 	 *
-	 * @param chatId The chat ID to retrieve the recipient public key for
-	 * @returns The recipient public key as a Uint8Array or null if not found
+	 * @param {string} chatId The chat ID to retrieve the recipient public key for
+	 * @returns {Uint8Array | null} The recipient public key or null if not found
 	 */
 	private async getRecipientPublicKey(chatId: string): Promise<Uint8Array | null> {
 		const res = await fetch(`http://localhost:${import.meta.env.VITE_BACKEND_PORT || 5000}/api/key/recipient/${chatId}`, {

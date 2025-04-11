@@ -10,7 +10,7 @@ interface SeedPhraseModalProps {
 /**
  * The SeedPhraseModal component used to display the seed phrase to the user.
  *
- * @param param0 The props for the SeedPhraseModal component
+ * @param {SeedPhraseModalProps} param0 The props for the SeedPhraseModal component
  * @returns {JSX.Element} The SeedPhraseModal component
  */
 const SeedPhraseModal: React.FC<SeedPhraseModalProps> = ({ seedPhrase, onAcknowledge }) => {
@@ -42,7 +42,7 @@ const SeedPhraseModal: React.FC<SeedPhraseModalProps> = ({ seedPhrase, onAcknowl
 					<strong className="mt-4 block text-red-500">Do not share the phrase with anyone!</strong>
 				</p>
 				<div className="relative mb-4 flex items-center justify-between rounded-md bg-gray-200 p-4 text-gray-700">
-					<code className="mb-2 font-mono text-lg">{seedPhrase}</code>
+					<code className="mb-4 font-mono text-lg">{seedPhrase}</code>
 					<div className="absolute right-0 bottom-2 flex flex-col items-center">
 						<span className={`mb-1 text-sm text-green-600 ${copied ? 'visible' : 'invisible'}`}>Copied!</span>
 						<button onClick={handleCopy} className="text-blue-500 hover:text-blue-700">

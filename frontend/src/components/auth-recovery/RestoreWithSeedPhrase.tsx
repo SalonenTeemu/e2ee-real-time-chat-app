@@ -24,8 +24,8 @@ const RestoreWithSeedPhrase = () => {
 	/**
 	 * Handles the change event for the mnemonic input fields.
 	 *
-	 * @param index The index of the mnemonic word
-	 * @param value The value of the mnemonic word
+	 * @param {number} index The index of the mnemonic word
+	 * @param {string} value The new value of the mnemonic word
 	 */
 	const handleMnemonicChange = (index: number, value: string) => {
 		const updatedMnemonic = [...mnemonic];
@@ -36,8 +36,8 @@ const RestoreWithSeedPhrase = () => {
 	/**
 	 * Handles the key down event for the mnemonic input fields.
 	 *
-	 * @param index The index of the mnemonic word
-	 * @param e The keyboard event
+	 * @param {number} index The index of the mnemonic word
+	 * @param {React.KeyboardEvent<HTMLInputElement>} e The keyboard event
 	 */
 	const handleKeyDown = (index: number, e: React.KeyboardEvent<HTMLInputElement>) => {
 		if (e.key === 'Backspace' && !mnemonic[index] && index > 0) {
@@ -59,7 +59,7 @@ const RestoreWithSeedPhrase = () => {
 	/**
 	 * Handles the paste event for the mnemonic input fields.
 	 *
-	 * @param e The paste event
+	 * @param {React.ClipboardEvent<HTMLDivElement>} e The clipboard event
 	 */
 	const handlePaste = (e: React.ClipboardEvent<HTMLDivElement>) => {
 		e.preventDefault();
@@ -95,6 +95,7 @@ const RestoreWithSeedPhrase = () => {
 				headers: {
 					'Content-Type': 'application/json',
 				},
+				credentials: 'include',
 			});
 			const data = await res.json();
 			if (!res.ok) {
@@ -106,6 +107,7 @@ const RestoreWithSeedPhrase = () => {
 				notificationContext.addNotification('error', 'Not authenticated. Please log in again.');
 				return false;
 			}
+			return true;
 		} catch {
 			notificationContext.addNotification('error', 'Error verifying password. Please try again.');
 			return false;
@@ -126,7 +128,7 @@ const RestoreWithSeedPhrase = () => {
 			notificationContext.addNotification('success', 'Restored successfully. Start chatting!');
 			navigate('/chat');
 		} catch {
-			notificationContext.addNotification('error', 'Failed to restore from the given seed phrase. Please try again.');
+			notificationContext.addNotification('error', 'Failed to restore from the given seed phrase. Please check your input and try again.');
 		}
 	};
 
@@ -147,8 +149,14 @@ const RestoreWithSeedPhrase = () => {
 		<div className="flex h-screen items-center justify-center bg-gray-200">
 			<div className="rounded-lg bg-gray-100 p-6 shadow-md">
 				<h2 className="mb-6 text-center text-2xl font-bold text-blue-700">Restore Private Key With Seed Phrase</h2>
+				<p className="mb-2 text-center text-gray-700">
+					<strong>
+						Enter your 24-word seed phrase and your account password below in order to restore your private key in this environment and to
+						start chatting again.
+					</strong>
+				</p>
 				<p className="mb-4 text-center text-gray-700">
-					<strong>Enter your 24-word seed phrase below to restore your private key in this environment and to start chatting again:</strong>
+					You can input the seed phrase by pasting it in the first field or typing the words in the fields.
 				</p>
 				<div className="mb-4 grid grid-cols-6 gap-2" onPaste={handlePaste}>
 					{mnemonic.map((word, index) => (

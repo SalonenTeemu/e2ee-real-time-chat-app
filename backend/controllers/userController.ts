@@ -6,9 +6,9 @@ import { searchUsersByUsername } from '../db/queries/user';
 /**
  * Responds to a GET request to search for users by username.
  *
- * @param req The request object
- * @param res The response object
- * @returns The users with usernames that match the search term
+ * @param {CustomRequest} req The request object
+ * @param {Response} res The response object
+ * @returns The response
  */
 export const searchUsers = async (req: CustomRequest, res: Response): Promise<any> => {
 	const searchTerm = req.query.searchTerm;

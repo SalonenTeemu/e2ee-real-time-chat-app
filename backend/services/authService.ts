@@ -13,9 +13,9 @@ const refreshExpiration = env.REFRESH_TOKEN_EXPIRATION || '7d';
 /**
  * Creates an access token and a refresh token for a user.
  *
- * @param user The user object
- * @returns The access token and refresh token
- * @throws Error if there is an issue creating the tokens
+ * @param {User} user The user object containing the user's ID and role
+ * @returns {{ accessToken: string; refreshToken: string }} The access token and refresh token
+ * @throws {Error} If there is an issue creating the tokens
  */
 export const createTokens = async (user: User) => {
 	try {
@@ -38,8 +38,8 @@ export const createTokens = async (user: User) => {
 /**
  * Verifies an access token.
  *
- * @param token The access token
- * @returns The user object, or null if the token is invalid
+ * @param {string} token The access token
+ * @returns {User | null} The user object if the token is valid, otherwise null
  */
 export const verifyAccessToken = (token: string) => {
 	try {
@@ -57,8 +57,8 @@ export const verifyAccessToken = (token: string) => {
 /**
  * Verifies a refresh token.
  *
- * @param token The refresh token
- * @returns The user object, or null if the token is invalid
+ * @param {string} token The refresh token
+ * @returns {User | null} The user object if the token is valid, otherwise null
  */
 export const verifyRefreshToken = async (token: string) => {
 	try {
@@ -82,8 +82,8 @@ export const verifyRefreshToken = async (token: string) => {
 /**
  * Revokes a refresh token.
  *
- * @param token The refresh token
- * @throws Error if there is an issue revoking the token
+ * @param {string} token The refresh token to revoke
+ * @throws {Error} If there is an issue revoking the token
  */
 export const revokeARefreshToken = async (token: string) => {
 	try {

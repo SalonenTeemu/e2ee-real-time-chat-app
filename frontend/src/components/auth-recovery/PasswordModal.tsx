@@ -11,7 +11,7 @@ interface PasswordModalProps {
 /**
  * The PasswordModal component.
  *
- * @param param0 The props for the PasswordModal component
+ * @param {PasswordModalProps} param0 The props for the PasswordModal component
  * @returns {JSX.Element} The PasswordModal component
  */
 const PasswordModal: React.FC<PasswordModalProps> = ({ onSubmit, onClose }) => {

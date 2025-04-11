@@ -6,9 +6,9 @@ import { getUserById } from '../db/queries/user';
 /**
  * Responds to a POST request to start a chat.
  *
- * @param req The request object
- * @param res The response object
- * @returns The chat ID
+ * @param {CustomRequest} req The request object
+ * @param {Response} res The response object
+ * @returns The response
  */
 export const startChat = async (req: CustomRequest, res: Response): Promise<any> => {
 	const { userId } = req.body;
@@ -35,9 +35,9 @@ export const startChat = async (req: CustomRequest, res: Response): Promise<any>
 /**
  * Responds to a GET request to get the chats for a user.
  *
- * @param req The request object
- * @param res The response object
- * @returns The chats for the user
+ * @param {CustomRequest} req The request object
+ * @param {Response} res The response object
+ * @returns The response
  */
 export const getUserChats = async (req: CustomRequest, res: Response): Promise<any> => {
 	const userId = req.user.id;
@@ -61,9 +61,9 @@ export const getUserChats = async (req: CustomRequest, res: Response): Promise<a
 /**
  * Responds to a GET request to get a specific chat.
  *
- * @param req The request object
- * @param res The response object
- * @returns The chat for the user
+ * @param {CustomRequest} req The request object
+ * @param {Response} res The response object
+ * @returns The response
  */
 export const getChat = async (req: CustomRequest, res: Response): Promise<any> => {
 	const { chatId } = req.params;

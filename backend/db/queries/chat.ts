@@ -4,9 +4,9 @@ import { chatTableName, userTableName } from '../initDB';
 /**
  * Returns a chat by the chat ID.
  *
- * @param chatId The chat ID
- * @returns The chat if it exists
- * @throws Error if there is an issue retrieving the chat
+ * @param {string} chatId The chat ID
+ * @returns {any} The chat if it exists
+ * @throws {Error} If there is an issue retrieving the chat
  */
 export const getChatById = async (chatId: string) => {
 	try {
@@ -20,10 +20,10 @@ export const getChatById = async (chatId: string) => {
 /**
  * Returns a chat by the user IDs.
  *
- * @param userId1 The user ID of the first user
- * @param userId2 The user ID of the second user
- * @returns The chat if it exists
- * @throws Error if there is an issue retrieving the chat
+ * @param {string} userId1 The user ID of the first user
+ * @param {string} userId2 The user ID of the second user
+ * @returns {any} The chat if it exists
+ * @throws {Error} If there is an issue retrieving the chat
  */
 export const getChatByUsers = async (userId1: string, userId2: string) => {
 	try {
@@ -37,9 +37,9 @@ export const getChatByUsers = async (userId1: string, userId2: string) => {
 /**
  * Returns the chats for a user, including the other user's username.
  *
- * @param userId The user ID
- * @returns The chats for the user with the other user's username
- * @throws Error if there is an issue retrieving the chats
+ * @param {string} userId The user ID of the user
+ * @returns {any} The chats for the user with the other user's username
+ * @throws {Error} If there is an issue retrieving the chats
  */
 export const getChatsByUserId = async (userId: string) => {
 	try {
@@ -57,12 +57,12 @@ export const getChatsByUserId = async (userId: string) => {
 };
 
 /**
- * Create a chat.
+ * Create a chat between two users.
  *
- * @param userId1 The user ID of the first user
- * @param userId2 The user ID of the second user
- * @returns The chat ID
- * @throws Error if there is an issue creating the chat
+ * @param {string} userId1 The user ID of the first user
+ * @param {string} userId2 The user ID of the second user
+ * @returns {string} The chat ID
+ * @throws {Error} If there is an issue creating the chat
  */
 export const createChat = async (userId1: string, userId2: string) => {
 	try {

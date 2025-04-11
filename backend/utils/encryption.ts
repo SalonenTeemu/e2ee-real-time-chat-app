@@ -10,8 +10,8 @@ const IV_LENGTH = 12; // Recommended for GCM
 /**
  * Encrypts a message using AES-256-GCM.
  *
- * @param message The message to encrypt
- * @returns The encrypted message
+ * @param {string} message The message to encrypt
+ * @returns {string} The encrypted message
  */
 export const encryptMessage = (message: string) => {
 	const iv = crypto.randomBytes(IV_LENGTH);
@@ -27,8 +27,8 @@ export const encryptMessage = (message: string) => {
 /**
  * Decrypts a message using AES-256-GCM.
  *
- * @param encryptedMessage The encrypted message
- * @returns The decrypted message
+ * @param {string} encryptedMessage The encrypted message to decrypt
+ * @returns {string} The decrypted message
  */
 export const decryptMessage = (encryptedMessage: string) => {
 	const [iv, encrypted, authTag] = encryptedMessage.split(':');

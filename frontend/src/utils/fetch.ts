@@ -1,11 +1,11 @@
 /**
  * Helper function to fetch again in case of 401 or 403 errors and to handle rate limiting responses.
  *
- * @param url The URL to fetch
- * @param options The options to pass to the fetch function
- * @param addNotification The function to add a notification
- * @param logout The function to log out the user
- * @returns The response from the fetch function or null in case of an error
+ * @param {string} url The URL to fetch
+ * @param {RequestInit} options The options for the fetch request
+ * @param {function} addNotification The function to add a notification
+ * @param {function} logout The function to log out the user
+ * @returns {Response | null} The response from the fetch request or null if an error occurred
  */
 export const fetchWithAuth = async (
 	url: string,
@@ -15,11 +15,15 @@ export const fetchWithAuth = async (
 ) => {
 	try {
 		options.credentials = 'include';
+		// Fetch the URL with the provided options
 		const res = await fetch(url, options);
+
+		// Check for rate limiting related errors
 		if (res.status === 429) {
 			addNotification('error', 'Too many requests. Please try again later.');
 			return null;
 		}
+		// If the response is 401 or 403, try to refresh the token and fetch again
 		if (res.status === 401 || res.status === 403) {
 			const refreshRes = await fetch(`http://localhost:${import.meta.env.VITE_BACKEND_PORT || 5000}/api/auth/refresh`, {
 				method: 'POST',

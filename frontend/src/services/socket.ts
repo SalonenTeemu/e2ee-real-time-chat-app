@@ -5,8 +5,8 @@ let socket: Socket | null = null;
 /**
  * Initialize the socket connection to the server and set up event listeners.
  *
- * @param notificationContext The context to use for notifications
- * @param handleReceiveMessage The function to handle received messages
+ * @param {notificationContext} notificationContext The context for notifications
+ * @param {function} handleReceiveMessage The function to handle incoming messages
  */
 export const connectSocket = (notificationContext: any, handleReceiveMessage: (data: any) => void) => {
 	if (!socket) {

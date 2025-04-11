@@ -4,9 +4,9 @@ import { chatTableName, messageTableName } from '../initDB';
 /**
  * Returns the messages for a chat.
  *
- * @param chatId The chat ID
- * @returns The messages for the chat
- * @throws Error if there is an issue retrieving the messages
+ * @param {string} chatId The chat ID
+ * @returns {any} The messages for the chat
+ * @throws {Error} If there is an issue retrieving the messages
  */
 export const getChatMessagesById = async (chatId: string) => {
 	try {
@@ -20,11 +20,11 @@ export const getChatMessagesById = async (chatId: string) => {
 /**
  * Save a message to the database.
  *
- * @param chatId The chat ID
- * @param senderId The sender ID
- * @param encryptedContent The encrypted message content
- * @returns The saved message along with the recipient ID
- * @throws Error if there is an issue saving the message
+ * @param {string} chatId The chat ID
+ * @param {string} senderId The sender ID
+ * @param {string} encryptedContent The encrypted message content
+ * @returns {any} The saved message along with the recipient ID
+ * @throws {Error} If there is an issue saving the message
  */
 export const saveMessage = async (chatId: string, senderId: string, encryptedContent: string) => {
 	try {

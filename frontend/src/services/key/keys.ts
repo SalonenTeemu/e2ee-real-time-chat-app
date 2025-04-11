@@ -6,10 +6,10 @@ import { saveToDB } from '../../utils/db';
 /**
  * Encrypt and store the private key using password-derived encryption.
  *
- * @param privateKey The private key to encrypt
- * @param password The password to derive the encryption key
- * @param userId The user ID to associate with the private key
- * @throws Error if the password is not provided or encryption fails
+ * @param {Uint8Array} privateKey The private key to encrypt
+ * @param {string} password The password to derive the encryption key
+ * @param {string} userId The user ID to associate with the private key
+ * @throws {Error} If the password is not provided or encryption fails
  */
 export const encryptAndStorePrivateKey = async (privateKey: Uint8Array, password: string, userId: string) => {
 	if (!password) {
@@ -43,10 +43,10 @@ export const encryptAndStorePrivateKey = async (privateKey: Uint8Array, password
 /**
  * Create a key pair (public and private keys) using a mnemonic seed phrase and encrypt and store the private key.
  *
- * @param password The password to derive the encryption key
- * @param userId The user ID to associate with the private key
- * @param mnemonic The mnemonic seed phrase to generate the key pair
- * @returns The public key as a Base64 string
+ * @param {string} password The password to derive the encryption key
+ * @param {string} userId The user ID to associate with the private key
+ * @param {string} mnemonic The mnemonic seed phrase to generate the key pair
+ * @returns {string} The public key as a base64 string
  */
 export const createKeyPair = async (password: string, userId: string, mnemonic: string) => {
 	await sodium.ready;
@@ -63,10 +63,10 @@ export const createKeyPair = async (password: string, userId: string, mnemonic: 
 /**
  * Retrieve the shared key for encryption/decryption in the chat.
  *
- * @param chatId The chat ID
- * @param userId The user ID to retrieve the private key for
- * @returns The shared key as a Uint8Array
- * @throws Error if the shared key retrieval fails
+ * @param {string} chatId The chat ID to retrieve the shared key for
+ * @param {string} userId The user ID to retrieve the shared key for
+ * @returns {Uint8Array} The shared key for the chat
+ * @throws {Error} If the shared key retrieval fails
  */
 export const getSharedKey = async (chatId: string, userId: string) => {
 	await sodium.ready;
@@ -83,8 +83,8 @@ export const getSharedKey = async (chatId: string, userId: string) => {
 /**
  * Retrieve the decrypted private key for a specific user ID.
  *
- * @param userId The user ID to retrieve the private key for
- * @param password The password to decrypt the private key or null to prompt the user for it
+ * @param {string} userId The user ID to retrieve the private key for
+ * @param {string} password The password to decrypt the private key if given or null to prompt the user for it
  */
 export const getDecryptedPrivateKey = async (userId: string, password?: string) => {
 	keyManager.getDecryptedPrivateKey(userId, password);

@@ -3,8 +3,8 @@ import { passwordStrength } from 'check-password-strength';
 /**
  * Validate a username.
  *
- * @param username The username to validate
- * @returns The result of the validation
+ * @param {string} username The username to validate
+ * @returns {boolean} The result of the validation
  */
 const validateUsername = (username: string): boolean => {
 	return username.length >= 4 && username.length <= 50;
@@ -13,8 +13,8 @@ const validateUsername = (username: string): boolean => {
 /**
  * Validate a password.
  *
- * @param password The password to validate
- * @returns The result of the validation
+ * @param {string} password The password to validate
+ * @returns {boolean} The result of the validation
  */
 export const validatePassword = (password: string): boolean => {
 	const strength = passwordStrength(password).id;
@@ -24,9 +24,9 @@ export const validatePassword = (password: string): boolean => {
 /**
  * Validate a username and password for registration and login.
  *
- * @param username The username to validate
- * @param password The password to validate
- * @returns The result of the validation
+ * @param {string} username The username to validate
+ * @param {string} password The password to validate
+ * @returns {{ success: boolean; message?: string }} The result of the validation
  */
 export const validateRegisterAndLogin = (username: string, password: string): { success: boolean; message?: string } => {
 	if (!username || !password) {
@@ -47,8 +47,8 @@ export const validateRegisterAndLogin = (username: string, password: string): { 
 /**
  * Validate a user search term.
  *
- * @param searchTerm The user search term to validate
- * @returns The result of the validation
+ * @param {string} searchTerm The search term to validate
+ * @returns {boolean} The result of the validation
  */
 export const validateUserSearchTerm = (searchTerm: string): boolean => {
 	return searchTerm.length >= 1 && searchTerm.length <= 50;
@@ -57,8 +57,8 @@ export const validateUserSearchTerm = (searchTerm: string): boolean => {
 /**
  * Validate a message.
  *
- * @param message The message to validate
- * @returns The result of the validation
+ * @param {string} message The message to validate
+ * @returns {boolean} The result of the validation
  */
 export const validateMessage = (message: string): boolean => {
 	return message.length >= 1 && message.length <= 1000;
@@ -67,8 +67,8 @@ export const validateMessage = (message: string): boolean => {
 /**
  * Validate a public key.
  *
- * @param publicKey The public key to validate
- * @returns The result of the validation
+ * @param {string} publicKey The public key to validate
+ * @returns {{ success: boolean; message?: string }} The result of the validation
  */
 export const validatePublicKey = (publicKey: string): { success: boolean; message?: string } => {
 	if (!publicKey) {

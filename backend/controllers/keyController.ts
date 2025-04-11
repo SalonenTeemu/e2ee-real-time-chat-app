@@ -7,9 +7,9 @@ import { validatePublicKey } from '../utils/validate';
 /**
  * Responds to a GET request to get the recipient's public key.
  *
- * @param req The request object
- * @param res The response object
- * @returns The recipient's public key
+ * @param {CustomRequest} req The request object
+ * @param {Response} res The response object
+ * @returns The response
  */
 export const getRecipientPublicKey = async (req: CustomRequest, res: Response): Promise<any> => {
 	const { chatId } = req.params;
@@ -42,8 +42,8 @@ export const getRecipientPublicKey = async (req: CustomRequest, res: Response): 
 /**
  * Responds to a POST request to save the user's public key.
  *
- * @param req The request object
- * @param res The response object
+ * @param {CustomRequest} req The request object
+ * @param {Response} res The response object
  * @returns The response
  */
 export const savePublicKey = async (req: CustomRequest, res: Response): Promise<any> => {

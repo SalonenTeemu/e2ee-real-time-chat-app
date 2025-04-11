@@ -12,9 +12,9 @@ const rateLimiter = new RateLimiterMemory({
 /**
  * Rate limiting middleware function to limit the number of requests from a single IP address.
  *
- * @param req The request object
- * @param res The response object
- * @param next The next function to call
+ * @param {Request} req The request object
+ * @param {Response} res The response object
+ * @param {NextFunction} next The next function to call
  * @returns The next function or a 429 error response
  */
 export const rateLimiterMiddleware = (req: Request, res: Response, next: NextFunction) => {

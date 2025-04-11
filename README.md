@@ -13,8 +13,10 @@ The project is created for the COMP.SEC.300 Secure programming course exercise w
 
 ## TODO
 
+console errors to console.log
+
 - update documentation to reflect the changes
-- specify types and JSDOCs
+console errors to console.log
 - job runner to claer revoked feresh tokens
 
 - Logging for security monitoring
@@ -47,19 +49,13 @@ This project uses PostgreSQL as the database. Ensure you have PostgreSQL install
 
 ## Running the Application
 
-1. Start the backend server:
+1. Start the frontend and backend server:
 
    ```sh
-   npm run start:backend
+   npm run start
    ```
 
-2. Start the frontend:
-
-   ```sh
-   npm run start:frontend
-   ```
-
-3. Open the app in a browser at: `http://localhost:5173`.
+2. Open the app in a browser at: `http://localhost:5173`.
 
 ## Development
 

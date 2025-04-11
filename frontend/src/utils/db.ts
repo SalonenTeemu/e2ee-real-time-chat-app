@@ -4,7 +4,7 @@ const STORE_NAME = import.meta.env.STORE_NAME || 'keys';
 /**
  * Opens the IndexedDB database.
  *
- * @returns {Promise<IDBDatabase>} The opened IndexedDB database.
+ * @returns {IDBDatabase} The opened IndexedDB database.
  */
 const openDB = () => {
 	return new Promise((resolve, reject) => {
@@ -30,8 +30,8 @@ const openDB = () => {
 /**
  * Saves a value to the IndexedDB database under the specified key.
  *
- * @param key The key to save the value under
- * @param value The value to save
+ * @param {string} key The key to save the value under
+ * @param {any} value The value to save
  */
 export const saveToDB = async (key: string, value: any) => {
 	const db = (await openDB()) as IDBDatabase;
@@ -43,8 +43,8 @@ export const saveToDB = async (key: string, value: any) => {
 /**
  * Retrieves a value from the IndexedDB database using the specified key.
  *
- * @param key The key to retrieve the value from
- * @returns The value associated with the key
+ * @param {string} key The key to retrieve the value for
+ * @returns {any} The value associated with the key
  */
 export const getFromDB = async (key: string) => {
 	const db = (await openDB()) as IDBDatabase;

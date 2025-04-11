@@ -13,12 +13,18 @@ const NotificationContext = createContext<NotificationContextType | undefined>(u
 /**
  * The NotificationProvider component provides the notification functions to its children.
  *
- * @returns The NotificationProvider component.
+ * @returns {JSX.Element} The NotificationProvider component
  */
 export function NotificationProvider({ children }: { children: React.ReactNode }) {
 	const [notifications, setNotifications] = useState<{ id: number; type: 'success' | 'error' | 'info'; message: string }[]>([]);
 
-	// Add a notification
+	/**
+	 * Dispatches a notification to the notification container.
+	 *
+	 * @param {string} type The type of notification (success, error, info)
+	 * @param {string} message The message to display in the notification
+	 * @param {number} duration The duration to display the notification (default is 5000ms)
+	 */
 	const addNotification = (type: 'success' | 'error' | 'info', message: string, duration: number = 5000) => {
 		const id = Date.now() + Math.floor(Math.random() * 1000);
 
@@ -30,7 +36,11 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
 		}, duration);
 	};
 
-	// Remove a notification manually
+	/**
+	 * Removes a notification from the notification container.
+	 *
+	 * @param {number} id The ID of the notification to remove
+	 */
 	const removeNotification = (id: number) => {
 		setNotifications((prev) => prev.filter((notif) => notif.id !== id));
 	};
@@ -46,7 +56,7 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
 /**
  * Custom hook to use the notification context.
  *
- * @returns The notification context.
+ * @returns {NotificationContextType} The notification context
  */
 export const useNotification = () => {
 	const context = useContext(NotificationContext);
@@ -56,6 +66,12 @@ export const useNotification = () => {
 	return context;
 };
 
+/**
+ * The NotificationContainer component displays the notifications.
+ *
+ * @param notifications The list of notifications to display
+ * @returns {JSX.Element} The notification container component
+ */
 function NotificationContainer({ notifications }: { notifications: { id: number; type: 'success' | 'error' | 'info'; message: string }[] }) {
 	return (
 		<div className="pointer-events-none fixed top-0 left-0 z-50 mt-4 flex w-full flex-col items-center space-y-2 px-4">
@@ -66,7 +82,12 @@ function NotificationContainer({ notifications }: { notifications: { id: number;
 	);
 }
 
-// Notification Component
+/**
+ * The Notification component displays a single notification.
+ *
+ * @param param0 The notification properties
+ * @returns {JSX.Element} The notification component
+ */
 function Notification({ id, type, message }: { id: number; type: 'success' | 'error' | 'info'; message: string }) {
 	const { removeNotification } = useNotification()!;
 	const bgColor = type === 'success' ? 'bg-green-500' : type === 'error' ? 'bg-red-500' : 'bg-blue-400';

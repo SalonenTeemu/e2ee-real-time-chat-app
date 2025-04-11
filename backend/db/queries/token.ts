@@ -4,10 +4,10 @@ import { refreshTokenTableName } from '../initDB';
 /**
  * Saves a refresh token to the database.
  *
- * @param user_id The user ID
- * @param token The refresh token
- * @returns The refresh token
- * @throws Error if there is an issue inserting the token
+ * @param {string} user_id The user ID
+ * @param {string} token The refresh token
+ * @returns {any} The inserted refresh token record
+ * @throws {Error} If there is an issue inserting the token
  */
 export const addRefreshToken = async (user_id: string, token: string) => {
 	try {
@@ -23,9 +23,9 @@ export const addRefreshToken = async (user_id: string, token: string) => {
 /**
  * Retrieve a refresh token from the database.
  *
- * @param token The refresh token
- * @returns The refresh token
- * @throws Error if there is an issue retrieving the token
+ * @param {string} token The refresh token
+ * @returns {any} The refresh token record if it exists, otherwise null
+ * @throws {Error} If there is an issue retrieving the token
  */
 export const getRefreshToken = async (token: string) => {
 	try {
@@ -39,8 +39,8 @@ export const getRefreshToken = async (token: string) => {
 /**
  * Revoke a refresh token.
  *
- * @param token The refresh token
- * @throws Error if there is an issue revoking the token
+ * @param {string} token The refresh token to revoke
+ * @throws {Error} If there is an issue revoking the token
  */
 export const revokeRefreshToken = async (token: string) => {
 	try {

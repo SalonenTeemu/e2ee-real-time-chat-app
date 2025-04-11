@@ -7,9 +7,9 @@ import { decryptMessage } from '../utils/encryption';
 /**
  * Responds to a GET request to get the chat messages for a chat.
  *
- * @param req The request object
- * @param res The response object
- * @returns The chat messages
+ * @param {CustomRequest} req The request object
+ * @param {Response} res The response object
+ * @returns The response
  */
 export const getChatMessages = async (req: CustomRequest, res: Response): Promise<any> => {
 	const userId = req.user.id;
@@ -41,7 +41,6 @@ export const getChatMessages = async (req: CustomRequest, res: Response): Promis
 				}
 			})
 			.filter((message) => message !== null); // Remove null entries
-		return res.status(200).json({ message: decryptedMessages });
 		return res.status(200).json({ message: decryptedMessages });
 	} catch (error) {
 		console.error('Error getting chat messages:', error);

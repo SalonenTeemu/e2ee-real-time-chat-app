@@ -10,7 +10,12 @@ export interface CustomRequest extends Request {
 }
 
 /**
- * Sets the user on the request object.
+ * Sets the user on the request object. The user is set to null if the access token is invalid or not present.
+ *
+ * @param {CustomRequest} req The request object
+ * @param {Response} res The response object
+ * @param {NextFunction} next The next function to call
+ * @returns The next function
  */
 export const authenticateUserMiddleware = (req: CustomRequest, res: Response, next: NextFunction): void => {
 	try {
@@ -33,7 +38,8 @@ export const authenticateUserMiddleware = (req: CustomRequest, res: Response, ne
 /**
  * Authorizes roles to access a route.
  *
- * @param roles The roles to authorize
+ * @param {string[]} roles The roles to authorize
+ * @returns A middleware function that checks if the user has the required role
  */
 export const authorizeRole = (roles: string[]) => {
 	return (req: CustomRequest, res: Response, next: NextFunction): void => {

@@ -31,10 +31,11 @@ app.use('/api/chat', chatRoutes);
 app.use('/api/message', messageRoutes);
 app.use('/api/key', keyRoutes);
 
-// Create HTTP server and pass it to WebSockets
+// Create HTTP server and pass it to WebSocket
 const server = http.createServer(app);
 setupSocket(server);
 
+// Initialize database and start the server
 server.listen(process.env.BACKEND_PORT || 5000, async () => {
 	await initializeDatabase();
 	console.log(`Server running on http://localhost:${process.env.BACKEND_PORT || 5000}`);

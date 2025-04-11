@@ -66,7 +66,7 @@ const Chat = () => {
 	};
 
 	/**
-	 * Retrieves the chats for the current user.
+	 * Retrieves the chats for the current user and sets them in the state.
 	 */
 	const getChats = async () => {
 		try {
@@ -92,6 +92,8 @@ const Chat = () => {
 
 	/**
 	 * Handles incoming messages via socket by decrypting open chat messages and showing notifications for others.
+	 *
+	 * @param data The message data containing chatId, senderId, content, and createdAt
 	 */
 	const handleReceiveMessage = async (data: { chatId: string; senderId: string; content: string; createdAt: string }) => {
 		if (!user) return;
@@ -138,7 +140,7 @@ const Chat = () => {
 	};
 
 	/**
-	 * Retrieves the users based on the search term.
+	 * Retrieves the users based on the search term and sets them in the state.
 	 */
 	const searchUsers = async () => {
 		const sanitizedSearchTerm = sanitizeMessage(searchTerm);
@@ -173,9 +175,9 @@ const Chat = () => {
 	};
 
 	/**
-	 * Starts a chat with other user.
+	 * Starts a chat with other user and opens it.
 	 *
-	 * @param otherUserId The other user's ID
+	 * @param {string} otherUserId The ID of the other user
 	 */
 	const startChat = async (otherUserId: string) => {
 		try {
@@ -216,7 +218,7 @@ const Chat = () => {
 	/**
 	 * Opens a chat and retrieves the messages for the chat using the chat ID and the shared key.
 	 *
-	 * @param chatId The chat ID
+	 * @param {string} chatId The ID of the chat to open
 	 */
 	const openChat = async (chatId: string) => {
 		if (!user) return;
@@ -239,15 +241,14 @@ const Chat = () => {
 				return;
 			}
 
-			if (data.message.length === 0) {
-				return;
-			}
+			if (data.message.length === 0) return;
 
 			const sharedKey = await retrieveSharedKey(chatId, user.id);
 			if (!sharedKey) return;
 
 			const decryptedMessages = [];
 			let errorOccurred = false;
+			// Iterate through the messages and decrypt them
 			for (const msg of data.message) {
 				try {
 					const decryptedContent = await decryptMessage(msg.content, sharedKey);
@@ -261,6 +262,7 @@ const Chat = () => {
 				}
 			}
 
+			// If some messages could not be decrypted, show a notification
 			if (errorOccurred) {
 				notificationContext.addNotification('info', 'Some messages could not be decrypted and are missing.');
 			}
@@ -293,8 +295,10 @@ const Chat = () => {
 				const sharedKey = await retrieveSharedKey(selectedChat, user.id);
 				if (!sharedKey) return;
 
+				// Encrypt the message using the shared key
 				const encryptedMessage = await encryptMessage(sanitizedMessage, sharedKey);
 
+				// Send the encrypted message to the server through the socket
 				getSocket().emit('sendMessage', {
 					chatId: selectedChat,
 					content: encryptedMessage,
@@ -311,12 +315,12 @@ const Chat = () => {
 	};
 
 	/**
-	 * Retrieves the shared key for encryption/decryption in the chat. Display error messages based on the error type in case of failure.
+	 * Retrieves the shared key for encryption/decryption in the chat.
+	 * Displays error messages based on the error type in case of failure.
 	 *
-	 * @param chatId The chat ID
-	 * @param userId The user ID to retrieve the shared key for
-	 * @returns {Uint8Array} The shared key
-	 * @throws {Error} If the shared key cannot be retrieved
+	 * @param {string} chatId The chat ID to retrieve the shared key for
+	 * @param {string} userId The user ID to retrieve the shared key for
+	 * @returns {Uint8Array | null} The shared key or null if an error occurred
 	 */
 	const retrieveSharedKey = async (chatId: string, userId: string) => {
 		try {
