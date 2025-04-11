@@ -368,7 +368,7 @@ const Chat = () => {
 		<div className="flex h-screen bg-gray-100">
 			<div className="flex h-full w-1/3 flex-col bg-white p-6 shadow-md">
 				<div className="mb-6">
-					<h3 className="mb-2 text-xl font-semibold text-gray-800">Active Chats</h3>
+					<h3 className="mb-2 text-xl font-semibold text-gray-700">Active Chats</h3>
 					<ul className="rounded-lg border border-gray-300">
 						{chats.map((chat, index) => (
 							<li
@@ -415,7 +415,7 @@ const Chat = () => {
 						</button>
 						{hasSearched && users.length === 0 && (
 							<div className="mt-4">
-								<p className="mb-2 text-center text-lg font-semibold text-gray-800">No users found with the search term.</p>
+								<p className="mb-2 text-center text-lg font-semibold text-gray-700">No users found with the search term.</p>
 							</div>
 						)}
 						<ul className="mt-4">
@@ -438,7 +438,7 @@ const Chat = () => {
 			<div className="flex h-full w-2/3 flex-col p-6 pb-18">
 				{selectedChat && (
 					<div className="flex h-full flex-col">
-						<h3 className="mb-2 flex items-center justify-between text-xl font-semibold text-gray-800">
+						<h3 className="mb-2 flex items-center justify-between text-xl font-semibold text-gray-700">
 							<span>Chat with {chats.find((chat) => chat.id === selectedChat)?.username}</span>
 							<button
 								onClick={() => closeChat()}

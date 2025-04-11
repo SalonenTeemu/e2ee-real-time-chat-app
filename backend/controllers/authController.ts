@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import bcrypt from 'bcrypt';
-import { validateRegisterAndLogin } from '../utils/validate';
+import { validateRegisterAndLogin, validatePassword } from '../utils/validate';
 import { createUser, getUserByUsername, getUserById } from '../db/queries/user';
 import { createTokens, revokeARefreshToken, verifyRefreshToken } from '../services/authService';
 import { CustomRequest } from '../middleware/user';
@@ -173,5 +173,46 @@ export const refresh = async (req: CustomRequest, res: Response) => {
 	} catch (error) {
 		console.error('Error refreshing token:', error);
 		res.status(500).json({ message: 'Error refreshing token' });
+	}
+};
+
+/**
+ * Responds to a POST request to verify the user's password.
+ *
+ * @param req The request object
+ * @param res The response object
+ * @returns The response
+ */
+export const verifyPassword = async (req: CustomRequest, res: Response) => {
+	try {
+		const { password } = req.body;
+		// Validate the password
+		if (!password || !validatePassword(password)) {
+			res.status(400).json({
+				message: 'Password must be between 12 and 100 characters and have lower case, upper case, number, and a special character.',
+			});
+			return;
+		}
+		const reqUser = req.user;
+		if (!reqUser) {
+			res.status(401).json({ message: 'Unauthorized' });
+			return;
+		}
+		// Get the user from the database
+		const user = await getUserById(reqUser.id);
+		if (!user) {
+			res.status(401).json({ message: 'User not found' });
+			return;
+		}
+		// Check if the password is correct using bcrypt
+		const correctPassword = await bcrypt.compare(password, user.password);
+		if (!correctPassword) {
+			res.status(401).json({ message: 'Incorrect password' });
+			return;
+		}
+		res.status(200).json({ message: 'Password is valid' });
+	} catch (error) {
+		console.error('Error verifying password:', error);
+		res.status(500).json({ message: 'Error verifying password' });
 	}
 };

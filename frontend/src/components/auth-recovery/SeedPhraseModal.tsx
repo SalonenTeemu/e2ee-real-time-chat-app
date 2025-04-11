@@ -17,7 +17,7 @@ const SeedPhraseModal: React.FC<SeedPhraseModalProps> = ({ seedPhrase, onAcknowl
 	const [copied, setCopied] = useState(false);
 
 	/**
-	 * Handle the copy button click event.
+	 * Handles the copy button click event.
 	 */
 	const handleCopy = () => {
 		navigator.clipboard
@@ -41,7 +41,7 @@ const SeedPhraseModal: React.FC<SeedPhraseModalProps> = ({ seedPhrase, onAcknowl
 					<strong> If you lose this phrase, you will not be able to read or send messages.</strong>
 					<strong className="mt-4 block text-red-500">Do not share the phrase with anyone!</strong>
 				</p>
-				<div className="relative mb-4 flex items-center justify-between rounded-md bg-gray-200 p-4 text-gray-800">
+				<div className="relative mb-4 flex items-center justify-between rounded-md bg-gray-200 p-4 text-gray-700">
 					<code className="mb-2 font-mono text-lg">{seedPhrase}</code>
 					<div className="absolute right-0 bottom-2 flex flex-col items-center">
 						<span className={`mb-1 text-sm text-green-600 ${copied ? 'visible' : 'invisible'}`}>Copied!</span>
@@ -50,7 +50,7 @@ const SeedPhraseModal: React.FC<SeedPhraseModalProps> = ({ seedPhrase, onAcknowl
 						</button>
 					</div>
 				</div>
-				<p className="mb-4 text-gray-600">
+				<p className="mb-4 text-gray-700">
 					<strong>Important:</strong> Write it down and keep it somewhere secure. You won&apos;t be able to use your account without it.
 				</p>
 				<button onClick={onAcknowledge} className="w-full cursor-pointer rounded-lg bg-blue-500 py-2 text-white hover:bg-blue-600">

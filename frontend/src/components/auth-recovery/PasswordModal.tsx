@@ -19,7 +19,7 @@ const PasswordModal: React.FC<PasswordModalProps> = ({ onSubmit, onClose }) => {
 	const [errorMessage, setErrorMessage] = useState('');
 
 	/**
-	 * Handle the submit button click event.
+	 * Handles the submit button click event.
 	 */
 	const handleSubmit = () => {
 		setErrorMessage('');
@@ -35,7 +35,7 @@ const PasswordModal: React.FC<PasswordModalProps> = ({ onSubmit, onClose }) => {
 	};
 
 	/**
-	 * Handle the cancel button click event.
+	 * Handles the cancel button click event.
 	 */
 	const handleCancel = () => {
 		onSubmit(null);
@@ -45,7 +45,7 @@ const PasswordModal: React.FC<PasswordModalProps> = ({ onSubmit, onClose }) => {
 	return (
 		<div className="fixed inset-0 z-50 flex items-center justify-center">
 			<div className="w-full max-w-sm rounded-lg border border-gray-200 bg-white p-6 shadow-2xl">
-				<h2 className="mb-4 text-center text-xl font-semibold text-gray-800">Enter Your Password To Proceed</h2>
+				<h2 className="mb-4 text-center text-xl font-semibold text-gray-700">Enter Your Password To Proceed</h2>
 				<input
 					type="password"
 					value={password}
@@ -62,10 +62,16 @@ const PasswordModal: React.FC<PasswordModalProps> = ({ onSubmit, onClose }) => {
 				{errorMessage && <p className="mb-4 text-center text-sm text-red-500">{errorMessage}</p>}
 
 				<div className="flex justify-end space-x-2">
-					<button onClick={handleSubmit} className="rounded-lg bg-blue-500 px-4 py-2 text-white hover:bg-blue-600 focus:outline-none">
+					<button
+						onClick={handleSubmit}
+						className="cursor-pointer rounded-lg bg-blue-500 px-4 py-2 text-white hover:bg-blue-600 focus:outline-none"
+					>
 						Submit
 					</button>
-					<button onClick={handleCancel} className="rounded-lg bg-gray-300 px-4 py-2 text-gray-800 hover:bg-gray-400 focus:outline-none">
+					<button
+						onClick={handleCancel}
+						className="cursor-pointer rounded-lg bg-gray-300 px-4 py-2 text-gray-700 hover:bg-gray-400 focus:outline-none"
+					>
 						Cancel
 					</button>
 				</div>

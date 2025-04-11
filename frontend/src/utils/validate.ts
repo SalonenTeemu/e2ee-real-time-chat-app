@@ -63,3 +63,18 @@ export const validateUserSearchTerm = (searchTerm: string): boolean => {
 export const validateMessage = (message: string): boolean => {
 	return message.length >= 1 && message.length <= 1000;
 };
+
+/**
+ * Validate a seed phrase (mnemonic).
+ *
+ * @param mnemonic The mnemonic to validate
+ * @returns The result of the validation
+ */
+export const validateSeedPhrase = (mnemonic: string): boolean => {
+	const words = mnemonic.split(' ');
+	if (words.length !== 24) return false;
+	for (const word of words) {
+		if (word.length < 3 || word.length > 10) return false;
+	}
+	return true;
+};

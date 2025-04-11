@@ -180,7 +180,7 @@ const Login = () => {
 				{isModalOpen && <SeedPhraseModal seedPhrase={seedPhrase} onAcknowledge={closeSeedPhraseModal} />}
 
 				<div className="mt-4 text-center">
-					<p className="text-gray-600">
+					<p className="text-gray-700">
 						Don&apos;t have an account?{' '}
 						<Link to="/register" className="text-blue-500 hover:text-blue-600">
 							Register here
