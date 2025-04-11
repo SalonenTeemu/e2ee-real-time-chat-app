@@ -14,6 +14,7 @@ import { authenticateUserMiddleware } from './middleware/user';
 import { corsOptions } from './middleware/cors';
 import { rateLimiterMiddleware } from './middleware/rateLimiting';
 import './utils/tokenCleanupCron';
+import logger from './utils/logger';
 
 const app = express();
 
@@ -39,5 +40,6 @@ setupSocket(server);
 // Initialize database and start the server
 server.listen(process.env.BACKEND_PORT || 5000, async () => {
 	await initializeDatabase();
-	console.log(`Server running on http://localhost:${process.env.BACKEND_PORT || 5000}`);
+	logger.info('Database initialized successfully');
+	logger.info(`Server running on http://localhost:${process.env.BACKEND_PORT || 5000}`);
 });

@@ -1,5 +1,6 @@
 import db from '../knex';
 import { chatTableName, messageTableName } from '../initDB';
+import logger from '../../utils/logger';
 
 /**
  * Returns the messages for a chat.
@@ -11,8 +12,8 @@ import { chatTableName, messageTableName } from '../initDB';
 export const getChatMessagesById = async (chatId: string) => {
 	try {
 		return await db(messageTableName).where({ chat_id: chatId }).orderBy('created_at', 'asc');
-	} catch (error) {
-		console.error('Error getting chat:', error);
+	} catch (error: any) {
+		logger.error(`Error getting messages for chat ID ${chatId} from DB: ${error}`);
 		throw new Error(`Error getting chat: ${error}`);
 	}
 };
@@ -32,6 +33,7 @@ export const saveMessage = async (chatId: string, senderId: string, encryptedCon
 		const chat = await db(chatTableName).select('user1_id', 'user2_id').where({ id: chatId }).first();
 
 		if (!chat) {
+			logger.error(`Error saving message to DB: Chat not found for ID ${chatId}`);
 			throw new Error('Chat not found');
 		}
 
@@ -48,8 +50,8 @@ export const saveMessage = async (chatId: string, senderId: string, encryptedCon
 
 		// Return the new message along with the recipient ID
 		return { ...newMessage, recipientId };
-	} catch (error) {
-		console.error('Error saving message:', error);
+	} catch (error: any) {
+		logger.error(`Error saving message to DB: ${error}`);
 		throw new Error(`Error saving message: ${error}`);
 	}
 };

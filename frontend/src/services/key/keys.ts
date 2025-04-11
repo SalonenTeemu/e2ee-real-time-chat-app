@@ -71,12 +71,8 @@ export const createKeyPair = async (password: string, userId: string, mnemonic: 
 export const getSharedKey = async (chatId: string, userId: string) => {
 	await sodium.ready;
 
-	try {
-		const sharedKey = await keyManager.getSharedKey(chatId, userId);
-		return sharedKey;
-	} catch (error) {
-		throw error;
-	}
+	const sharedKey = await keyManager.getSharedKey(chatId, userId);
+	return sharedKey;
 };
 
 /**

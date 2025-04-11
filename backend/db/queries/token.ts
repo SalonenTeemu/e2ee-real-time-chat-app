@@ -1,5 +1,6 @@
 import db from '../knex';
 import { refreshTokenTableName } from '../initDB';
+import logger from '../../utils/logger';
 
 /**
  * Saves a refresh token to the database.
@@ -14,8 +15,8 @@ export const addRefreshToken = async (user_id: string, token: string) => {
 		// Set the expiration date to 7 days from now
 		const expires_at = new Date(Date.now() + 1000 * 60 * 60 * 24 * 7);
 		return await db(refreshTokenTableName).insert({ user_id, token, expires_at });
-	} catch (error) {
-		console.error('Error inserting record:', error);
+	} catch (error: any) {
+		logger.error(`Error inserting refresh token to DB for user ${user_id}: ${error}`);
 		throw new Error(`Error inserting  refresh token: ${error}`);
 	}
 };
@@ -30,8 +31,8 @@ export const addRefreshToken = async (user_id: string, token: string) => {
 export const getRefreshToken = async (token: string) => {
 	try {
 		return await db(refreshTokenTableName).where({ token }).first();
-	} catch (error) {
-		console.error('Error getting refresh token:', error);
+	} catch (error: any) {
+		logger.error(`Error getting refresh token from DB: ${error}`);
 		throw new Error(`Error getting refresh token: ${error}`);
 	}
 };
@@ -45,8 +46,8 @@ export const getRefreshToken = async (token: string) => {
 export const revokeRefreshToken = async (token: string) => {
 	try {
 		await db(refreshTokenTableName).where({ token }).update({ is_revoked: true });
-	} catch (error) {
-		console.error('Error revoking refresh token:', error);
+	} catch (error: any) {
+		logger.error(`Error revoking refresh token in DB: ${error}`);
 		throw new Error(`Error revoking refresh token: ${error}`);
 	}
 };
@@ -57,8 +58,8 @@ export const revokeRefreshToken = async (token: string) => {
 export const deleteExpiredAndRevokedTokens = async () => {
 	try {
 		await db(refreshTokenTableName).where('expires_at', '<', new Date()).orWhere('is_revoked', true).del();
-	} catch (error) {
-		console.error('Error deleting expired and revoked tokens:', error);
+	} catch (error: any) {
+		logger.error(`Error deleting expired and revoked tokens from DB: ${error}`);
 		throw new Error(`Error deleting expired and revoked tokens: ${error}`);
 	}
 };

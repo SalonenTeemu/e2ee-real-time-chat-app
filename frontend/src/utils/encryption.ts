@@ -1,4 +1,5 @@
 import sodium from 'libsodium-wrappers';
+import { logError } from './logger';
 
 /**
  * Encrypts a message using XChaCha20-Poly1305.
@@ -25,8 +26,8 @@ export const encryptMessage = async (message: string, sharedKey: Uint8Array) => 
 		);
 
 		return `${sodium.to_base64(nonce)}:${sodium.to_base64(encrypted)}`;
-	} catch (error) {
-		console.error('Encryption failed:', error);
+	} catch (error: any) {
+		logError('Message encryption failed:', error);
 		throw new Error('Encryption failed');
 	}
 };
@@ -51,8 +52,8 @@ export const decryptMessage = async (encryptedData: string, sharedKey: Uint8Arra
 		// Decrypt the message using XChaCha20-Poly1305
 		const decrypted = sodium.crypto_aead_xchacha20poly1305_ietf_decrypt(null, encrypted, null, nonce, sharedKey);
 		return sodium.to_string(decrypted);
-	} catch (error) {
-		console.error('Decryption failed:', error);
+	} catch (error: any) {
+		logError('Message decryption failed:', error);
 		throw new Error('Decryption failed');
 	}
 };

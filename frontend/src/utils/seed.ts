@@ -2,6 +2,7 @@ import * as bip39 from 'bip39';
 import nacl from 'tweetnacl';
 import sodium from 'libsodium-wrappers';
 import { Buffer } from 'buffer';
+import { logError } from './logger';
 
 /**
  * Generate a random seed phrase using BIP39.
@@ -14,8 +15,8 @@ export const generateSeedPhrase = async (): Promise<string | null> => {
 		const entropy = sodium.randombytes_buf(32); // 256-bit entropy (32 bytes) for 24-word mnemonic
 		const entropyBuffer = Buffer.from(entropy); // Convert Uint8Array to Buffer
 		return bip39.entropyToMnemonic(entropyBuffer);
-	} catch (error) {
-		console.error('Error generating seed phrase:', error);
+	} catch (error: any) {
+		logError('Error generating seed phrase:', error);
 		return null;
 	}
 };
@@ -30,6 +31,7 @@ export const generateSeedPhrase = async (): Promise<string | null> => {
  */
 export const mnemonicToPrivateKey = async (mnemonic: string, password: string): Promise<{ privateKey: Uint8Array; publicKey: Uint8Array }> => {
 	if (!bip39.validateMnemonic(mnemonic)) {
+		logError('Invalid mnemonic:', mnemonic);
 		throw new Error('Invalid mnemonic');
 	}
 

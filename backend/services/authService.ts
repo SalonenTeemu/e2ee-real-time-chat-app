@@ -1,6 +1,7 @@
 import jwt from 'jsonwebtoken';
 import { addRefreshToken, getRefreshToken, revokeRefreshToken } from '../db/queries/token';
 import { User } from '../utils/types';
+import logger from '../utils/logger';
 
 const env = process.env;
 
@@ -29,8 +30,8 @@ export const createTokens = async (user: User) => {
 		// Save the refresh token to the database
 		await addRefreshToken(user.id, refreshToken);
 		return { accessToken, refreshToken };
-	} catch (error) {
-		console.error('Error creating tokens:', error);
+	} catch (error: any) {
+		logger.error(`Error creating tokens: ${error}`);
 		throw new Error('Error creating tokens');
 	}
 };
@@ -46,14 +47,16 @@ export const verifyAccessToken = (token: string) => {
 		// Verify the access token using jsonwebtoken
 		const decoded = jwt.verify(token, secret);
 		if (!decoded) {
+			logger.warn('Access token verification failed: token is invalid or expired');
 			return null;
 		}
 		return decoded as User;
-	} catch (error) {
-		console.error('Error verifying access token:', error);
+	} catch (error: any) {
+		logger.error(`Error verifying access token: ${error}`);
 		return null;
 	}
 };
+
 /**
  * Verifies a refresh token.
  *
@@ -65,16 +68,18 @@ export const verifyRefreshToken = async (token: string) => {
 		// Verify the refresh token using jsonwebtoken
 		const decoded = jwt.verify(token, refreshSecret);
 		if (!decoded) {
+			logger.warn('Refresh token verification failed: token is invalid or expired');
 			return null;
 		}
 		// Retrieve the refresh token from the database to check if it is revoked
 		const refreshToken = await getRefreshToken(token);
 		if (!refreshToken || refreshToken.is_revoked) {
+			logger.warn('Refresh token verification failed: token is revoked or does not exist');
 			return null;
 		}
 		return decoded as User;
-	} catch (error) {
-		console.error('Error verifying refresh token:', error);
+	} catch (error: any) {
+		logger.error(`Error verifying refresh token: ${error}`);
 		return null;
 	}
 };
@@ -88,8 +93,8 @@ export const verifyRefreshToken = async (token: string) => {
 export const revokeARefreshToken = async (token: string) => {
 	try {
 		await revokeRefreshToken(token);
-	} catch (error) {
-		console.error('Error revoking refresh token:', error);
+	} catch (error: any) {
+		logger.error(`Error revoking refresh token: ${error}`);
 		throw new Error('Error revoking refresh token');
 	}
 };

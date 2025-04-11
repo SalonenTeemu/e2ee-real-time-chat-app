@@ -8,6 +8,7 @@ import { validateUserSearchTerm, validateMessage } from '../../utils/validate';
 import { sanitizeMessage } from '../../utils/sanitize';
 import { decryptMessage, encryptMessage } from '../../utils/encryption';
 import { getSharedKey } from '../../services/key/keys';
+import { logError } from '../../utils/logger';
 
 /**
  * The Chat component.
@@ -84,9 +85,9 @@ const Chat = () => {
 				return;
 			}
 			setChats(data.message);
-		} catch (error) {
+		} catch (error: any) {
 			notificationContext.addNotification('error', 'Error fetching chats.');
-			console.error('Error fetching chats:', error);
+			logError('Error fetching chats:', error);
 		}
 	};
 
@@ -126,10 +127,10 @@ const Chat = () => {
 							setChats((prev) => (chat ? [...prev, chat] : prev));
 						}
 					} else {
-						console.error(`Failed to fetch chat details: ${chatData.message}`);
+						logError(`Failed to fetch chat details: ${chatData.message}`);
 					}
-				} catch (error) {
-					console.error('Error fetching chat details:', error);
+				} catch (error: any) {
+					logError('Error fetching chat details:', error);
 				}
 			}
 
@@ -168,9 +169,9 @@ const Chat = () => {
 			const filteredUsers = data.message.filter((user: { username: string }) => !chats.some((chat) => chat.username === user.username));
 			setUsers(filteredUsers);
 			setHasSearched(true);
-		} catch (error) {
+		} catch (error: any) {
 			notificationContext.addNotification('error', 'Error fetching users.');
-			console.error('Error fetching users:', error);
+			logError('Error fetching users:', error);
 		}
 	};
 
@@ -209,9 +210,9 @@ const Chat = () => {
 			});
 			// Open the chat after starting it
 			openChat(data.message.chatId);
-		} catch (error) {
+		} catch (error: any) {
 			notificationContext.addNotification('error', 'Error starting chat.');
-			console.error('Error starting chat:', error);
+			logError('Error starting chat:', error);
 		}
 	};
 
@@ -256,9 +257,9 @@ const Chat = () => {
 						...msg,
 						content: decryptedContent,
 					});
-				} catch (error) {
+				} catch (error: any) {
 					errorOccurred = true;
-					console.error('Error decrypting message:', error);
+					logError('Error decrypting message:', error);
 				}
 			}
 
@@ -268,9 +269,9 @@ const Chat = () => {
 			}
 
 			setMessages(decryptedMessages);
-		} catch (error) {
+		} catch (error: any) {
 			notificationContext.addNotification('error', 'Error fetching messages.');
-			console.error('Error fetching messages:', error);
+			logError('Error fetching messages:', error);
 		}
 	};
 
@@ -305,9 +306,9 @@ const Chat = () => {
 				});
 
 				setMessage('');
-			} catch (error) {
+			} catch (error: any) {
 				notificationContext.addNotification('error', 'Error encrypting message.');
-				console.error('Encryption error:', error);
+				logError('Error encrypting message:', error);
 			}
 		} else {
 			notificationContext.addNotification('error', 'Invalid message. Message must be between 1 and 1000 characters.');
@@ -351,7 +352,7 @@ const Chat = () => {
 		(acc, msg) => {
 			const messageDate = new Date(msg.createdAt);
 			if (!isValid(messageDate)) {
-				console.error('Invalid date:', msg.createdAt);
+				logError('Invalid date:', msg.createdAt);
 				return acc;
 			}
 			const dateKey = format(messageDate, 'yyyy-MM-dd');

@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { verifyAccessToken } from '../services/authService';
+import logger from '../utils/logger';
 import { GUEST } from '../utils/constants';
 
 /**
@@ -22,15 +23,22 @@ export const authenticateUserMiddleware = (req: CustomRequest, res: Response, ne
 		const accessToken = req.cookies.access_token;
 		if (!accessToken) {
 			req.user = { id: null, role: GUEST };
+			logger.info(`No access token found for IP: ${req.ip}. Assigning GUEST role.`);
 			next();
 			return;
 		}
 		// Verify the access token and get the user
 		const user = verifyAccessToken(accessToken);
-		req.user = user;
+		if (user) {
+			req.user = user;
+		} else {
+			req.user = { id: null, role: GUEST };
+			logger.info(`Invalid access token for IP: ${req.ip}. Assigning GUEST role.`);
+		}
 	} catch {
 		// If the token is invalid, set the user to null
 		req.user = { id: null, role: GUEST };
+		logger.warn(`Invalid or expired access token for IP: ${req.ip}. Assigning GUEST role.`);
 	}
 	next();
 };
@@ -44,6 +52,9 @@ export const authenticateUserMiddleware = (req: CustomRequest, res: Response, ne
 export const authorizeRole = (roles: string[]) => {
 	return (req: CustomRequest, res: Response, next: NextFunction): void => {
 		if (!req.user || !req.user.id || !roles.includes(req.user.role)) {
+			logger.warn(
+				`Unauthorized access attempt by user ${req.user?.id || 'unknown'} from IP: ${req.ip}. Required roles: ${roles.join(', ')}, but found role: ${req.user?.role || 'GUEST'}.`
+			);
 			res.status(403).json({ status: 403, message: 'Access denied' });
 			return;
 		}

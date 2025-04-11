@@ -1,5 +1,6 @@
 import bcrypt from 'bcrypt';
 import db from './knex';
+import logger from '../utils/logger';
 import { USER } from '../utils/constants';
 
 // Define the schema name and table names
@@ -16,16 +17,16 @@ export const publicKeyTableName = `${schemaName}.public_keys`;
 export const initializeDatabase = async () => {
 	try {
 		await db.raw('SELECT 1');
-		console.log('Connected to the database');
+		logger.info('Database connection successful');
 		await db.schema.createSchemaIfNotExists(schemaName);
 
 		await createTables();
-		console.log('Tables created');
+		logger.info('Database tables created successfully');
 
 		await insertTestData();
-		console.log('Test data inserted');
-	} catch (err: unknown) {
-		console.error('Error connecting to the database or creating tables:', err);
+		logger.info('Database test data inserted successfully');
+	} catch (error: any) {
+		logger.error(`Error initializing database: ${error.message}`);
 	}
 };
 

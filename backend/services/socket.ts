@@ -6,6 +6,7 @@ import { verifyAccessToken } from './authService';
 import { sanitizeMessage } from '../utils/sanitize';
 import { encryptMessage } from '../utils/encryption';
 import { saveMessage } from '../db/queries/message';
+import logger from '../utils/logger';
 
 /**
  * Setup the socket.io server.
@@ -38,6 +39,7 @@ export const setupSocket = (server: http.Server) => {
 			const cookieHeader = socket.handshake.headers?.cookie;
 
 			if (!cookieHeader) {
+				logger.warn('Socket authentication failed: No cookies sent');
 				return next(new Error('Authentication error: No cookies sent'));
 			}
 
@@ -45,20 +47,22 @@ export const setupSocket = (server: http.Server) => {
 			const token = cookies?.access_token;
 
 			if (!token) {
+				logger.warn('Socket authentication failed: No token found in cookies');
 				return next(new Error('Authentication error: No token found in cookies'));
 			}
 
 			// Verify the access token
 			const decoded = verifyAccessToken(token);
 			if (!decoded) {
+				logger.warn('Socket authentication failed: Invalid token');
 				return next(new Error('Authentication error: Invalid token'));
 			}
 
 			// Attach the user data to the socket object
 			socket.data = { user: decoded };
 			return next();
-		} catch (error) {
-			console.error(error);
+		} catch (error: any) {
+			logger.error(`Socket authentication error: ${error.message}`);
 			return next(new Error('Authentication error: Invalid token or cookie parsing failed'));
 		}
 	});
@@ -66,7 +70,7 @@ export const setupSocket = (server: http.Server) => {
 	io.on('connect', (socket) => {
 		const userId = socket.data.user.id;
 
-		console.log(`User ${userId} connected`);
+		logger.info(`User ${userId} connected to socket with ID ${socket.id}`);
 
 		// Store the socket ID for the user
 		userSockets[userId] = socket.id;
@@ -75,7 +79,7 @@ export const setupSocket = (server: http.Server) => {
 			try {
 				await rateLimiter.consume(userId); // Rate limit check
 
-				console.log(`User ${userId} sent a message to chat ${chatId}`);
+				logger.info(`User ${userId} sent a message to chat ${chatId}`);
 
 				// Sanitize and encrypt the message before saving it
 				const sanitizedMessage = sanitizeMessage(content);
@@ -101,10 +105,11 @@ export const setupSocket = (server: http.Server) => {
 						createdAt: newMessage.created_at,
 					});
 				} else {
-					console.log(`User ${recipientId} is offline. Message saved so they can retrieve it later.`);
+					logger.info(`User ${recipientId} is offline. Message saved so they can retrieve it later.`);
 				}
-			} catch {
+			} catch (error: any) {
 				// Rate limit exceeded
+				logger.warn(`User ${userId} exceeded socket rate limit for messages: ${error.message}`);
 				socket.emit('error', {
 					type: 'RateLimit',
 					message: 'Too many messages. Please slow down.',
@@ -113,7 +118,7 @@ export const setupSocket = (server: http.Server) => {
 		});
 
 		socket.on('disconnect', () => {
-			console.log(`User ${userId} disconnected`);
+			logger.info(`User ${userId} disconnected from socket with ID ${socket.id}`);
 			// Remove socket ID from the userSockets record on disconnect
 			delete userSockets[userId];
 		});

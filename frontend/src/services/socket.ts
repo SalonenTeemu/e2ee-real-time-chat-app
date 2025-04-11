@@ -1,4 +1,5 @@
 import { io, Socket } from 'socket.io-client';
+import { log, logError } from '../utils/logger';
 
 let socket: Socket | null = null;
 
@@ -19,22 +20,22 @@ export const connectSocket = (notificationContext: any, handleReceiveMessage: (d
 		});
 
 		socket.on('connect', () => {
-			console.log('Connected to WebSocket server:', socket?.id);
+			log(`Socket connected: ${socket?.id}`);
 		});
 
 		socket.on('disconnect', (reason) => {
-			console.log('Disconnected:', reason);
+			log(`Socket disconnected: ${reason}`);
 			if (reason === 'io server disconnect') {
 				socket?.connect();
 			}
 		});
 
-		socket.on('connect_error', (error) => {
-			console.error('Connection error:', error.message);
+		socket.on('connect_error', (error: any) => {
+			logError(`Socket connection error: ${error.message}`);
 			notificationContext.addNotification('error', 'Connection error. Please refresh the page.');
 		});
 
-		socket.on('error', (error) => {
+		socket.on('error', (error: any) => {
 			if (error.type === 'RateLimit') {
 				notificationContext.addNotification('error', error.message || 'Too many messages. Please slow down.');
 			} else {
@@ -59,7 +60,7 @@ export const disconnectSocket = () => {
 		socket.disconnect();
 		socket.removeAllListeners(); // Clean up all listeners
 		socket = null;
-		console.log('Socket disconnected');
+		log('Socket disconnected and cleaned up.');
 	}
 };
 

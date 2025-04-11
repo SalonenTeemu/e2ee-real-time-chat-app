@@ -1,6 +1,7 @@
 import sodium from 'libsodium-wrappers';
 import { getFromDB } from '../../utils/db';
 import { showPasswordModal } from '../../components/auth-recovery/PasswordModal';
+import { log, logError } from '../../utils/logger';
 
 /**
  * KeyManager class to handle key management, including private key decryption and shared key generation.
@@ -34,7 +35,7 @@ class KeyManager {
 		setInterval(() => {
 			if (Date.now() - lastInteractionTime > this.timeout) {
 				this.clearKeys();
-				console.log('Private key and shared keys cleared due to inactivity.');
+				log('Private key and shared keys cleared due to inactivity.');
 			}
 		}, this.checkInterval);
 	}
@@ -142,8 +143,8 @@ class KeyManager {
 				true,
 				['encrypt', 'decrypt']
 			);
-		} catch (error) {
-			console.error('Error deriving encryption key:', error);
+		} catch (error: any) {
+			logError('Key derivation error:', error);
 			throw new Error('KeyDerivationFailed');
 		}
 	}

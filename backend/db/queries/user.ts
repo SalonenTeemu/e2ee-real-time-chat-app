@@ -1,5 +1,6 @@
 import db from '../knex';
 import { userTableName, publicKeyTableName } from '../initDB';
+import logger from '../../utils/logger';
 
 /**
  * Retrieve a user by their ID.
@@ -11,8 +12,8 @@ import { userTableName, publicKeyTableName } from '../initDB';
 export const getUserById = async (id: string) => {
 	try {
 		return db(userTableName).where({ id }).first();
-	} catch (error) {
-		console.error('Error getting user by ID:', error);
+	} catch (error: any) {
+		logger.error(`Error getting user by ID ${id} from DB: ${error}`);
 		throw new Error('Error getting user by ID');
 	}
 };
@@ -27,8 +28,8 @@ export const getUserById = async (id: string) => {
 export const getUserByUsername = async (username: string) => {
 	try {
 		return db(userTableName).where({ username }).first();
-	} catch (error) {
-		console.error('Error getting user by username:', error);
+	} catch (error: any) {
+		logger.error(`Error getting user by username ${username} from DB: ${error}`);
 		throw new Error('Error getting user by username');
 	}
 };
@@ -44,8 +45,8 @@ export const getUserByUsername = async (username: string) => {
 export const createUser = async (username: string, hashedPassword: string) => {
 	try {
 		return db(userTableName).insert({ username, password: hashedPassword }).returning('id');
-	} catch (error) {
-		console.error('Error creating user:', error);
+	} catch (error: any) {
+		logger.error(`Error creating user in DB: ${error}`);
 		throw new Error('Error creating user');
 	}
 };
@@ -63,8 +64,8 @@ export const searchUsersByUsername = async (searchTerm: string) => {
 			.join(publicKeyTableName, `${userTableName}.id`, '=', `${publicKeyTableName}.user_id`)
 			.where('username', 'ilike', `%${searchTerm}%`)
 			.select(`${userTableName}.id`, `${userTableName}.username`);
-	} catch (error) {
-		console.error('Error searching users by username:', error);
+	} catch (error: any) {
+		logger.error(`Error searching users by username ${searchTerm} from DB: ${error}`);
 		throw new Error('Error searching users by username');
 	}
 };

@@ -16,9 +16,6 @@ The project is created for the COMP.SEC.300 Secure programming course exercise w
 
 ## TODO
 
-- update documentation to reflect the changes
-
-- Logging for security monitoring
 - Unit testing
 - CI/CD Pipeline with security features:
   - SBOM generation

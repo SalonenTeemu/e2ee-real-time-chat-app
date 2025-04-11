@@ -5,6 +5,7 @@ import { fetchWithAuth } from '../utils/fetch';
 import { User } from '../utils/types';
 import { clearKeys } from '../services/key/keys';
 import { disconnectSocket } from '../services/socket';
+import { logError } from '../utils/logger';
 
 // Define the auth context type
 interface AuthContextType {
@@ -47,8 +48,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 			} else {
 				setUser(null);
 			}
-		} catch (error) {
-			console.error('User not authenticated', error);
+		} catch (error: any) {
+			logError('Error fetching user:', error);
 			setUser(null);
 		}
 	};
@@ -74,8 +75,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 			setUser(null);
 			clearKeys();
 			navigate('/');
-		} catch (error) {
-			console.error('Error logging out:', error);
+		} catch (error: any) {
+			logError('Error logging out:', error);
 		}
 	}, []);
 

@@ -1,5 +1,6 @@
 import db from '../knex';
 import { chatTableName, userTableName } from '../initDB';
+import logger from '../../utils/logger';
 
 /**
  * Returns a chat by the chat ID.
@@ -11,8 +12,8 @@ import { chatTableName, userTableName } from '../initDB';
 export const getChatById = async (chatId: string) => {
 	try {
 		return await db(chatTableName).where({ id: chatId }).first();
-	} catch (error) {
-		console.error('Error getting chat:', error);
+	} catch (error: any) {
+		logger.error(`Error getting chat with ID ${chatId} from DB: ${error}`);
 		throw new Error(`Error getting chat: ${error}`);
 	}
 };
@@ -28,8 +29,8 @@ export const getChatById = async (chatId: string) => {
 export const getChatByUsers = async (userId1: string, userId2: string) => {
 	try {
 		return await db(chatTableName).where({ user1_id: userId1, user2_id: userId2 }).orWhere({ user1_id: userId2, user2_id: userId1 }).first();
-	} catch (error) {
-		console.error('Error getting chat:', error);
+	} catch (error: any) {
+		logger.error(`Error getting chat by users ${userId1} and ${userId2} from DB: ${error}`);
 		throw new Error(`Error getting chat: ${error}`);
 	}
 };
@@ -50,8 +51,8 @@ export const getChatsByUserId = async (userId: string) => {
 			.orWhere({ user2_id: userId })
 			.select(`${chatTableName}.*`, db.raw(`CASE WHEN user1_id = ? THEN u2.username ELSE u1.username END as other_username`, [userId]));
 		return chats;
-	} catch (error) {
-		console.error('Error getting chats:', error);
+	} catch (error: any) {
+		logger.error(`Error getting chats for user ${userId} from DB: ${error}`);
 		throw new Error(`Error getting chats: ${error}`);
 	}
 };
@@ -68,8 +69,8 @@ export const createChat = async (userId1: string, userId2: string) => {
 	try {
 		const chat = await db(chatTableName).insert({ user1_id: userId1, user2_id: userId2 }).returning('id');
 		return chat[0];
-	} catch (error) {
-		console.error('Error creating chat:', error);
+	} catch (error: any) {
+		logger.error(`Error creating chat in DB between users ${userId1} and ${userId2}: ${error}`);
 		throw new Error(`Error creating chat: ${error}`);
 	}
 };

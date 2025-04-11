@@ -1,5 +1,6 @@
 import { RateLimiterMemory } from 'rate-limiter-flexible';
 import type { Request, Response, NextFunction } from 'express';
+import logger from '../utils/logger';
 
 /**
  * Rate limiting middleware to limit the number of requests from a single IP address.
@@ -24,6 +25,7 @@ export const rateLimiterMiddleware = (req: Request, res: Response, next: NextFun
 			next();
 		})
 		.catch(() => {
+			logger.warn(`Rate limit exceeded for IP: ${req.ip || 'unknown-ip'}. Returning 429 status.`);
 			res.status(429).json({ message: 'Too many requests, please try again later.' });
 		});
 };
