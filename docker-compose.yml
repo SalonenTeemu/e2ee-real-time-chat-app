@@ -1,4 +1,3 @@
-name: e2ee-real-time-chat-app
 services:
   db:
     image: postgres:17-alpine
