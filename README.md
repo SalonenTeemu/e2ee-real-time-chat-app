@@ -49,7 +49,7 @@ The project is created for the COMP.SEC.300 Secure programming course exercise w
    cd e2ee-real-time-chat-app
    ```
 
-2. Configure environment variables:
+2. Configure environment variables (the Docker version should work without creating a .env file using with default values):
 
    Create a .env file in the root using .env.example as a reference.
 
