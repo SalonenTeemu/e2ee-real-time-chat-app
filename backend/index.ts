@@ -38,21 +38,7 @@ const server = http.createServer(app);
 setupSocket(server);
 
 // Initialize database and start the server
-/*
 server.listen(process.env.BACKEND_PORT || 5000, async () => {
 	await initializeDatabase();
-	logger.info('Database initialized successfully');
 	logger.info(`Server running on http://localhost:${process.env.BACKEND_PORT || 5000}`);
-});
-*/
-
-server.listen(process.env.BACKEND_PORT || 5000, async () => {
-	try {
-		await initializeDatabase();
-		logger.info('Database initialized successfully');
-		logger.info(`Server running on http://localhost:${process.env.BACKEND_PORT || 5000}`);
-	} catch (error) {
-		logger.error('Failed to initialize database', error);
-		process.exit(1); // Exit the app if DB setup fails
-	}
 });

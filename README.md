@@ -78,7 +78,7 @@ The project is created for the COMP.SEC.300 Secure programming course exercise w
 2. Install root, frontend & backend dependencies:
 
    ```sh
-   npm run local:install:all
+   npm run local:install
    ```
 
 3. Start the app locally:
