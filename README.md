@@ -1,4 +1,4 @@
-# real-time-chat-app
+# e2ee-real-time-chat-app
 
 This is a real-time end-to-end encrypted chat application built with a Node.js + Express.js + Socket.io backend and a React + Socket.io client + TailwindCSS frontend.
 
@@ -8,9 +8,9 @@ The project is created for the COMP.SEC.300 Secure programming course exercise w
 
 - User registration and login with strong passwords required
 - Real-time E2E-encrypted messaging between authenticated users using Socket.io
-- Secure message storage
+- Secure message storage with further message encryption before database storage
 - Role-based access control for enhanced security
-- Message sanitazion
+- Input sanitazion
 - Rate limiting
 - Security logging
 

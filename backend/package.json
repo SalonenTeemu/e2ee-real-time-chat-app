@@ -22,6 +22,7 @@
 		"dompurify": "^3.2.4",
 		"dotenv": "^16.4.7",
 		"e2e-encrypted-real-time-chat-app": "file:..",
+		"e2ee-real-time-chat-app": "file:..",
 		"express": "^4.21.2",
 		"helmet": "^8.0.0",
 		"jsdom": "^26.0.0",

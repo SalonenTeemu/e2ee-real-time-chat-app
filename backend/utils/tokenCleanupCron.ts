@@ -3,7 +3,7 @@ import { deleteExpiredAndRevokedTokens } from '../db/queries/token';
 import logger from '../utils/logger';
 
 /**
- * A cron job that runs every day at 2 AM to delete expired and revoked refresh tokens from the database.
+ * A cron job that runs every day 2:00 at night to delete expired and revoked refresh tokens from the database.
  */
 cron.schedule('0 2 * * *', async () => {
 	logger.info('Running refresh token cleanup job...');

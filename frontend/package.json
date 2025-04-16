@@ -20,6 +20,7 @@
 		"date-fns": "^4.1.0",
 		"dompurify": "^3.2.4",
 		"e2e-encrypted-real-time-chat-app": "file:..",
+		"e2ee-real-time-chat-app": "file:..",
 		"libsodium-wrappers": "^0.7.15",
 		"lucide-react": "^0.487.0",
 		"react": "^19.0.0",
