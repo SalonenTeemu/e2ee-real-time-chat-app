@@ -4,7 +4,7 @@
 	"main": "index.js",
 	"scripts": {
 		"start": "tsx index.ts",
-		"dev": "nodemon --exec tsx index.ts",
+		"dev": "nodemon --legacy-watch --exec tsx index.ts",
 		"lint": "eslint . --fix",
 		"format": "prettier --write ."
 	},

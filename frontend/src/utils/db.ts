@@ -1,4 +1,4 @@
-const DB_NAME = import.meta.env.DB_NAME || 'chat';
+const DB_NAME = import.meta.env.INDEXED_DB_NAME || 'chat';
 const STORE_NAME = import.meta.env.STORE_NAME || 'keys';
 
 /**

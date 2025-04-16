@@ -1,18 +1,20 @@
 # e2ee-real-time-chat-app
 
-This is a real-time end-to-end encrypted chat application built with a Node.js + Express.js + Socket.io backend and a React + Socket.io client + TailwindCSS frontend.
+This is a real-time end-to-end encrypted chat application built with:
+
+- **Backend**: Node.js + Express + Socket.io + PostgreSQL
+- **Frontend**: React + Socket.io client + TailwindCSS
 
 The project is created for the COMP.SEC.300 Secure programming course exercise work.
 
 ## Features
 
-- User registration and login with strong passwords required
-- Real-time E2E-encrypted messaging between authenticated users using Socket.io
-- Secure message storage with further message encryption before database storage
+- Strong-password registration and login
+- Real-time, end-to-end encrypted messaging
+- Messages further encrypted before database storage
 - Role-based access control for enhanced security
-- Input sanitazion
-- Rate limiting
-- Security logging
+- Input sanitization and rate limiting
+- Security-focused logging
 
 ## TODO
 
@@ -23,52 +25,85 @@ The project is created for the COMP.SEC.300 Secure programming course exercise w
   - Dependency-check to track outdated or insecure dependencies
 - Update README.md
 
-## Installation
+## Prerequisites
 
-This project uses PostgreSQL as the database. Ensure you have PostgreSQL installed and running on your machine.
+### Docker-based use (Recommended)
 
-1. Clone the repository:
+- **No local Node.js or PostgreSQL required**
+- Requires [Docker](https://www.docker.com/) and [Docker Compose](https://docs.docker.com/compose/)
+
+### Local use
+
+- Requires:
+  - [Node.js](https://nodejs.org/) (v20+ recommended)
+  - [PostgreSQL](https://www.postgresql.org/) installed and running
+
+---
+
+## Setup
+
+1. Clone the repository and navigate to the project root folder:
 
    ```sh
-   git clone https://github.com/SalonenTeemu/real-time-chat-app
-   cd real-time-chat-app
+   git clone https://github.com/SalonenTeemu/e2ee-real-time-chat-app
+   cd e2ee-real-time-chat-app
    ```
 
-2. Install dependencies for both frontend and backend:
+2. Configure environment variables:
 
-   ```sh
-   npm run install:all
-   ```
-
-3. Create a `.env` file in the project root directory. Use the `.env.example` file in the project root as a reference for required variables.
+   Create a .env file in the root using .env.example as a reference.
 
 ## Running the Application
 
-1. Start the frontend and backend server:
+### Option 1: Docker
+
+1. Build and start the application with:
 
    ```sh
-   npm run start
+   docker-compose up --build
    ```
 
-2. Open the app in a browser at: `http://localhost:5173`.
+   Restart without rebuilding:
 
-## Development
+   ```sh
+   docker-compose up
+   ```
 
-To run the application in development mode:
+2. Access the app at: `http://localhost:5173` or whatever port you have defined in the .env file.
 
-```sh
-npm run dev
-```
+### Option 2: Local
 
-## Linting and Formatting
+1. Start PostgreSQL locally and ensure .env matches the DB config.
 
-To lint the code:
+2. Install root, frontend & backend dependencies:
+
+   ```sh
+   npm run local:install:all
+   ```
+
+3. Start the app locally:
+
+   Development mode:
+
+   ```sh
+   npm run local:dev
+   ```
+
+   Regular mode:
+
+   ```sh
+   npm run local:start
+   ```
+
+## Code Quality
+
+Lint:
 
 ```sh
 npm run lint
 ```
 
-To format the code:
+Format:
 
 ```sh
 npm run format

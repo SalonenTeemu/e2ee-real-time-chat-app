@@ -25,7 +25,7 @@ const Navbar = () => {
 			<div className="mx-auto flex w-full items-center justify-between">
 				<div className="left-0 text-2xl font-bold text-white">
 					<Link to="/" className="hover:text-gray-400">
-						Real-Time Chat App
+						E2EE Real-Time Chat App
 					</Link>
 				</div>
 

@@ -1,0 +1,63 @@
+name: e2ee-real-time-chat-app
+services:
+  db:
+    image: postgres:17-alpine
+    container_name: e2ee-real-time-chat-app-database
+    restart: on-failure:5
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "${DB_PORT:-5432}:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  backend:
+    image: node:23-alpine
+    container_name: e2ee-real-time-chat-app-backend
+    working_dir: /app
+    command: sh -c "npm install && npm run dev"
+    restart: on-failure:5
+    volumes:
+      - ./backend:/app/
+    ports:
+      - "${BACKEND_PORT}:5000"
+    environment:
+      NODE_ENV: ${NODE_ENV}
+      BACKEND_PORT: ${BACKEND_PORT}
+      FRONTEND_PORT: ${FRONTEND_PORT}
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT}
+      DB_NAME: ${DB_NAME}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET}
+      ACCESS_TOKEN_EXPIRATION: ${ACCESS_TOKEN_EXPIRATION}
+      REFRESH_TOKEN_EXPIRATION: ${REFRESH_TOKEN_EXPIRATION}
+      DB_ENCRYPTION_KEY: ${DB_ENCRYPTION_KEY}
+    depends_on:
+      - db
+
+  frontend:
+    image: node:23-alpine
+    container_name: e2ee-real-time-chat-app-frontend
+    working_dir: /app
+    command: sh -c "npm install && npm run dev"
+    restart: on-failure:5
+    volumes:
+      - ./frontend:/app/
+    ports:
+      - "${FRONTEND_PORT}:5173"
+    environment:
+      VITE_ENV: ${VITE_ENV}
+      VITE_BACKEND_PORT: ${VITE_BACKEND_PORT}
+      VITE_FRONTEND_PORT: ${VITE_FRONTEND_PORT}
+      INDEXED_DB_NAME: ${DB_NAME}
+      STORE_NAME: ${STORE_NAME}
+    depends_on:
+      - backend
+
+volumes:
+  pgdata:
