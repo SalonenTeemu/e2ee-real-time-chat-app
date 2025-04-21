@@ -18,11 +18,10 @@ The project is created for the COMP.SEC.300 Secure programming course exercise w
 
 ## TODO
 
+- Fix CI/CD Pipeline
+   - uncomment all steps and verify that they work
+   - include unit testing
 - Unit testing
-- CI/CD Pipeline with security features:
-  - SBOM generation
-  - Vulnerability scanning (e.g., Snyk, Trivy)
-  - Dependency-check to track outdated or insecure dependencies
 - Update README.md
 
 ## Prerequisites

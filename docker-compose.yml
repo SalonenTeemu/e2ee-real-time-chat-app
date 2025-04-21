@@ -13,10 +13,9 @@ services:
       - pgdata:/var/lib/postgresql/data
 
   backend:
-    image: node:23-alpine
+    build: ./backend
     container_name: e2ee-real-time-chat-app-backend
     working_dir: /app
-    command: sh -c "npm install && npm run dev"
     restart: on-failure:5
     volumes:
       - ./backend:/app:delegated
@@ -41,10 +40,9 @@ services:
       - db
 
   frontend:
-    image: node:23-alpine
+    build: ./frontend
     container_name: e2ee-real-time-chat-app-frontend
     working_dir: /app
-    command: sh -c "npm install && npm run dev"
     restart: on-failure:5
     volumes:
       - ./frontend:/app:delegated
