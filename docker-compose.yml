@@ -14,6 +14,7 @@ services:
 
   backend:
     build: ./backend
+    image: e2ee-real-time-chat-app-backend
     container_name: e2ee-real-time-chat-app-backend
     working_dir: /app
     restart: on-failure:5
@@ -41,6 +42,7 @@ services:
 
   frontend:
     build: ./frontend
+    image: e2ee-real-time-chat-app-frontend
     container_name: e2ee-real-time-chat-app-frontend
     working_dir: /app
     restart: on-failure:5
