@@ -1,21 +1,30 @@
 // Jenkins Pipeline for e2ee-real-time-chat-app
-//
+
+// Focus: This Jenkins pipeline automates the security testing of the e2ee-real-time-chat-app project. 
+// It performs Static Application Security Testing (SAST) using Semgrep, Software Composition Analysis (SCA) using OWASP Dependency-Check, 
+// Trivy for both filesystem and container image scanning, and Dynamic Application Security Testing (DAST) using OWASP ZAP. 
+// The pipeline generates various security reports and archives them for review.
+
 // Requirements:
 // - Jenkins with Docker support enabled
 // - Docker Compose
-// - Tools: JDK 17, Node.js 20, Python 3.x, CycloneDX plugin, OWASP Dependency-Check, Trivy, SonarQube Scanner, OWASP ZAP
-// - Credentials: NVD_API_KEY (for Dependency-Check)
-//
+// - Tools: Git, JDK 17, Node.js 20, Python 3.x, Semgrep, CycloneDX plugin, OWASP Dependency-Check, Trivy, OWASP ZAP
+// - Credentials: NVD_API_KEY (for Dependency-Check). Can be requested from: https://nvd.nist.gov/developers/request-an-api-key
+
 // Pipeline Steps:
-// 1. Checkout code from GitHub.
-// 2. Install dependencies & generate SBOMs.
-// 3. Run SAST (Semgrep) and SCA (Dependency-Check).
-// 4. Run Trivy filesystem and container image scan.
-// 5. Run OWASP ZAP for DAST.
-// 6. Archive security reports.
-//
-// Change the DAST_URL variable in the environment section based on your setup
-//
+// 1. Clean workspace to ensure a fresh start.
+// 2. Checkout code from GitHub.
+// 3. Install Semgrep and run SAST scan, generating a report in JSON format.
+// 4. Install dependencies & generate SBOMs for root, backend, and frontend using CycloneDX.
+// 5. Run OWASP Dependency-Check for SCA on backend and frontend, generating reports in XML format.
+// 6. Run Trivy filesystem scan and generate a report in HTML format.
+// 7. Build Docker images using Docker Compose.
+// 8. Run Trivy container image scan for the used images and generate reports in HTML format.
+// 9. Run OWASP ZAP for DAST and generate a report in HTML format.
+// 10. Archive all generated security reports.
+// 11. Cleanup: remove Docker artifacts and reset workspace to free up space.
+
+// Note: Change the DAST_URL variable in the environment section of the pipeline based on your setup.
 
 pipeline {
     agent any
@@ -24,9 +33,7 @@ pipeline {
         nodejs 'node20'
     }
     environment {
-        SCANNER_HOME = tool 'sonar-scanner'
-        SHELL = '/bin/bash'
-          // Define URL for DAST based on your setup
+          // Define frontend base URL for OWASP ZAP DAST testing (adjust based on environment)
         DAST_URL = 'http://192.168.0.121:5173'
     }
     stages {
@@ -44,58 +51,62 @@ pipeline {
             }
         }
 
-        // Run Semgrep for static analysis and generate a report in JSON format
-        stage('Install and Run Semgrep') {
+        // Run Semgrep for Static Application Security Testing (SAST) and generate a report in JSON format
+        stage('Install and Run Semgrep (SAST)') {
             steps {
-                // Install Semgrep and create a virtual environment and run Semgrep using the virtual environment
+                // Create a virtual environment, install Semgrep and run Semgrep using the virtual environment
                 sh '''
                     python3 -m venv semgrep-env
                     . semgrep-env/bin/activate
                     pip install semgrep
-                    . semgrep-env/bin/activate
                     semgrep --config=auto --json > semgrep-output.json
                 '''
             }
         }
         
-        // Install Dependencies + Generate SBOMs for backend and frontend
-        stage('Install Dependencies + SBOM') {
+        // Install Dependencies + Generate SBOMs for root, backend and frontend
+        stage('Install Dependencies and generate SBOMs') {
             steps {
-                sh 'npm i'
+                sh 'npm install'
+                sh 'cyclonedx-npm --output-file sbom-root.json --output-format json'
 
                 dir('backend') {
-                    sh 'npm i'
+                    sh 'npm install'
                     sh 'cyclonedx-npm --output-file sbom-backend.json --output-format json'
                 }
                 dir('frontend') {
-                    sh 'npm i'
+                    sh 'npm install'
                     sh 'cyclonedx-npm --output-file sbom-frontend.json --output-format json'
                 }
             }
         }
 
         // Run Dependency Check (SCA) for backend and generate a report in XML format
-         stage('Run Dependency Check (SCA) - Backend') {
+        stage('Run Dependency Check (SCA) - Backend') {
             steps {
                 withCredentials([string(credentialsId: 'NVD_API_KEY', variable: 'NVD_API_KEY')]) {
-                    dependencyCheck additionalArguments: '--scan ./backend --exclude "**/node_modules/**" --format XML --project e2ee-backend --nvdApiKey=${NVD_API_KEY} --disableYarnAudit --disableNodeAudit --disableRetireJS', odcInstallation: 'DP-Check'
+                    dependencyCheck additionalArguments: '--scan ./backend --out ./backend --format XML --project e2ee-backend --nvdApiKey=${NVD_API_KEY} --disableYarnAudit --disableNodeAudit', odcInstallation: 'DP-Check'
                 }
+                // Move and rename the generated report for easier access
+                sh 'mv ./backend/dependency-check-report.xml ./dependency-check-report-backend.xml'
             }
         }
 
-        // Run dependency-check for SCA for frontend and generate a report in XML format
-        stage('Dependency Check - Frontend') {
+        // Run Dependency Check (SCA) for frontend and generate a report in XML format
+        stage('Run Dependency Check (SCA) - Frontend') {
             steps {
                 withCredentials([string(credentialsId: 'NVD_API_KEY', variable: 'NVD_API_KEY')]) {
-                    dependencyCheck additionalArguments: '--scan ./frontend --exclude "**/node_modules/**" --format XML --project e2ee-frontend --nvdApiKey=${NVD_API_KEY} --disableYarnAudit --disableNodeAudit --disableRetireJS', odcInstallation: 'DP-Check'
+                    dependencyCheck additionalArguments: '--scan ./frontend --out ./frontend --format XML --project e2ee-frontend --nvdApiKey=${NVD_API_KEY} --disableYarnAudit --disableNodeAudit', odcInstallation: 'DP-Check'
                 }
+                // Move and rename the generated report for easier access
+                sh 'mv ./frontend/dependency-check-report.xml ./dependency-check-report-frontend.xml'
             }
         }
 
-        // Run a file system scan with Trivy and generate a report in HTML format
+        // Run a Trivy file system scan and generate a report in HTML format
         stage('Trivy File System Scan') {
             steps {
-                sh 'trivy fs . --format template --template @/usr/share/trivy/contrib/html.tpl > trivy-fs-report.html'
+                sh 'trivy fs . --format template --template @/usr/share/trivy/contrib/html.tpl > trivy-report-fs.html'
             }
         }
 
@@ -104,45 +115,57 @@ pipeline {
             steps {
                 sh 'docker-compose down -v'
                 sh 'docker-compose build'
-                sh 'docker images'
             }
         }
 
         // Run Trivy container image scan for the used images and generate reports in HTML format
         stage('Trivy Image Scan') {
             steps {
-                sh 'trivy image e2ee-real-time-chat-app-backend:latest --format template --template @/usr/share/trivy/contrib/html.tpl > trivy-backend-report.html'
-                sh 'trivy image e2ee-real-time-chat-app-frontend:latest --format template --template @/usr/share/trivy/contrib/html.tpl > trivy-frontend-report.html'
-                sh 'trivy image postgres:17-alpine --format template --template @/usr/share/trivy/contrib/html.tpl > trivy-postgres-report.html'
+                sh 'trivy image e2ee-real-time-chat-app-backend:latest --format template --template @/usr/share/trivy/contrib/html.tpl > trivy-report-backend.html'
+                sh 'trivy image e2ee-real-time-chat-app-frontend:latest --format template --template @/usr/share/trivy/contrib/html.tpl > trivy-report-frontend.html'
+                sh 'trivy image postgres:17-alpine --format template --template @/usr/share/trivy/contrib/html.tpl > trivy-report-postgres.html'
             }
         }
 
         // Run OWASP ZAP for DAST and generate a report in HTML format
         stage('OWASP ZAP (DAST)') {
             steps {
+                // Ensure the current directory is writable by ZAP
+                sh "chmod 777 \$(pwd)"
+
                 // Run the application using Docker Compose for OWASP ZAP
                 sh 'docker-compose up -d'
+
+                // Create a dedicated directory for ZAP report output and set permissions
                 sh """
-                    docker run --rm -v \$(pwd):/zap/wrk/:rw \
-                      --name zap \
-                      -t zaproxy/zap-stable zap-baseline.py \
-                      -t \$DAST_URL -I -j -r DAST_Report.html
+                    mkdir -p zap-reports
+                    chmod 777 zap-reports
+                """
+
+                // Run the OWASP ZAP container, outputting the report to zap-reports
+                sh """
+                    docker run --rm \
+                    -v \$(pwd)/zap-reports:/zap/wrk/:rw \
+                    --name zap \
+                    -t zaproxy/zap-stable zap-baseline.py \
+                    -t \$DAST_URL -I -j -r DAST_report.html
                 """
             }
         }
-
-        // Archive the generated reports
+     
+        // Archive all generated security reports
         stage('Archive Reports') {
-            steps {
-                archiveArtifacts artifacts: 'backend/dependency-check-report.xml, frontend/dependency-check-report.xml, semgrep-output.json, sbom-root.json, sbom-backend.json, sbom-frontend.json, trivy-fs-report.html, trivy-backend-report.html, trivy-frontend-report.html, trivy-postgres-report.html, DAST_Report.html', onlyIfSuccessful: true
+           steps {
+               archiveArtifacts artifacts: 'dependency-check-report-backend.xml, dependency-check-report-frontend.xml, semgrep-output.json, sbom-root.json, backend/sbom-backend.json, frontend/sbom-frontend.json, trivy-*.html, zap-reports/DAST_report.html', onlyIfSuccessful: true
             }
         }
     }
     
-    // Run cleanup tasks to remove containers, images, volumes, and networks
+    // Run final cleanup: remove Docker artifacts and reset workspace to free up space
     post {
         always {
             script {
+                sh 'docker-compose down -v'
                 sh 'docker container prune -f'
                 sh 'docker image prune -f'
                 sh 'docker volume prune -f'

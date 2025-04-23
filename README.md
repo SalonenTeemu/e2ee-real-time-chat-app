@@ -1,11 +1,19 @@
 # e2ee-real-time-chat-app
 
-This is a real-time end-to-end encrypted chat application built with:
+This project is a real-time chat application with end-to-end encryption, developed using:
 
-- **Backend**: Node.js + Express + Socket.io + PostgreSQL
-- **Frontend**: React + Socket.io client + TailwindCSS
+- **Backend**: Node.js, Express, Socket.io, and PostgreSQL
+- **Frontend**: React, Socket.io client, and TailwindCSS
 
-The project is created for the COMP.SEC.300 Secure programming course exercise work.
+It was created as part of the COMP.SEC.300 Secure Programming course exercise work. The project report can be found in the `docs` folder.
+
+## TODO
+
+- semgrep.json to html with online tool
+- docs folder to project -> add security artifacts there
+- Report update
+- Unit testing
+- Update README.md
 
 ## Features
 
@@ -15,14 +23,7 @@ The project is created for the COMP.SEC.300 Secure programming course exercise w
 - Role-based access control for enhanced security
 - Input sanitization and rate limiting
 - Security-focused logging
-
-## TODO
-
-- Fix CI/CD Pipeline
-   - uncomment all steps and verify that they work
-   - include unit testing
-- Unit testing
-- Update README.md
+- CI/CD security pipeline with Jenkins, including SAST, SCA, file system and container scanning and DAST
 
 ## Prerequisites
 
@@ -93,6 +94,19 @@ The project is created for the COMP.SEC.300 Secure programming course exercise w
    ```sh
    npm run local:start
    ```
+
+## CI/CD Security Pipeline
+
+The project includes a Jenkins pipeline designed to ensure the security and quality of the application. The pipeline performs the following tasks:
+
+- **Static Application Security Testing (SAST)** using Semgrep
+- **Software Composition Analysis (SCA)** with OWASP Dependency-Check
+- **File System And Container Scanning** with Trivy
+- **Dynamic Application Security Testing (DAST)** using OWASP ZAP
+- Generates security reports (e.g., SBOMs, scan results) and archives them for review. The generated reports can also be found in the docs folder of the project.
+- Generates and archives security reports for review, which can be found in the project's `docs/security-reports` folder.
+
+Refer to the `Jenkinsfile` for detailed pipeline steps and configuration.
 
 ## Code Quality
 
