@@ -148,7 +148,7 @@ pipeline {
                     -v \$(pwd)/zap-reports:/zap/wrk/:rw \
                     --name zap \
                     -t zaproxy/zap-stable zap-baseline.py \
-                    -t \$DAST_URL -I -j -r DAST_report.html
+                    -t \$DAST_URL -I -j -r DAST-report.html
                 """
             }
         }
@@ -156,7 +156,7 @@ pipeline {
         // Archive all generated security reports
         stage('Archive Reports') {
            steps {
-               archiveArtifacts artifacts: 'dependency-check-report-backend.xml, dependency-check-report-frontend.xml, semgrep-output.json, sbom-root.json, backend/sbom-backend.json, frontend/sbom-frontend.json, trivy-*.html, zap-reports/DAST_report.html', onlyIfSuccessful: true
+               archiveArtifacts artifacts: 'dependency-check-report-backend.xml, dependency-check-report-frontend.xml, semgrep-output.json, sbom-root.json, backend/sbom-backend.json, frontend/sbom-frontend.json, trivy-*.html, zap-reports/DAST-report.html', onlyIfSuccessful: true
             }
         }
     }

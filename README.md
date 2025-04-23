@@ -9,9 +9,8 @@ It was created as part of the COMP.SEC.300 Secure Programming course exercise wo
 
 ## TODO
 
-- semgrep.json to html with online tool
-- docs folder to project -> add security artifacts there
 - Report update
+- Fix possible issues found in the reports
 - Unit testing
 - Update README.md
 
