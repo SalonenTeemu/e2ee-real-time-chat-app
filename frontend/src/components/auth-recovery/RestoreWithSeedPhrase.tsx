@@ -1,5 +1,6 @@
 import { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { env } from '../../utils/env';
 import { useAuth } from '../../context/AuthContext';
 import { useNotification } from '../../context/NotificationContext';
 import { createKeyPair } from '../../services/key/keys';
@@ -89,7 +90,7 @@ const RestoreWithSeedPhrase = () => {
 		}
 
 		try {
-			const res = await fetch(`http://localhost:${import.meta.env.VITE_BACKEND_PORT || 5000}/api/auth/verify-password`, {
+			const res = await fetch(`http://localhost:${env.VITE_BACKEND_PORT}/api/auth/verify-password`, {
 				method: 'POST',
 				body: JSON.stringify({ password }),
 				headers: {

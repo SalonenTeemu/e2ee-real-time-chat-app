@@ -1,4 +1,5 @@
 import sodium from 'libsodium-wrappers';
+import { env } from '../../utils/env';
 import { getFromDB } from '../../utils/db';
 import { showPasswordModal } from '../../components/auth-recovery/PasswordModal';
 import { log, logError } from '../../utils/logger';
@@ -198,7 +199,7 @@ class KeyManager {
 	 * @returns {Uint8Array | null} The recipient public key or null if not found
 	 */
 	private async getRecipientPublicKey(chatId: string): Promise<Uint8Array | null> {
-		const res = await fetch(`http://localhost:${import.meta.env.VITE_BACKEND_PORT || 5000}/api/key/recipient/${chatId}`, {
+		const res = await fetch(`http://localhost:${env.VITE_BACKEND_PORT}/api/key/recipient/${chatId}`, {
 			credentials: 'include',
 		});
 		const data = await res.json();

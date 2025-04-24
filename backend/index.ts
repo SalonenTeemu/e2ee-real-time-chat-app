@@ -42,3 +42,5 @@ server.listen(process.env.BACKEND_PORT || 5000, async () => {
 	await initializeDatabase();
 	logger.info(`Server running on http://localhost:${process.env.BACKEND_PORT || 5000}`);
 });
+
+export default app;

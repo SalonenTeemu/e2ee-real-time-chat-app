@@ -7,6 +7,6 @@
 		"skipLibCheck": true,
 		"strict": true
 	},
-	"include": ["./**/*.ts", ".env"],
+	"include": ["./**/*.ts", ".env", "tests/**/*.ts"],
 	"exclude": ["node_modules"]
 }

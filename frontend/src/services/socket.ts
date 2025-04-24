@@ -1,4 +1,5 @@
 import { io, Socket } from 'socket.io-client';
+import { env } from '../utils/env';
 import { log, logError } from '../utils/logger';
 
 let socket: Socket | null = null;
@@ -11,7 +12,7 @@ let socket: Socket | null = null;
  */
 export const connectSocket = (notificationContext: any, handleReceiveMessage: (data: any) => void) => {
 	if (!socket) {
-		socket = io(`http://localhost:${import.meta.env.VITE_BACKEND_PORT || 5000}`, {
+		socket = io(`http://localhost:${env.VITE_BACKEND_PORT}`, {
 			transports: ['websocket'],
 			reconnection: true,
 			reconnectionAttempts: 5,

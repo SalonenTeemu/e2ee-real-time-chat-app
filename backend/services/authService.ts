@@ -1,4 +1,5 @@
 import jwt from 'jsonwebtoken';
+import ms from 'ms';
 import { addRefreshToken, getRefreshToken, revokeRefreshToken } from '../db/queries/token';
 import { User } from '../utils/types';
 import logger from '../utils/logger';
@@ -8,8 +9,12 @@ const env = process.env;
 // Secrets and expiration times for JWT tokens
 const secret = env.JWT_SECRET || 'secret';
 const refreshSecret = env.JWT_REFRESH_SECRET || 'refreshSecret';
-const expiration = env.ACCESS_TOKEN_EXPIRATION || '15m';
+const accessExpiration = env.ACCESS_TOKEN_EXPIRATION || '15m';
 const refreshExpiration = env.REFRESH_TOKEN_EXPIRATION || '7d';
+
+// Convert expiration times to milliseconds to avoid issues with string values with jsonwebtoken
+const accessTokenExpiration = ms(accessExpiration as ms.StringValue);
+const refreshTokenExpiration = ms(refreshExpiration as ms.StringValue);
 
 /**
  * Creates an access token and a refresh token for a user.
@@ -22,10 +27,10 @@ export const createTokens = async (user: User) => {
 	try {
 		// Create the access token and refresh token using jsonwebtoken
 		const accessToken = jwt.sign({ id: user.id, role: user.role }, secret, {
-			expiresIn: expiration,
+			expiresIn: accessTokenExpiration,
 		});
 		const refreshToken = jwt.sign({ id: user.id, role: user.role }, refreshSecret, {
-			expiresIn: refreshExpiration,
+			expiresIn: refreshTokenExpiration,
 		});
 		// Save the refresh token to the database
 		await addRefreshToken(user.id, refreshToken);

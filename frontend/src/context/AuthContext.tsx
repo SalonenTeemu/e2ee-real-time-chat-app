@@ -1,5 +1,6 @@
 import { createContext, useState, useContext, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { env } from '../utils/env';
 import { useNotification } from '../context/NotificationContext';
 import { fetchWithAuth } from '../utils/fetch';
 import { User } from '../utils/types';
@@ -33,12 +34,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 	 */
 	const fetchUser = async () => {
 		try {
-			const res = await fetchWithAuth(
-				`http://localhost:${import.meta.env.VITE_BACKEND_PORT || 5000}/api/auth/me`,
-				{},
-				notificationContext.addNotification,
-				logout
-			);
+			const res = await fetchWithAuth(`http://localhost:${env.VITE_BACKEND_PORT}/api/auth/me`, {}, notificationContext.addNotification, logout);
 			if (!res) {
 				return;
 			}
@@ -64,7 +60,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 	 */
 	const logout = useCallback(async () => {
 		try {
-			await fetch(`http://localhost:${import.meta.env.VITE_BACKEND_PORT || 5000}/api/auth/logout`, {
+			await fetch(`http://localhost:${env.VITE_BACKEND_PORT}/api/auth/logout`, {
 				method: 'POST',
 				credentials: 'include',
 			});
@@ -89,7 +85,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 			if (!user) return;
 
 			try {
-				const res = await fetch(`http://localhost:${import.meta.env.VITE_BACKEND_PORT || 5000}/api/auth/refresh`, {
+				const res = await fetch(`http://localhost:${env.VITE_BACKEND_PORT}/api/auth/refresh`, {
 					method: 'POST',
 					credentials: 'include',
 				});

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { env } from '../../utils/env';
 import { useAuth } from '../../context/AuthContext';
 import { useNotification } from '../../context/NotificationContext';
 import { fetchWithAuth } from '../../utils/fetch';
@@ -69,7 +70,7 @@ const Login = () => {
 		}
 
 		try {
-			const res = await fetch(`http://localhost:${import.meta.env.VITE_BACKEND_PORT || 5000}/api/auth/login`, {
+			const res = await fetch(`http://localhost:${env.VITE_BACKEND_PORT}/api/auth/login`, {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',
@@ -105,7 +106,7 @@ const Login = () => {
 
 					// Save the public key to the backend
 					const keyRes = await fetchWithAuth(
-						`http://localhost:${import.meta.env.VITE_BACKEND_PORT || 5000}/api/key`,
+						`http://localhost:${env.VITE_BACKEND_PORT}/api/key`,
 						{
 							method: 'POST',
 							headers: {

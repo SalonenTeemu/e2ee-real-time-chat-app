@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { env } from '../../utils/env';
 import { useNotification } from '../../context/NotificationContext';
 import { validateRegisterAndLogin } from '../../utils/validate';
 
@@ -37,7 +38,7 @@ const Register = () => {
 		}
 
 		try {
-			const res = await fetch(`http://localhost:${import.meta.env.VITE_BACKEND_PORT || 5000}/api/auth/register`, {
+			const res = await fetch(`http://localhost:${env.VITE_BACKEND_PORT}/api/auth/register`, {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',

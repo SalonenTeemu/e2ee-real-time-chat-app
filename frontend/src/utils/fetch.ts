@@ -1,3 +1,5 @@
+import { env } from './env';
+
 /**
  * Helper function to fetch again in case of 401 or 403 errors and to handle rate limiting responses.
  *
@@ -25,7 +27,7 @@ export const fetchWithAuth = async (
 		}
 		// If the response is 401 or 403, try to refresh the token and fetch again
 		if (res.status === 401 || res.status === 403) {
-			const refreshRes = await fetch(`http://localhost:${import.meta.env.VITE_BACKEND_PORT || 5000}/api/auth/refresh`, {
+			const refreshRes = await fetch(`http://localhost:${env.VITE_BACKEND_PORT}/api/auth/refresh`, {
 				method: 'POST',
 				credentials: 'include',
 			});

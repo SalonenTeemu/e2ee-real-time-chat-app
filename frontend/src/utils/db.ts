@@ -1,5 +1,4 @@
-const DB_NAME = import.meta.env.INDEXED_DB_NAME || 'chat';
-const STORE_NAME = import.meta.env.STORE_NAME || 'keys';
+import { env } from './env';
 
 /**
  * Opens the IndexedDB database.
@@ -8,7 +7,7 @@ const STORE_NAME = import.meta.env.STORE_NAME || 'keys';
  */
 const openDB = () => {
 	return new Promise((resolve, reject) => {
-		const request = indexedDB.open(DB_NAME, 1);
+		const request = indexedDB.open(env.INDEXED_DB_NAME, 1);
 
 		request.onupgradeneeded = (event) => {
 			const target = event.target as IDBOpenDBRequest;
@@ -17,8 +16,8 @@ const openDB = () => {
 			}
 			const db = target.result;
 			// Check if the object store already exists and create it if not
-			if (!db.objectStoreNames.contains(STORE_NAME)) {
-				db.createObjectStore(STORE_NAME);
+			if (!db.objectStoreNames.contains(env.STORE_NAME)) {
+				db.createObjectStore(env.STORE_NAME);
 			}
 		};
 
@@ -35,8 +34,8 @@ const openDB = () => {
  */
 export const saveToDB = async (key: string, value: any) => {
 	const db = (await openDB()) as IDBDatabase;
-	const transaction = db.transaction(STORE_NAME, 'readwrite');
-	const store = transaction.objectStore(STORE_NAME);
+	const transaction = db.transaction(env.STORE_NAME, 'readwrite');
+	const store = transaction.objectStore(env.STORE_NAME);
 	store.put(value, key);
 };
 
@@ -49,8 +48,8 @@ export const saveToDB = async (key: string, value: any) => {
 export const getFromDB = async (key: string) => {
 	const db = (await openDB()) as IDBDatabase;
 	return new Promise((resolve, reject) => {
-		const transaction = db.transaction(STORE_NAME, 'readonly');
-		const store = transaction.objectStore(STORE_NAME);
+		const transaction = db.transaction(env.STORE_NAME, 'readonly');
+		const store = transaction.objectStore(env.STORE_NAME);
 		const request = store.get(key);
 
 		request.onsuccess = () => resolve(request.result);

@@ -1,5 +1,6 @@
-const env = import.meta.env.VITE_ENV || 'development';
-const isDevelopment = env === 'development';
+import { env } from './env';
+
+const isDevelopment = env.VITE_ENV === 'development';
 
 /**
  * Logs a message to the console if the environment is development.

@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { format, isValid } from 'date-fns';
+import { env } from '../../utils/env';
 import { connectSocket, disconnectSocket, getSocket } from '../../services/socket';
 import { useAuth } from '../../context/AuthContext';
 import { useNotification } from '../../context/NotificationContext';
@@ -72,7 +73,7 @@ const Chat = () => {
 	const getChats = async () => {
 		try {
 			const res = await fetchWithAuth(
-				`http://localhost:${import.meta.env.VITE_BACKEND_PORT || 5000}/api/chat`,
+				`http://localhost:${env.VITE_BACKEND_PORT}/api/chat`,
 				{},
 				notificationContext.addNotification,
 				authContext.logout
@@ -113,7 +114,7 @@ const Chat = () => {
 				// If chat is not found in the current chats, fetch it from the server
 				try {
 					const res = await fetchWithAuth(
-						`http://localhost:${import.meta.env.VITE_BACKEND_PORT || 5000}/api/chat/${data.chatId}`,
+						`http://localhost:${env.VITE_BACKEND_PORT}/api/chat/${data.chatId}`,
 						{},
 						notificationContext.addNotification,
 						authContext.logout
@@ -153,7 +154,7 @@ const Chat = () => {
 
 		try {
 			const res = await fetchWithAuth(
-				`http://localhost:${import.meta.env.VITE_BACKEND_PORT || 5000}/api/users/search?searchTerm=${sanitizedSearchTerm}`,
+				`http://localhost:${env.VITE_BACKEND_PORT}/api/users/search?searchTerm=${sanitizedSearchTerm}`,
 				{},
 				notificationContext.addNotification,
 				authContext.logout
@@ -183,7 +184,7 @@ const Chat = () => {
 	const startChat = async (otherUserId: string) => {
 		try {
 			const res = await fetchWithAuth(
-				`http://localhost:${import.meta.env.VITE_BACKEND_PORT || 5000}/api/chat/start`,
+				`http://localhost:${env.VITE_BACKEND_PORT}/api/chat/start`,
 				{
 					method: 'POST',
 					headers: {
@@ -229,7 +230,7 @@ const Chat = () => {
 
 		try {
 			const res = await fetchWithAuth(
-				`http://localhost:${import.meta.env.VITE_BACKEND_PORT || 5000}/api/message/${chatId}`,
+				`http://localhost:${env.VITE_BACKEND_PORT}/api/message/${chatId}`,
 				{},
 				notificationContext.addNotification,
 				authContext.logout

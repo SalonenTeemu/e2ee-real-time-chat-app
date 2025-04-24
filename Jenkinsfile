@@ -1,6 +1,6 @@
 // Jenkins Pipeline for e2ee-real-time-chat-app
 
-// Focus: This Jenkins pipeline automates the security testing of the e2ee-real-time-chat-app project. 
+// Focus: This Jenkins pipeline is used to run the security testing of the e2ee-real-time-chat-app project. 
 // It performs Static Application Security Testing (SAST) using Semgrep, Software Composition Analysis (SCA) using OWASP Dependency-Check, 
 // Trivy for both filesystem and container image scanning, and Dynamic Application Security Testing (DAST) using OWASP ZAP. 
 // The pipeline generates various security reports and archives them for review.
