@@ -9,11 +9,11 @@ It was created as part of the COMP.SEC.300 Secure Programming course exercise wo
 
 ## TODO
 
-- Update packages
 - Add unit tests (also security related)
-- Fix possible issues found in the reports
+- Fix possible issues found in the security reports
 - Report update (changes made due to tests and what vulnerabilities they fixed)
 - Go through code comments and possibly add details about security solutions
+- Final testing of the application
 - Update README.md
 
 ## Features
