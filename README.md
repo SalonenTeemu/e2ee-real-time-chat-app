@@ -9,8 +9,8 @@ It was created as part of the COMP.SEC.300 Secure Programming course exercise wo
 
 ## TODO
 
-- Unit testing (readme -> how to run tests)
 - Update packages
+- Add unit tests (also security related)
 - Fix possible issues found in the reports
 - Report update (changes made due to tests and what vulnerabilities they fixed)
 - Go through code comments and possibly add details about security solutions
@@ -25,6 +25,7 @@ It was created as part of the COMP.SEC.300 Secure Programming course exercise wo
 - Input sanitization and rate limiting
 - Security-focused logging
 - CI/CD security pipeline with Jenkins, including SAST, SCA, file system and container scanning and DAST
+- Basic unit testing for both frontend and backend to ensure main functionality and security
 
 ## Prerequisites
 
@@ -84,17 +85,39 @@ It was created as part of the COMP.SEC.300 Secure Programming course exercise wo
 
 3. Start the app locally:
 
+   Regular mode:
+
+   ```sh
+   npm run local:start
+   ```
+
    Development mode:
 
    ```sh
    npm run local:dev
    ```
 
-   Regular mode:
+## Running Unit Tests
 
-   ```sh
-   npm run local:start
-   ```
+Ensure all dependencies are installed locally before running tests. To run all unit tests for the project, execute the following command in the project root:
+
+```sh
+npm test
+```
+
+You can also run tests for the frontend or backend individually.
+
+For frontend tests:
+
+```sh
+npm run test:frontend
+```
+
+For backend tests:
+
+```sh
+npm run test:backend
+```
 
 ## CI/CD Security Pipeline
 
@@ -104,20 +127,19 @@ The project includes a Jenkins pipeline designed to ensure the security and qual
 - **Software Composition Analysis (SCA)** with OWASP Dependency-Check
 - **File System And Container Scanning** with Trivy
 - **Dynamic Application Security Testing (DAST)** using OWASP ZAP
-- Generates security reports (e.g., SBOMs, scan results) and archives them for review. The generated reports can also be found in the docs folder of the project.
-- Generates and archives security reports for review, which can be found in the project's `docs/security-reports` folder.
+- Generate and archive security reports for review. The generated reports can be found in the project's `docs/security-reports` folder.
 
 Refer to the `Jenkinsfile` for detailed pipeline steps and configuration.
 
 ## Code Quality
 
-Lint:
+To check code quality, run linting in the project root with:
 
 ```sh
 npm run lint
 ```
 
-Format:
+Automatically format the code with:
 
 ```sh
 npm run format
