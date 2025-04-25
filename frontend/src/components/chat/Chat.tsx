@@ -154,7 +154,7 @@ const Chat = () => {
 
 		try {
 			const res = await fetchWithAuth(
-				`http://localhost:${env.VITE_BACKEND_PORT}/api/users/search?searchTerm=${sanitizedSearchTerm}`,
+				`http://localhost:${env.VITE_BACKEND_PORT}/api/user/search?searchTerm=${sanitizedSearchTerm}`,
 				{},
 				notificationContext.addNotification,
 				authContext.logout

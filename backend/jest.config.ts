@@ -1,7 +1,7 @@
 import type { Config } from 'jest';
 
 /**
- * * Jest configuration file.
+ * Jest configuration file.
  */
 const config: Config = {
 	rootDir: './',
@@ -12,6 +12,10 @@ const config: Config = {
 	},
 	testMatch: ['<rootDir>/tests/**/*.test.ts'],
 	moduleFileExtensions: ['js', 'ts', 'json', 'node'],
+	globalSetup: '<rootDir>/tests/jest.global-setup.ts',
+	globalTeardown: '<rootDir>/tests/jest.global-teardown.ts',
+	maxWorkers: 1,
+	testTimeout: 10000,
 };
 
 export default config;

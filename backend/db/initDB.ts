@@ -3,8 +3,10 @@ import db from './knex';
 import logger from '../utils/logger';
 import { USER } from '../utils/constants';
 
-// Define the schema name and table names
-const schemaName = 'chat-app';
+// Set schema dynamically based on environment
+const schemaName = process.env.DB_SCHEMA || 'chat-app';
+
+// Define the table names
 export const userTableName = `${schemaName}.users`;
 export const chatTableName = `${schemaName}.chats`;
 export const messageTableName = `${schemaName}.messages`;

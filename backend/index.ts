@@ -28,19 +28,22 @@ app.use(rateLimiterMiddleware);
 
 // Routes
 app.use('/api/auth', authRoutes);
-app.use('/api/users', userRoutes);
+app.use('/api/user', userRoutes);
 app.use('/api/chat', chatRoutes);
 app.use('/api/message', messageRoutes);
 app.use('/api/key', keyRoutes);
 
-// Create HTTP server and pass it to WebSocket
-const server = http.createServer(app);
-setupSocket(server);
+// Only create and start the server if not in test environment
+if (process.env.NODE_ENV !== 'test') {
+	// Create HTTP server and pass it to WebSocket
+	const server = http.createServer(app);
+	setupSocket(server);
 
-// Initialize database and start the server
-server.listen(process.env.BACKEND_PORT || 5000, async () => {
-	await initializeDatabase();
-	logger.info(`Server running on http://localhost:${process.env.BACKEND_PORT || 5000}`);
-});
+	// Start the server and initialize the database
+	server.listen(process.env.BACKEND_PORT || 5000, async () => {
+		await initializeDatabase();
+		logger.info(`Server running on http://localhost:${process.env.BACKEND_PORT || 5000}`);
+	});
+}
 
 export default app;

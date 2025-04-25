@@ -9,7 +9,7 @@ It was created as part of the COMP.SEC.300 Secure Programming course exercise wo
 
 ## TODO
 
-- Add unit tests (also security related)
+- Add unit tests for frontend (also security related)
 - Fix possible issues found in the security reports
 - Report update (changes made due to tests and what vulnerabilities they fixed)
 - Go through code comments and possibly add details about security solutions
@@ -99,7 +99,7 @@ It was created as part of the COMP.SEC.300 Secure Programming course exercise wo
 
 ## Running Unit Tests
 
-Ensure all dependencies are installed locally before running tests. To run all unit tests for the project, execute the following command in the project root:
+Ensure all dependencies are installed locally before running tests and that the database is running. To run all unit tests for the project, execute the following command in the project root:
 
 ```sh
 npm test
