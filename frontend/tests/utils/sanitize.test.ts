@@ -1,4 +1,4 @@
-import { sanitizeMessage } from '../../utils/sanitize';
+import { sanitizeMessage } from '../../src/utils/sanitize';
 
 /**
  * Test suite for the message sanitization function.

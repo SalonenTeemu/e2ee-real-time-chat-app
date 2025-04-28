@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Copy } from 'lucide-react';
+import { useNotification } from '../../context/NotificationContext';
 
 // Define the props for the SeedPhraseModal component
 interface SeedPhraseModalProps {
@@ -14,6 +15,7 @@ interface SeedPhraseModalProps {
  * @returns {JSX.Element} The SeedPhraseModal component
  */
 const SeedPhraseModal: React.FC<SeedPhraseModalProps> = ({ seedPhrase, onAcknowledge }) => {
+	const notificationContext = useNotification();
 	const [copied, setCopied] = useState(false);
 
 	/**
@@ -27,7 +29,7 @@ const SeedPhraseModal: React.FC<SeedPhraseModalProps> = ({ seedPhrase, onAcknowl
 				setTimeout(() => setCopied(false), 2000); // Hide the message after 2 seconds
 			})
 			.catch(() => {
-				alert('Failed to copy seed phrase.');
+				notificationContext.addNotification('error', 'Failed to copy seed phrase. Please try again.');
 			});
 	};
 

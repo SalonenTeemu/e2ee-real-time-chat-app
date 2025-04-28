@@ -2,7 +2,7 @@ import { encryptMessage } from '../../utils/encryption';
 import { decryptMessage } from '../../utils/encryption';
 
 /**
- * Test suite for message encryption and decryption functions.
+ * Test suite for the message encryption and decryption functions.
  */
 describe('encryption.ts tests', () => {
 	it('should encrypt a message', () => {

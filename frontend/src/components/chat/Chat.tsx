@@ -376,20 +376,24 @@ const Chat = () => {
 				<div className="mb-6">
 					<h3 className="mb-2 text-xl font-semibold text-gray-700">Active Chats</h3>
 					<ul className="rounded-lg border border-gray-300">
-						{chats.map((chat, index) => (
-							<li
-								key={`${chat.id}-${chat.username}`}
-								className={`flex items-center justify-between p-2 ${index !== chats.length - 1 ? 'border-b border-gray-300' : ''}`}
-							>
-								<span>Chat with {chat.username}</span>
-								<button
-									onClick={() => openChat(chat.id)}
-									className="cursor-pointer rounded-lg bg-blue-500 px-4 py-1 text-white hover:bg-blue-600"
+						{!chats || chats.length === 0 ? (
+							<li className="mt-4 mb-4 text-center text-gray-500">No active chats</li>
+						) : (
+							chats.map((chat, index) => (
+								<li
+									key={`${chat.id}-${chat.username}`}
+									className={`flex items-center justify-between p-2 ${index !== chats.length - 1 ? 'border-b border-gray-300' : ''}`}
 								>
-									Open Chat
-								</button>
-							</li>
-						))}
+									<span>Chat with {chat.username}</span>
+									<button
+										onClick={() => openChat(chat.id)}
+										className="cursor-pointer rounded-lg bg-blue-500 px-4 py-1 text-white hover:bg-blue-600"
+									>
+										Open Chat
+									</button>
+								</li>
+							))
+						)}
 					</ul>
 				</div>
 				<button
@@ -421,7 +425,7 @@ const Chat = () => {
 						</button>
 						{hasSearched && users.length === 0 && (
 							<div className="mt-4">
-								<p className="mb-2 text-center text-lg font-semibold text-gray-700">No users found with the search term.</p>
+								<p className="mb-2 text-center text-lg font-semibold text-gray-700">No users found with the given search term.</p>
 							</div>
 						)}
 						<ul className="mt-4">

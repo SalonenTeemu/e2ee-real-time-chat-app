@@ -1,7 +1,6 @@
 import * as bip39 from 'bip39';
 import nacl from 'tweetnacl';
 import sodium from 'libsodium-wrappers';
-import { Buffer } from 'buffer';
 import { logError } from './logger';
 
 /**
@@ -12,9 +11,7 @@ import { logError } from './logger';
 export const generateSeedPhrase = async (): Promise<string | null> => {
 	try {
 		await sodium.ready;
-		const entropy = sodium.randombytes_buf(32); // 256-bit entropy (32 bytes) for 24-word mnemonic
-		const entropyBuffer = Buffer.from(entropy); // Convert Uint8Array to Buffer
-		return bip39.entropyToMnemonic(entropyBuffer);
+		return bip39.generateMnemonic(256); // 256-bit entropy (32 bytes) for 24-word mnemonic
 	} catch (error: any) {
 		logError('Error generating seed phrase:', error);
 		return null;
@@ -30,6 +27,8 @@ export const generateSeedPhrase = async (): Promise<string | null> => {
  * @returns { privateKey: Uint8Array; publicKey: Uint8Array } The generated private and public keys
  */
 export const mnemonicToPrivateKey = async (mnemonic: string, password: string): Promise<{ privateKey: Uint8Array; publicKey: Uint8Array }> => {
+	await sodium.ready;
+
 	if (!bip39.validateMnemonic(mnemonic)) {
 		logError('Invalid mnemonic:', mnemonic);
 		throw new Error('Invalid mnemonic');

@@ -8,7 +8,7 @@ interface NotificationContextType {
 }
 
 // Create the notification context with an initial value of undefined
-const NotificationContext = createContext<NotificationContextType | undefined>(undefined);
+export const NotificationContext = createContext<NotificationContextType | undefined>(undefined);
 
 /**
  * The NotificationProvider component provides the notification functions to its children.

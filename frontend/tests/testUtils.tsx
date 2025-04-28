@@ -1,22 +1,24 @@
 import { render } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
-import { AuthProvider } from '../src/context/AuthContext';
-import { NotificationProvider } from '../src/context/NotificationContext';
+import { MockNotificationProvider } from './mocks/NotificationContext';
+import { MockAuthProvider } from './mocks/AuthContext';
 
 /**
  * Helper function to render components with necessary providers for testing.
  *
- * @param ui The component to be rendered
- * @returns The rendered component wrapped in the necessary providers
+ * @param {React.ReactElement} ui The component to be rendered
+ * @param {any | null} user The user object to be passed to the MockAuthProvider or null if not needed
+ * @returns {RenderResult} The result of the render function from @testing-library/react
  */
-const renderWithProviders = (ui: React.ReactElement) =>
-	render(
+const renderWithMockProviders = (ui: React.ReactElement, user: any = null) => {
+	return render(
 		<MemoryRouter>
-			<NotificationProvider>
-				<AuthProvider>{ui}</AuthProvider>
-			</NotificationProvider>
+			<MockNotificationProvider>
+				<MockAuthProvider user={user}>{ui}</MockAuthProvider>
+			</MockNotificationProvider>
 		</MemoryRouter>
 	);
+};
 
 export * from '@testing-library/react';
-export { renderWithProviders as render };
+export { renderWithMockProviders as render };

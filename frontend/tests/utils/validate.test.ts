@@ -1,4 +1,5 @@
-import { validateMessage, validatePassword, validatePublicKey, validateRegisterAndLogin, validateUserSearchTerm } from '../../utils/validate';
+import { validateMessage, validatePassword, validateRegisterAndLogin, validateUserSearchTerm, validateSeedPhrase } from '../../src/utils/validate';
+import { generateSeedPhrase } from '../../src/utils/seed';
 
 /**
  * Test suite for the validation functions.
@@ -32,7 +33,7 @@ describe('validate.ts tests', () => {
 		const invalidPassword = 'weak';
 		const invalidResult = validateRegisterAndLogin(invalidUsername, invalidPassword);
 		expect(invalidResult.success).toBe(false);
-		expect(invalidResult.message).toBe('Username must be between 4 and 50 characters');
+		expect(invalidResult.message).toBe('Username must be between 4 and 50 characters.');
 	});
 
 	it('should validate a user search term', () => {
@@ -67,19 +68,27 @@ describe('validate.ts tests', () => {
 		expect(isLongValid).toBe(false);
 	});
 
-	it('should validate a public key', () => {
-		const nullPublicKey = null;
-		const nullResult = validatePublicKey(nullPublicKey as any);
-		expect(nullResult.success).toBe(false);
-		expect(nullResult.message).toBe('Public key is required');
+	it('should validate a seed phrase', async () => {
+		const validSeedPhrase = await generateSeedPhrase();
+		if (validSeedPhrase) {
+			const isValid = validateSeedPhrase(validSeedPhrase);
+			expect(isValid).toBe(true);
+		} else {
+			fail('Generated seed phrase should not be null');
+		}
 
-		const validPublicKey = 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=';
-		const isValid = validatePublicKey(validPublicKey);
-		expect(isValid.success).toBe(true);
+		const invalidSeedPhrase = 'invalid seed phrase';
+		const isInvalidValid = validateSeedPhrase(invalidSeedPhrase);
+		expect(isInvalidValid).toBe(false);
 
-		const invalidPublicKey = 'invalidPublicKey';
-		const invalidResult = validatePublicKey(invalidPublicKey);
-		expect(invalidResult.success).toBe(false);
-		expect(invalidResult.message).toBe('Invalid public key length');
+		const emptySeedPhrase = '';
+		const isEmptyValid = validateSeedPhrase(emptySeedPhrase);
+		expect(isEmptyValid).toBe(false);
+
+		const seedPhraseArray = validSeedPhrase?.split(' ') || [];
+		seedPhraseArray[5] = 'toolongword';
+		const invalidSeedPhraseArray = seedPhraseArray.join(' ');
+		const isInvalidArrayValid = validateSeedPhrase(invalidSeedPhraseArray);
+		expect(isInvalidArrayValid).toBe(false);
 	});
 });

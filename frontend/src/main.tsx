@@ -1,10 +1,5 @@
 import { createRoot } from 'react-dom/client';
-import { Buffer } from 'buffer';
 import './index.css';
 import App from './App.tsx';
 
 createRoot(document.getElementById('root')!).render(<App />);
-
-if (!window.Buffer) {
-	window.Buffer = Buffer;
-}

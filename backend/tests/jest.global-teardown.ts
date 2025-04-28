@@ -11,6 +11,7 @@ export default async () => {
 		await db.schema.dropSchemaIfExists(schema, true);
 		await db.destroy();
 		console.log('Test database schema deleted successfully after Jest tests');
+		process.exit(0);
 	} catch (error: any) {
 		console.error('Error with Jest global teardown:', error);
 	}

@@ -17,7 +17,7 @@ interface AuthContextType {
 }
 
 // Create the auth context with an initial value of undefined
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+export const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 /**
  * The AuthProvider component provides the auth context to its children.
