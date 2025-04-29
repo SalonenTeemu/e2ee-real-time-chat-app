@@ -65,7 +65,7 @@
 		"ignore": [
 			".git",
 			"node_modules/*",
-			"test/*",
+			"tests/*",
 			"views/*",
 			"docs/*"
 		],

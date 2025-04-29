@@ -11,8 +11,8 @@ const Home = () => {
 
 	return (
 		<div className="flex min-h-screen flex-col items-center justify-center bg-blue-50 p-6 text-center">
-			<h1 className="mb-4 text-4xl font-bold text-blue-700">Welcome to Real-Time Chat App!</h1>
-			<p className="mb-2 text-lg text-gray-700">Chat securely with others in real-time.</p>
+			<h1 className="mb-4 text-4xl font-bold text-blue-700">Welcome to E2EE Real-Time Chat App!</h1>
+			<p className="mb-2 text-lg text-gray-700">Chat securely with end-to-end encryption in real-time.</p>
 			{user ? (
 				<>
 					<p className="mb-6 text-lg text-gray-700">You are logged in. Start chatting now!</p>

@@ -2,7 +2,7 @@
 
 // Focus: This Jenkins pipeline is used to run the security testing of the e2ee-real-time-chat-app project. 
 // It performs Static Application Security Testing (SAST) using Semgrep, Software Composition Analysis (SCA) using OWASP Dependency-Check, 
-// Trivy for both filesystem and container image scanning, and Dynamic Application Security Testing (DAST) using OWASP ZAP. 
+// filesystem and container image scanning using Trivy, and Dynamic Application Security Testing (DAST) using OWASP ZAP. 
 // The pipeline generates various security reports and archives them for review.
 
 // Requirements:
@@ -33,7 +33,7 @@ pipeline {
         nodejs 'node20'
     }
     environment {
-          // Define frontend base URL for OWASP ZAP DAST testing (adjust based on environment)
+        // Define frontend base URL for OWASP ZAP DAST testing (adjust based on environment)
         DAST_URL = 'http://192.168.0.121:5173'
     }
     stages {
@@ -59,7 +59,7 @@ pipeline {
                     python3 -m venv semgrep-env
                     . semgrep-env/bin/activate
                     pip install semgrep
-                    semgrep --config=auto --json > semgrep-output.json
+                    semgrep --config=auto --json --exclude semgrep-env/ > semgrep-output.json
                 '''
             }
         }
@@ -114,7 +114,7 @@ pipeline {
         stage('Docker Compose Build') {
             steps {
                 sh 'docker-compose down -v'
-                sh 'docker-compose build'
+                sh 'docker-compose build --no-cache'
             }
         }
 
@@ -123,7 +123,7 @@ pipeline {
             steps {
                 sh 'trivy image e2ee-real-time-chat-app-backend:latest --format template --template @/usr/share/trivy/contrib/html.tpl > trivy-report-backend.html'
                 sh 'trivy image e2ee-real-time-chat-app-frontend:latest --format template --template @/usr/share/trivy/contrib/html.tpl > trivy-report-frontend.html'
-                sh 'trivy image postgres:17-alpine --format template --template @/usr/share/trivy/contrib/html.tpl > trivy-report-postgres.html'
+                sh 'trivy image postgres:17.4-alpine3.21 --format template --template @/usr/share/trivy/contrib/html.tpl > trivy-report-postgres.html'
             }
         }
 

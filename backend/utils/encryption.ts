@@ -7,6 +7,7 @@ const ALGORITHM = 'aes-256-gcm';
 const ENCRYPTION_KEY = process.env.DB_ENCRYPTION_KEY || '5537c2abc506de279e641bc797a7e05d1d9eaa3d68bec3e47968f090a25872eb';
 
 const IV_LENGTH = 12; // Recommended for GCM
+const AUTH_TAG_LENGTH = 16; // Standard GCM tag length
 
 /**
  * Encrypts a message using AES-256-GCM.
@@ -45,7 +46,9 @@ export const decryptMessage = (encryptedMessage: string) => {
 			throw new Error('Malformed encrypted message');
 		}
 
-		const decipher = crypto.createDecipheriv(ALGORITHM, Buffer.from(ENCRYPTION_KEY, 'hex'), Buffer.from(iv, 'hex'));
+		const decipher = crypto.createDecipheriv(ALGORITHM, Buffer.from(ENCRYPTION_KEY, 'hex'), Buffer.from(iv, 'hex'), {
+			authTagLength: AUTH_TAG_LENGTH,
+		});
 		decipher.setAuthTag(Buffer.from(authTag, 'hex'));
 
 		let decrypted = decipher.update(encrypted, 'hex', 'utf8');

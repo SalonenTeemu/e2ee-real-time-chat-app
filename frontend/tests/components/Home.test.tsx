@@ -14,8 +14,8 @@ describe('Home.tsx tests', () => {
 	it('should render the welcome message and buttons', () => {
 		render(<Home />);
 
-		expect(screen.getByText(/Welcome to Real-Time Chat App!/i)).toBeInTheDocument();
-		expect(screen.getByText(/Chat securely with others in real-time./i)).toBeInTheDocument();
+		expect(screen.getByText(/Welcome to E2EE Real-Time Chat App!/i)).toBeInTheDocument();
+		expect(screen.getByText(/Chat securely with end-to-end encryption in real-time./i)).toBeInTheDocument();
 		expect(screen.getByText(/Login or register to start chatting./i)).toBeInTheDocument();
 		expect(screen.getByRole('link', { name: /Login/i })).toBeInTheDocument();
 		expect(screen.getByRole('link', { name: /Register/i })).toBeInTheDocument();
