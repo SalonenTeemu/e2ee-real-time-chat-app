@@ -12,7 +12,7 @@ It was created as part of the COMP.SEC.300 Secure Programming course exercise wo
 - Fix possible issues found in the security reports
 - Report update (changes made due to tests and what vulnerabilities they fixed)
 - Go through code comments and possibly add details about security solutions
-- Final testing of the application locally and with docker
+- Final testing of the application locally and with docker using different browsers
 - Update README.md
 
 ## Features
@@ -70,27 +70,27 @@ It was created as part of the COMP.SEC.300 Secure Programming course exercise wo
    docker-compose up
    ```
 
-2. Access the app at: `http://localhost:5173` or whatever port you have defined in the .env file.
+2. Access the app at: `http://localhost:5173` or whatever frontend port you have defined in the .env file.
 
 ### Option 2: Local
 
-1. Start PostgreSQL locally and ensure .env matches the DB config.
+1. Start PostgreSQL locally, and ensure your .env file is configured correctly with the matching database settings.
 
-2. Install root, frontend & backend dependencies:
+2. Install all dependencies for the root project, frontend, and backend:
 
    ```sh
    npm run local:install
    ```
 
-3. Start the app locally:
+3. Start the application locally using one of the following modes:
 
-   Regular mode:
+   Production preview mode:
 
    ```sh
    npm run local:start
    ```
 
-   Development mode:
+   Development mode (ensure the frontend .env variable VITE_ENV is NOT set to production):
 
    ```sh
    npm run local:dev

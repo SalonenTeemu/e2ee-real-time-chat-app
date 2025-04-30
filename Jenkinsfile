@@ -59,7 +59,7 @@ pipeline {
                     python3 -m venv semgrep-env
                     . semgrep-env/bin/activate
                     pip install semgrep
-                    semgrep --config=auto --json --exclude semgrep-env/ > semgrep-output.json
+                    semgrep --config=auto --json --exclude semgrep-env/ --exclude docs/ > semgrep-output.json
                 '''
             }
         }
