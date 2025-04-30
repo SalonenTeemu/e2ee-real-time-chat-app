@@ -9,7 +9,10 @@
 // - Jenkins with Docker support enabled
 // - Docker Compose
 // - Tools: Git, JDK 17, Node.js 20, Python 3.x, Semgrep, CycloneDX plugin, OWASP Dependency-Check, Trivy, OWASP ZAP
-// - Credentials: NVD_API_KEY (for Dependency-Check). Can be requested from: https://nvd.nist.gov/developers/request-an-api-key
+// - Credentials: 
+//     - NVD_API_KEY (for Dependency-Check). Can be requested from: https://nvd.nist.gov/developers/request-an-api-key
+//     - The projects .env file uploaded to Jenkins credentials as a secret file with the ID `e2ee-real-time-chat-app-env-file` 
+//       (used to run the DAST scan in the wanted environment, which in my case is a production environment)
 
 // Pipeline Steps:
 // 1. Clean workspace to ensure a fresh start.
@@ -18,7 +21,7 @@
 // 4. Install dependencies & generate SBOMs for root, backend, and frontend using CycloneDX.
 // 5. Run OWASP Dependency-Check for SCA on backend and frontend, generating reports in XML format.
 // 6. Run Trivy filesystem scan and generate a report in HTML format.
-// 7. Build Docker images using Docker Compose.
+// 7. Build Docker images using Docker Compose, ensuring the project .env file is copied correctly.
 // 8. Run Trivy container image scan for the used images and generate reports in HTML format.
 // 9. Run OWASP ZAP for DAST and generate a report in HTML format.
 // 10. Archive all generated security reports.
@@ -59,7 +62,7 @@ pipeline {
                     python3 -m venv semgrep-env
                     . semgrep-env/bin/activate
                     pip install semgrep
-                    semgrep --config=auto --json --exclude semgrep-env/ --exclude docs/ > semgrep-output.json
+                    semgrep --config=auto --json --exclude semgrep-env/ --exclude docs/ --exclude semgrep-output.json > semgrep-output.json
                 '''
             }
         }
@@ -113,8 +116,14 @@ pipeline {
         // Build Docker images using Docker Compose
         stage('Docker Compose Build') {
             steps {
-                sh 'docker-compose down -v'
-                sh 'docker-compose build --no-cache'
+                // Copy the .env file and build the Docker images using Docker Compose
+                withCredentials([file(credentialsId: 'e2ee-real-time-chat-app-env-file', variable: 'ENV_FILE')]) {
+                    sh '''
+                        cp $ENV_FILE .env
+                        docker-compose down -v
+                        docker-compose build --no-cache
+                    '''
+                }
             }
         }
 

@@ -9,8 +9,6 @@ It was created as part of the COMP.SEC.300 Secure Programming course exercise wo
 
 ## TODO
 
-- Fix possible issues found in the security reports
-- Report update (changes made due to tests and what vulnerabilities they fixed)
 - Go through code comments and possibly add details about security solutions
 - Final testing of the application locally and with docker using different browsers
 - Update README.md
