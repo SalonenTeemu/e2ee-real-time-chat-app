@@ -9,7 +9,6 @@ It was created as part of the COMP.SEC.300 Secure Programming course exercise wo
 
 ## TODO
 
-- Remove test data
 - Final testing of the application locally and with docker using different browsers
 - Add presentation and report files to the docs folder
 - Update README.md (remove todo)

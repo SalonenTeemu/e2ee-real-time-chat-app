@@ -1,4 +1,3 @@
-import bcrypt from 'bcrypt';
 import db from './knex';
 import logger from '../utils/logger';
 import { USER } from '../utils/constants';
@@ -24,9 +23,6 @@ export const initializeDatabase = async () => {
 
 		await createTables();
 		logger.info('Database tables created successfully');
-
-		await insertTestData();
-		logger.info('Database test data inserted successfully');
 	} catch (error: any) {
 		logger.error(`Error initializing database: ${error.message}`);
 	}
@@ -82,19 +78,5 @@ const createTables = async () => {
 			table.string('public_key', 255).notNullable();
 			table.timestamp('created_at').defaultTo(db.fn.now());
 		});
-	}
-};
-
-/**
- * Insert test data into the database if no users exist.
- */
-const insertTestData = async () => {
-	const userCount = await db(userTableName).count('id').first();
-	if (userCount?.count === '0') {
-		await db(userTableName).insert([
-			{ username: 'user1', password: bcrypt.hashSync('Password123-', 10), role: USER },
-			{ username: 'user2', password: bcrypt.hashSync('Password123-', 10), role: USER },
-			{ username: 'user3', password: bcrypt.hashSync('Password123-', 10), role: USER },
-		]);
 	}
 };
