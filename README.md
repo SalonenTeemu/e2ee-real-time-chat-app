@@ -9,9 +9,10 @@ It was created as part of the COMP.SEC.300 Secure Programming course exercise wo
 
 ## TODO
 
-- Go through code comments and possibly add details about security solutions
+- Remove test data
 - Final testing of the application locally and with docker using different browsers
-- Update README.md
+- Add presentation and report files to the docs folder
+- Update README.md (remove todo)
 
 ## Features
 
@@ -124,7 +125,7 @@ The project includes a Jenkins pipeline designed to ensure the security and qual
 - **Software Composition Analysis (SCA)** with OWASP Dependency-Check
 - **File System And Container Scanning** with Trivy
 - **Dynamic Application Security Testing (DAST)** using OWASP ZAP
-- Generate and archive security reports for review. The generated reports can be found in the project's `docs/security-reports` folder.
+- Generate and archive security reports for review. The generated reports can be found in the project's `docs/security-reports` folder. This includes reports generated both before and after implementation of security fixes.
 
 Refer to the `Jenkinsfile` for detailed pipeline steps and configuration.
 
