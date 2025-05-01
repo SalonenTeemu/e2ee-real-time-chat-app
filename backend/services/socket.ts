@@ -38,6 +38,7 @@ export const setupSocket = (server: http.Server) => {
 		try {
 			const cookieHeader = socket.handshake.headers?.cookie;
 
+			// Check if cookies are present in the request headers and throw an error if not
 			if (!cookieHeader) {
 				logger.warn('Socket authentication failed: No cookies sent');
 				return next(new Error('Authentication error: No cookies sent'));
@@ -46,12 +47,13 @@ export const setupSocket = (server: http.Server) => {
 			const cookies = cookie.parse(cookieHeader);
 			const token = cookies?.access_token;
 
+			// Check if the access token is present in the cookies and throw an error if not
 			if (!token) {
 				logger.warn('Socket authentication failed: No token found in cookies');
 				return next(new Error('Authentication error: No token found in cookies'));
 			}
 
-			// Verify the access token
+			// Verify the access token and throw an error if invalid
 			const decoded = verifyAccessToken(token);
 			if (!decoded) {
 				logger.warn('Socket authentication failed: Invalid token');
@@ -77,7 +79,8 @@ export const setupSocket = (server: http.Server) => {
 
 		socket.on('sendMessage', async ({ chatId, content }) => {
 			try {
-				await rateLimiter.consume(userId); // Rate limit check
+				// Rate limit check
+				await rateLimiter.consume(userId);
 
 				logger.info(`User ${userId} sent a message to chat ${chatId}`);
 
@@ -108,7 +111,7 @@ export const setupSocket = (server: http.Server) => {
 					logger.info(`User ${recipientId} is offline. Message saved so they can retrieve it later.`);
 				}
 			} catch (error: any) {
-				// Rate limit exceeded
+				// Rate limit exceeded so log the error and send a message to the user
 				logger.warn(`User ${userId} exceeded socket rate limit for messages: ${error.message}`);
 				socket.emit('error', {
 					type: 'RateLimit',

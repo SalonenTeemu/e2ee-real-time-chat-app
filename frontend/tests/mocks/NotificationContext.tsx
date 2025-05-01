@@ -12,6 +12,7 @@ interface MockNotificationProviderProps {
  * @returns {JSX.Element} The NotificationContext provider with mocked functions
  */
 export const MockNotificationProvider: React.FC<MockNotificationProviderProps> = ({ children }) => {
+	// Mock functions for the NotificationContext
 	const mockNotificationContext = {
 		addNotification: jest.fn(),
 		removeNotification: jest.fn(),

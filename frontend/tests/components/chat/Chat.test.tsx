@@ -4,8 +4,8 @@ import { mockFetchSuccess } from '../../mocks/fetchMock';
 
 /**
  * Test suite for the Chat component including rendering, fetching chats, and searching for users.
- * Chat component is not fully automatically tested here as due to its complexity with many dependencies and side effects.
- * The component was tested manually in the browser.
+ * Chat component is not fully tested here as due to its complexity with many dependencies and side effects.
+ * The component was tested more manually in the browser.
  */
 describe('Chat.tsx tests', () => {
 	// Logged-in user mock

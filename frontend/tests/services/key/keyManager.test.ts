@@ -9,7 +9,7 @@ jest.mock('../../../src/components/auth-recovery/PasswordModal', () => ({
 	showPasswordModal: jest.fn(),
 }));
 
-// Mock the libsodium-wrappers library to avoid actual cryptographic operations
+// Mock the libsodium-wrappers library methods to avoid actual cryptographic operations
 jest.mock('libsodium-wrappers', () => ({
 	ready: Promise.resolve(),
 	to_base64: jest.fn(() => 'mockBase64'),

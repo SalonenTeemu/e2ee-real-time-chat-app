@@ -4,13 +4,11 @@ import { addRefreshToken, getRefreshToken, revokeRefreshToken } from '../db/quer
 import { User } from '../utils/types';
 import logger from '../utils/logger';
 
-const env = process.env;
-
 // Secrets and expiration times for JWT tokens
-const secret = env.JWT_SECRET || 'secret';
-const refreshSecret = env.JWT_REFRESH_SECRET || 'refreshSecret';
-const accessExpiration = env.ACCESS_TOKEN_EXPIRATION || '15m';
-const refreshExpiration = env.REFRESH_TOKEN_EXPIRATION || '7d';
+const secret = process.env.JWT_SECRET || 'secret';
+const refreshSecret = process.env.JWT_REFRESH_SECRET || 'refreshSecret';
+const accessExpiration = process.env.ACCESS_TOKEN_EXPIRATION || '15m';
+const refreshExpiration = process.env.REFRESH_TOKEN_EXPIRATION || '7d';
 
 // Convert expiration times to milliseconds to avoid issues with string values with jsonwebtoken
 const accessTokenExpiration = ms(accessExpiration as ms.StringValue);
@@ -25,7 +23,7 @@ const refreshTokenExpiration = ms(refreshExpiration as ms.StringValue);
  */
 export const createTokens = async (user: User) => {
 	try {
-		// Create the access token and refresh token using jsonwebtoken
+		// Create the access token and refresh token using jsonwebtoken adding the user ID and role to the payload
 		const accessToken = jwt.sign({ id: user.id, role: user.role }, secret, {
 			expiresIn: accessTokenExpiration,
 		});

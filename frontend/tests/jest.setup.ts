@@ -16,7 +16,7 @@ jest.mock('react-router-dom', () => ({
 	useNavigate: jest.fn(),
 }));
 
-// Mock the env module to provide default values for environment variables in order for the tests to run without errors
+// Mock the .env file to provide default values for environment variables in order for the tests to run without errors
 jest.mock('../src/utils/env', () => ({
 	env: {
 		VITE_ENV: 'development',

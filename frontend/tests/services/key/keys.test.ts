@@ -2,7 +2,7 @@ import { createKeyPair, encryptAndStorePrivateKey, clearKeys } from '../../../sr
 import { saveToDB } from '../../../src/utils/db';
 import { keyManager } from '../../../src/services/key/keyManager';
 
-// Mock the libsodium-wrappers library to avoid actual cryptographic operations
+// Mock the libsodium-wrappers library methods to avoid actual cryptographic operations
 jest.mock('libsodium-wrappers', () => ({
 	ready: Promise.resolve(),
 	randombytes_buf: jest.fn(() => new Uint8Array(24)),

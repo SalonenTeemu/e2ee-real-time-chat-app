@@ -22,16 +22,19 @@ export const getRecipientPublicKey = async (req: CustomRequest, res: Response): 
 	}
 	try {
 		const chat = await getChatById(chatId);
+		// Check if the chat exists
 		if (!chat) {
 			logger.warn(`Retrieving recipient public key failed for user ${userId}, chat not found for ID: ${chatId}`);
 			return res.status(404).json({ message: 'Chat not found' });
 		}
+		// Check that the user is part of the chat
 		if (chat.user1_id !== userId && chat.user2_id !== userId) {
 			logger.warn(`Retrieving recipient public key failed, user ${userId} is not part of the chat with ID: ${chatId}`);
 			return res.status(403).json({ message: 'Unauthorized' });
 		}
 
 		const recipientPublicKey = await getPublicKeyByUserId(chat.user1_id === userId ? chat.user2_id : chat.user1_id);
+		// Check if the recipient public key exists
 		if (!recipientPublicKey) {
 			logger.warn(`Retrieving recipient public key failed for user ${userId}, recipient public key not found for chat ID: ${chatId}`);
 			return res.status(404).json({ message: 'Recipient public key not found' });
@@ -64,6 +67,7 @@ export const savePublicKey = async (req: CustomRequest, res: Response): Promise<
 	}
 	try {
 		const existingPublicKey = await getPublicKeyByUserId(userId);
+		// Check if the public key already exists
 		if (existingPublicKey) {
 			logger.warn(`Saving public key failed for user ${userId}, public key already exists`);
 			return res.status(400).json({ message: 'Public key already exists' });

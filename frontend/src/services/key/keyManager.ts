@@ -36,7 +36,7 @@ class KeyManager {
 		setInterval(() => {
 			if (Date.now() - lastInteractionTime > this.timeout) {
 				this.clearKeys();
-				log('Private key and shared keys cleared due to inactivity.');
+				log('Keys cleared due to inactivity.');
 			}
 		}, this.checkInterval);
 	}
@@ -72,6 +72,7 @@ class KeyManager {
 		if (!pswd) {
 			try {
 				pswd = await showPasswordModal();
+				// If the user cancels the password prompt, throw the ActionCanceled error
 				if (!pswd) {
 					throw new Error('ActionCanceled');
 				}
@@ -79,6 +80,7 @@ class KeyManager {
 				throw new Error('ActionCanceled');
 			}
 		}
+		// If the password is empty, throw an error indicating that a password is required
 		if (!pswd) {
 			throw new Error('PasswordRequired');
 		}
@@ -86,6 +88,7 @@ class KeyManager {
 		try {
 			// Retrieve the encrypted private key for the specific userId
 			const encryptedData = (await getFromDB(`encryptedPrivateKey_${userId}`)) as { salt: string; nonce: string; data: string };
+			// If the encrypted data is not found, throw an error indicating that the key is not found
 			if (!encryptedData) {
 				throw new Error('NoEncryptedKey');
 			}
@@ -102,12 +105,14 @@ class KeyManager {
 			// Decrypt the private key using crypto_secretbox_open_easy
 			const decryptedPrivateKey = sodium.crypto_secretbox_open_easy(encryptedPrivateKey, nonce, new Uint8Array(rawEncryptionKey));
 
+			// If the decryption fails, throw an error indicating that the password is incorrect
 			if (!decryptedPrivateKey) {
 				throw new Error('IncorrectPassword');
 			}
 
 			return decryptedPrivateKey;
 		} catch (error: any) {
+			// Throw specific errors based on the error message
 			if (error.message === 'NoEncryptedKey') {
 				throw new Error('NoEncryptedKey');
 			} else {
@@ -169,6 +174,7 @@ class KeyManager {
 
 		// Retrieve the recipient public key for the chat ID from the server
 		const recipientPublicKey = await this.getRecipientPublicKey(chatId);
+		// If the recipient public key is not found, throw an error
 		if (!recipientPublicKey) {
 			throw new Error('RecipientPublicKeyNotFound');
 		}
@@ -176,6 +182,7 @@ class KeyManager {
 		// Decrypt and retrieve the user's private key
 		const userPrivateKey = await this.getDecryptedPrivateKey(userId);
 
+		// Generate the shared key using the user's private key and recipient's public key
 		const sharedKey = sodium.crypto_scalarmult(userPrivateKey, recipientPublicKey);
 
 		// Derive a session key from the shared key using a keyed derivation function (KDF)

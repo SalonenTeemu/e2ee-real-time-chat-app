@@ -21,10 +21,12 @@ export const getChatMessages = async (req: CustomRequest, res: Response): Promis
 	}
 	try {
 		const chat = await getChatById(chatId);
+		// Check if the chat exists
 		if (!chat) {
 			logger.warn(`Getting chat messages failed for user ${userId}, chat not found for ID: ${chatId}`);
 			return res.status(404).json({ message: 'Chat not found' });
 		}
+		// Check that the user is part of the chat
 		if (chat.user1_id !== userId && chat.user2_id !== userId) {
 			logger.warn(`Getting chat messages failed for user ${userId}, user is not part of the chat with ID: ${chatId}`);
 			return res.status(403).json({ message: 'Unauthorized' });

@@ -1,7 +1,7 @@
 import db from '../db/knex';
 
 /**
- * Global teardown script for Jest tests.
+ * Global teardown for Jest tests.
  * Deletes the test database schema after all tests have run.
  */
 export default async () => {

@@ -65,6 +65,7 @@ const RestoreWithSeedPhrase = () => {
 	const handlePaste = (e: React.ClipboardEvent<HTMLDivElement>) => {
 		e.preventDefault();
 		const pastedText = sanitizeMessage(e.clipboardData.getData('text').trim());
+		// Check if the pasted text is a valid seed phrase
 		if (!validateSeedPhrase(pastedText)) {
 			notificationContext.addNotification('error', 'Invalid seed phrase format. Please enter a valid 24-word seed phrase.');
 			return;
@@ -119,6 +120,7 @@ const RestoreWithSeedPhrase = () => {
 	 * Handles the restore action by creating a key pair using the provided mnemonic and password.
 	 */
 	const handleRestore = async () => {
+		// Validate the password
 		if (!(await handlePasswordValidation())) return;
 
 		try {
@@ -152,7 +154,7 @@ const RestoreWithSeedPhrase = () => {
 				<h2 className="mb-6 text-center text-2xl font-bold text-blue-700">Restore Private Key With Seed Phrase</h2>
 				<p className="mb-2 text-center text-gray-700">
 					<strong>
-						Enter your 24-word seed phrase and your account password below in order to restore your private key in this environment and to
+						Enter your 24-word seed phrase and your account password below in order to restore your private key in this environment to
 						start chatting again.
 					</strong>
 				</p>

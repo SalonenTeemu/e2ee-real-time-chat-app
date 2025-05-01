@@ -1,6 +1,7 @@
 import crypto from 'crypto';
 import logger from './logger';
 
+// AES-256-GCM encryption algorithm used to encrypt and decrypt messages to/from the database.
 const ALGORITHM = 'aes-256-gcm';
 
 // Key for encrypting and decrypting messages. Please add your own key in the .env file (must be 256 bits (32 characters)). This is just a placeholder key.
@@ -19,7 +20,9 @@ const AUTH_TAG_LENGTH = 16; // Standard GCM tag length
 export const encryptMessage = (message: string) => {
 	try {
 		const iv = crypto.randomBytes(IV_LENGTH);
-		const cipher = crypto.createCipheriv(ALGORITHM, Buffer.from(ENCRYPTION_KEY, 'hex'), iv);
+		const cipher = crypto.createCipheriv(ALGORITHM, Buffer.from(ENCRYPTION_KEY, 'hex'), iv, {
+			authTagLength: AUTH_TAG_LENGTH,
+		});
 
 		let encrypted = cipher.update(message, 'utf8', 'hex');
 		encrypted += cipher.final('hex');
@@ -42,6 +45,7 @@ export const encryptMessage = (message: string) => {
 export const decryptMessage = (encryptedMessage: string) => {
 	try {
 		const [iv, encrypted, authTag] = encryptedMessage.split(':');
+		// Check if all parts are present
 		if (!iv || !encrypted || !authTag) {
 			throw new Error('Malformed encrypted message');
 		}

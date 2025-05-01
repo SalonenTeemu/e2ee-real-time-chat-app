@@ -5,7 +5,8 @@ import { NodeGlobalsPolyfillPlugin } from '@esbuild-plugins/node-globals-polyfil
 import path from 'path';
 
 /**
- * Vite configuration file for the frontend application.
+ * Vite configuration file for the client application.
+ * This file sets up the development and production environments, configures plugins, and sets up middleware for security headers.
  */
 export default defineConfig(({ mode }) => {
 	const env = loadEnv(mode, path.resolve(__dirname, '..'));
@@ -32,7 +33,7 @@ export default defineConfig(({ mode }) => {
       `;
 
 	/**
-	 * Shared middleware configuration for both dev and preview servers.
+	 * Function to configure middleware for setting security headers.
 	 */
 	const configureHeaders = (server: any) => {
 		server.middlewares.use((_: any, res: any, next: any) => {
@@ -93,10 +94,12 @@ export default defineConfig(({ mode }) => {
 				buffer: 'buffer',
 			},
 		},
+		// Define the host and port for the development server
 		server: {
 			port: parseInt(frontendPort),
 			host: '0.0.0.0',
 		},
+		// Define the host and port for the preview server
 		preview: {
 			port: parseInt(frontendPort),
 			host: '0.0.0.0',

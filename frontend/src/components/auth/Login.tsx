@@ -29,8 +29,8 @@ const Login = () => {
 	/**
 	 * Handles the opening of the seed phrase modal.
 	 *
-	 * @param {string} generatedSeedPhrase The generated seed phrase to be displayed in the modal.
-	 * @returns The promise that resolves when the modal is acknowledged.
+	 * @param {string} generatedSeedPhrase The generated seed phrase to be displayed in the modal
+	 * @returns The promise that resolves when the modal is acknowledged
 	 */
 	const openSeedPhraseModal = async (generatedSeedPhrase: string) => {
 		setSeedPhrase(generatedSeedPhrase);
@@ -87,6 +87,7 @@ const Login = () => {
 			if (res.ok) {
 				await authContext.fetchUser();
 				const userId = data.userId;
+				// Check if the user requires a public key (e.g., first login)
 				if (data.requiresPublicKey) {
 					// Generate a new seed phrase and alert the user if this is the first login
 					const generatedSeedPhrase = await generateSeedPhrase();
@@ -97,7 +98,7 @@ const Login = () => {
 						return;
 					}
 
-					// Generate and save the public and private keys
+					// Generate the keys and save the private key to IndexedDB
 					const publicKey = await createKeyPair(password, userId, generatedSeedPhrase);
 					if (!publicKey) {
 						setErrorMessage('Failed to generate key pair.');

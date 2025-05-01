@@ -14,6 +14,7 @@ interface MockAuthProviderProps {
  * @returns {JSX.Element} The AuthContext provider with mocked functions
  */
 export const MockAuthProvider: React.FC<MockAuthProviderProps> = ({ user, children }) => {
+	// Mock functions for the AuthContext
 	const logout = jest.fn();
 	const fetchUser = jest.fn();
 	const setUser = jest.fn();

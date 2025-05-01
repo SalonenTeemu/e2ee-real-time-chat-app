@@ -18,10 +18,12 @@ export const startChat = async (req: CustomRequest, res: Response): Promise<any>
 	try {
 		const existingChat = await getChatByUsers(loggedInUserId, userId);
 		const otherUser = await getUserById(userId);
+		// Check if the user exists
 		if (!otherUser) {
 			logger.warn(`Starting chat failed, user not found: ${userId}`);
 			return res.status(404).json({ message: 'User not found' });
 		}
+		// Check if the chat already exists
 		if (existingChat) {
 			logger.info(`Starting a chat for user ${loggedInUserId} with user ${userId} returned existing chat`);
 			return res.status(200).json({ message: { chatId: existingChat.id, username: otherUser.username } });
@@ -78,15 +80,18 @@ export const getChat = async (req: CustomRequest, res: Response): Promise<any> =
 
 	try {
 		const chat = await getChatById(chatId);
+		// Check if the chat exists
 		if (!chat) {
 			logger.warn(`Retrieving chat failed for user ${userId}, chat not found for ID: ${chatId}`);
 			return res.status(404).json({ message: 'Chat not found' });
 		}
+		// Check that the user is part of the chat
 		if (chat.user1_id !== userId && chat.user2_id !== userId) {
 			logger.warn(`Retrieving chat failed for user ${userId}, user is not part of the chat with ID: ${chatId}`);
 			return res.status(403).json({ message: 'Unauthorized' });
 		}
 		const otherUsername = await getUserById(chat.user1_id === userId ? chat.user2_id : chat.user1_id);
+		// Check if the other user exists
 		if (!otherUsername) {
 			logger.warn(
 				`Retrieving chat failed for user ${userId}, other user ${chat.user1_id === userId ? chat.user2_id : chat.user1_id} not found`

@@ -32,6 +32,7 @@ export const saveMessage = async (chatId: string, senderId: string, encryptedCon
 		// Find the recipient ID based on the chatId and senderId
 		const chat = await db(chatTableName).select('user1_id', 'user2_id').where({ id: chatId }).first();
 
+		// Check if the chat exists
 		if (!chat) {
 			logger.error(`Error saving message to DB: Chat not found for ID ${chatId}`);
 			throw new Error('Chat not found');

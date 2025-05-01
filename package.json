@@ -3,9 +3,9 @@
   "version": "1.0.0",
   "description": "Secure programming exercise work",
   "scripts": {
-    "dev": "docker-compose up",
-    "dev:build": "docker-compose up --build",
-    "dev:build:no-cache": "docker-compose build --no-cache",
+    "start": "docker-compose up",
+    "start:build": "docker-compose up --build",
+    "start:build:no-cache": "docker-compose build --no-cache",
     "down": "docker-compose down",
     "clean:modules": "rimraf node_modules backend/node_modules frontend/node_modules && echo 'node_modules cleaned.'",
     "test": "npm test --prefix frontend && npm test --prefix backend",

@@ -59,7 +59,7 @@ export const connectSocket = (notificationContext: any, handleReceiveMessage: (d
 export const disconnectSocket = () => {
 	if (socket && socket.connected) {
 		socket.disconnect();
-		socket.removeAllListeners(); // Clean up all listeners
+		socket.removeAllListeners();
 		socket = null;
 		log('Socket disconnected and cleaned up.');
 	}
@@ -67,6 +67,8 @@ export const disconnectSocket = () => {
 
 /**
  * Get the current socket instance.
+ *
+ * @throws {Error} If the socket is not initialized
  */
 export const getSocket = () => {
 	if (!socket) {

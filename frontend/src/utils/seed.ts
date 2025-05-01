@@ -29,6 +29,7 @@ export const generateSeedPhrase = async (): Promise<string | null> => {
 export const mnemonicToPrivateKey = async (mnemonic: string, password: string): Promise<{ privateKey: Uint8Array; publicKey: Uint8Array }> => {
 	await sodium.ready;
 
+	// Validate the mnemonic using BIP39
 	if (!bip39.validateMnemonic(mnemonic)) {
 		logError('Invalid mnemonic:', mnemonic);
 		throw new Error('Invalid mnemonic');

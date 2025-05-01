@@ -3,7 +3,8 @@ import { env } from './env';
 /**
  * Opens the IndexedDB database.
  *
- * @returns {IDBDatabase} The opened IndexedDB database.
+ * @returns {IDBDatabase} The opened IndexedDB database
+ * @throws {Error} If the event target is null
  */
 const openDB = () => {
 	return new Promise((resolve, reject) => {

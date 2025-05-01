@@ -7,5 +7,6 @@ import DOMPurify from 'dompurify';
  * @returns {string} The sanitized message
  */
 export const sanitizeMessage = (message: string): string => {
+	// Sanitize the message using DOMPurify
 	return DOMPurify.sanitize(message);
 };

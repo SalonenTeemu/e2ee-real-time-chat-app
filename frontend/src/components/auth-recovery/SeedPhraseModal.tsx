@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Copy } from 'lucide-react';
 import { useNotification } from '../../context/NotificationContext';
 
@@ -18,8 +18,21 @@ const SeedPhraseModal: React.FC<SeedPhraseModalProps> = ({ seedPhrase, onAcknowl
 	const notificationContext = useNotification();
 	const [copied, setCopied] = useState(false);
 
+	// Prevent the user from accidentally leaving the page with the seed phrase displayed
+	useEffect(() => {
+		const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+			e.preventDefault();
+		};
+
+		window.addEventListener('beforeunload', handleBeforeUnload);
+
+		return () => {
+			window.removeEventListener('beforeunload', handleBeforeUnload);
+		};
+	}, []);
+
 	/**
-	 * Handles the copy button click event.
+	 * Handles the copy button click event by copying the seed phrase to the clipboard and displaying a success message.
 	 */
 	const handleCopy = () => {
 		navigator.clipboard

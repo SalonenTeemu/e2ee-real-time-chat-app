@@ -11,7 +11,6 @@ describe('authService.ts tests', () => {
 	// Clear the refresh token table before each test to ensure a clean state
 	beforeEach(async () => {
 		await db(refreshTokenTableName).truncate();
-		console.log(refreshTokenTableName);
 	});
 
 	it('should create access and refresh tokens', async () => {

@@ -4,7 +4,7 @@ import logger from '../utils/logger';
 import { GUEST } from '../utils/constants';
 
 /**
- * Custom request object to include the user.
+ * Custom request object to include the user object.
  */
 export interface CustomRequest extends Request {
 	user?: any;
@@ -21,6 +21,7 @@ export interface CustomRequest extends Request {
 export const authenticateUserMiddleware = (req: CustomRequest, res: Response, next: NextFunction): void => {
 	try {
 		const accessToken = req.cookies.access_token;
+		// If no access token is found, set the user to null and assign GUEST role
 		if (!accessToken) {
 			req.user = { id: null, role: GUEST };
 			logger.info(`No access token found for IP: ${req.ip}. Assigning GUEST role.`);
@@ -32,11 +33,12 @@ export const authenticateUserMiddleware = (req: CustomRequest, res: Response, ne
 		if (user) {
 			req.user = user;
 		} else {
+			// If the token is invalid, set the user to null and assign GUEST role
 			req.user = { id: null, role: GUEST };
 			logger.info(`Invalid access token for IP: ${req.ip}. Assigning GUEST role.`);
 		}
 	} catch {
-		// If the token is invalid, set the user to null
+		// If the token is invalid or in case of error, set the user to null
 		req.user = { id: null, role: GUEST };
 		logger.warn(`Invalid or expired access token for IP: ${req.ip}. Assigning GUEST role.`);
 	}
@@ -51,6 +53,7 @@ export const authenticateUserMiddleware = (req: CustomRequest, res: Response, ne
  */
 export const authorizeRole = (roles: string[]) => {
 	return (req: CustomRequest, res: Response, next: NextFunction): void => {
+		// If the user is not authenticated or does not have the required role, return 403
 		if (!req.user || !req.user.id || !roles.includes(req.user.role)) {
 			logger.warn(
 				`Unauthorized access attempt by user ${req.user?.id || 'unknown'} from IP: ${req.ip}. Required roles: ${roles.join(', ')}, but found role: ${req.user?.role || 'GUEST'}.`

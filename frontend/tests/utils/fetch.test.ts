@@ -5,7 +5,7 @@ import { fetchWithAuth } from '../../src/utils/fetch';
  * Test suite for the fetchWithAuth function including success and error cases.
  */
 describe('fetch.ts tests', () => {
-	// Mock url
+	// Mock url and functions
 	const url = 'https://localhost:5000/api/';
 	const logoutMock = jest.fn();
 	const notificationMock = jest.fn();

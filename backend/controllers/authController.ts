@@ -26,6 +26,7 @@ export const register = async (req: Request, res: Response) => {
 			res.status(400).json({ message: validation.message });
 			return;
 		}
+		// Check if the user already exists in the database
 		const user = await getUserByUsername(username);
 		if (user) {
 			logger.warn(`Registration failed, username already exists: ${username}`);
@@ -65,6 +66,7 @@ export const login = async (req: Request, res: Response) => {
 			res.status(400).json({ message: validation.message });
 			return;
 		}
+		// Check if the user exists in the database
 		const user = await getUserByUsername(username);
 		if (!user) {
 			logger.warn(`Login failed, username not found: ${username}`);
@@ -78,7 +80,7 @@ export const login = async (req: Request, res: Response) => {
 			res.status(401).json({ message: 'Incorrect password' });
 			return;
 		}
-		// Check if the user has a public key
+		// Check if the user has a public key already
 		const publicKey = await getPublicKeyByUserId(user.id);
 
 		// Create tokens for the user and set them as cookies
@@ -144,6 +146,7 @@ export const getUserProfile = async (req: CustomRequest, res: Response) => {
 			res.status(401).json({ message: 'Unauthorized' });
 			return;
 		}
+		// Get the user from the database
 		const user = await getUserById(reqUser.id);
 		if (!user) {
 			logger.warn(`User profile retrieval failed for user ID: ${reqUser.id}, user not found`);

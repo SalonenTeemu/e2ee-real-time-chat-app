@@ -39,6 +39,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 				return;
 			}
 			const data = await res.json();
+			// If the response is ok and contains a message, set the user otherwise set it to null
 			if (res.ok && data.message) {
 				setUser(data.message);
 			} else {
@@ -79,7 +80,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 	// Refresh the token every 14 minutes
 	useEffect(() => {
 		/**
-		 * Refreshes the access token by sending a POST request to the server.
+		 * Refreshes the access token by sending a request to the server.
 		 */
 		const refreshToken = async () => {
 			if (!user) return;
@@ -90,6 +91,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 					credentials: 'include',
 				});
 
+				// If the response is not ok or error occurs, log out the user
 				if (!res.ok) {
 					logout();
 				}

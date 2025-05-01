@@ -60,7 +60,9 @@ const Chat = () => {
 		scrollToBottom();
 	}, [messages]);
 
-	// Scroll to the bottom of the messages list
+	/**
+	 * Scrolls to the bottom of the messages list.
+	 */
 	const scrollToBottom = () => {
 		if (messagesEndRef.current) {
 			messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
@@ -100,6 +102,7 @@ const Chat = () => {
 	const handleReceiveMessage = async (data: { chatId: string; senderId: string; content: string; createdAt: string }) => {
 		if (!user) return;
 
+		// Fetch the shared key for the chat
 		const sharedKey = await retrieveSharedKey(data.chatId, user.id);
 		if (!sharedKey) return;
 
@@ -145,6 +148,7 @@ const Chat = () => {
 	 * Retrieves the users based on the search term and sets them in the state.
 	 */
 	const searchUsers = async () => {
+		// Sanitize the search term
 		const sanitizedSearchTerm = sanitizeMessage(searchTerm);
 		// Validate the search term
 		if (!sanitizedSearchTerm.trim() || !validateUserSearchTerm(sanitizedSearchTerm)) {
@@ -250,6 +254,7 @@ const Chat = () => {
 
 			const decryptedMessages = [];
 			let errorOccurred = false;
+
 			// Iterate through the messages and decrypt them
 			for (const msg of data.message) {
 				try {
@@ -265,9 +270,7 @@ const Chat = () => {
 			}
 
 			// If some messages could not be decrypted, show a notification
-			if (errorOccurred) {
-				notificationContext.addNotification('info', 'Some messages could not be decrypted and are missing.');
-			}
+			if (errorOccurred) notificationContext.addNotification('info', 'Some messages could not be decrypted and are missing.');
 
 			setMessages(decryptedMessages);
 		} catch (error: any) {
@@ -294,6 +297,7 @@ const Chat = () => {
 		const sanitizedMessage = sanitizeMessage(message);
 		if (message.trim() !== '' && selectedChat && validateMessage(sanitizedMessage)) {
 			try {
+				// Fetch the shared key for the chat
 				const sharedKey = await retrieveSharedKey(selectedChat, user.id);
 				if (!sharedKey) return;
 
@@ -326,6 +330,7 @@ const Chat = () => {
 	 */
 	const retrieveSharedKey = async (chatId: string, userId: string) => {
 		try {
+			// Fetch the shared key for the chat
 			const sharedKey = await getSharedKey(chatId, userId);
 			return sharedKey;
 		} catch (error: any) {

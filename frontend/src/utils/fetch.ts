@@ -31,11 +31,13 @@ export const fetchWithAuth = async (
 				method: 'POST',
 				credentials: 'include',
 			});
+			// If the refresh token request fails, log out the user and show a notification
 			if (!refreshRes.ok) {
 				logout();
 				addNotification('info', 'Session expired. Please log in again.');
 				return null;
 			}
+			// If the refresh token request is successful, try fetching the original URL again
 			return await fetch(url, options);
 		}
 		return res;

@@ -69,7 +69,7 @@ export const useNotification = () => {
 /**
  * The NotificationContainer component displays the notifications.
  *
- * @param notifications The list of notifications to display
+ * @param {Object} notifications The notifications to display
  * @returns {JSX.Element} The notification container component
  */
 function NotificationContainer({ notifications }: { notifications: { id: number; type: 'success' | 'error' | 'info'; message: string }[] }) {
@@ -85,11 +85,13 @@ function NotificationContainer({ notifications }: { notifications: { id: number;
 /**
  * The Notification component displays a single notification.
  *
- * @param param0 The notification properties
+ * @param {Object} props The notification properties
  * @returns {JSX.Element} The notification component
  */
 function Notification({ id, type, message }: { id: number; type: 'success' | 'error' | 'info'; message: string }) {
 	const { removeNotification } = useNotification()!;
+
+	// Define the background color and text color based on the notification type
 	const bgColor = type === 'success' ? 'bg-green-500' : type === 'error' ? 'bg-red-500' : 'bg-blue-400';
 	const textColor = type === 'success' || type === 'info' ? 'text-slate-950' : 'text-slate-50';
 	const buttonHoverTextColor = type === 'success' || type === 'info' ? 'hover:text-slate-50' : 'hover:text-slate-950';

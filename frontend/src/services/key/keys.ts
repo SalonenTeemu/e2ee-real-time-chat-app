@@ -12,6 +12,7 @@ import { saveToDB } from '../../utils/db';
  * @throws {Error} If the password is not provided or encryption fails
  */
 export const encryptAndStorePrivateKey = async (privateKey: Uint8Array, password: string, userId: string) => {
+	// Throw an error if the password is not provided
 	if (!password) {
 		throw new Error('Password is required to encrypt the private key');
 	}
@@ -51,10 +52,12 @@ export const encryptAndStorePrivateKey = async (privateKey: Uint8Array, password
 export const createKeyPair = async (password: string, userId: string, mnemonic: string) => {
 	await sodium.ready;
 
+	// Create a key pair using the mnemonic seed phrase
 	const keys = await mnemonicToPrivateKey(mnemonic, password);
 	const privateKey = keys.privateKey;
 	const publicKey = sodium.to_base64(keys.publicKey);
 
+	// Encrypt and store the private key using the provided password
 	await encryptAndStorePrivateKey(privateKey, password, userId);
 
 	return publicKey;
