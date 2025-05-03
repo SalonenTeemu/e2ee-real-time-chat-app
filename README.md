@@ -5,12 +5,7 @@ This project is a real-time chat application with end-to-end encryption, develop
 - **Backend**: Node.js, Express, Socket.io, and PostgreSQL
 - **Frontend**: React, Socket.io client, and TailwindCSS
 
-It was created as part of the COMP.SEC.300 Secure Programming course exercise work. The project report can be found in the `docs` folder.
-
-## TODO
-
-- Add presentation and report files to the docs folder
-- Update README.md (remove todo)
+It was created as part of the COMP.SEC.300 Secure Programming course exercise work. The project report and presentation can be found in the `docs` folder.
 
 ## Features
 
